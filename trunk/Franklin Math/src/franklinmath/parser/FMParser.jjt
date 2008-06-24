@@ -1,0 +1,151 @@
+options {
+	STATIC = false;
+	NODE_EXTENDS = "MyNode";
+}
+
+PARSER_BEGIN(FMParser)
+
+package franklinmath.parser;
+
+public class FMParser {
+	/*public static void main(String args[]) throws ParseException {
+		FMParser parser = new FMParser(System.in);
+		parser.StmtList();
+	}*/
+}
+
+PARSER_END(FMParser)
+
+SKIP:
+{
+	" "
+	| "\t"
+	| "\f"
+}
+
+TOKEN:
+{
+	< ID: ["a"-"h","j"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* | ["i"] ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
+	| < NUM: (["0"-"9"])+ | ["."] (["0"-"9"])+ | (["0"-"9"])+ ["."] | (["0"-"9"])+ ["."] (["0"-"9"])+ | "i">
+	| < NEWLINE: ["\r", "\n"] | "\r\n">
+        |
+        < STRING_LITERAL:
+            "\""
+            (
+                (~["\"","\\","\n","\r"])
+                |
+                ("\\"
+                    (
+                        ["n","t","b","r","f","\\","'","\""] | ["0"-"7"] ( ["0"-"7"] )? | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+                    )
+                )
+            )*
+            "\""
+        >
+}
+
+SimpleNode Program() :
+{}
+{
+	(<NEWLINE>)*
+	StmtList()
+	{ return jjtThis; }
+}
+
+void StmtList() :
+{}
+{
+	( Stmt() ((<NEWLINE>)+ | <EOF>) )*
+}
+
+//The Expr() = Expr() notation isn't perfect, but makes a LL grammar (no LOOKAHEAD statements needed)
+//Implement checks for assignment later on to disallow certain situations
+void Stmt() :
+{Token t = null;}
+{
+	Expr() [t="=" Expr()]
+	{jjtThis.addToken(t);}
+}
+
+void Expr() :
+{Token t = null;}
+{
+        [t="-"] ExprMain()
+        {jjtThis.addToken(t);}
+}
+
+void ExprMain() :
+{Token t = null;}
+{
+	Term() [(t="+" | t="-") ExprMain()]
+        {jjtThis.addToken(t);}
+}
+
+void Term() :
+{Token t = null;}
+{
+	Power() [[(t="*" | t="/")] Term()]
+        {jjtThis.addToken(t);}
+}
+
+void Power() :
+{}
+{
+	Factor() ["^" Power()]
+}
+
+void Factor() :
+{}
+{
+	"(" Expr() ")" | Identifier() [ "[" EqunList() "]" ] | Number() | EscSeq() | List() | StringLiteral()
+}
+
+void Identifier() :
+{Token t = null;}
+{
+	t = <ID>
+
+	{jjtThis.addToken(t);}
+}
+
+void Number() :
+{Token t = null;}
+{
+	t = <NUM>
+
+	{jjtThis.addToken(t);}
+}
+
+void StringLiteral() :
+{Token t = null;}
+{
+        t = <STRING_LITERAL>
+
+        {jjtThis.addToken(t);}
+}
+
+void EqunList() :
+{}
+{
+	[Equn() ("," Equn())*]
+}
+
+void Equn() :
+{Token t = null;}
+{
+	Expr() [t="==" Expr()]
+	{jjtThis.addToken(t);}
+}
+
+void EscSeq() :
+{}
+{
+	"\\" Identifier()
+}
+
+void List() :
+{Token t = null;}
+{
+	t="{" [Expr() ("," Expr())* ] "}"
+	{jjtThis.addToken(t);}
+}
