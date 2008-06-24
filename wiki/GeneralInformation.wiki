@@ -1,0 +1,17 @@
+#labels Featured
+= Franklin Math Information =
+
+I decided to create Franklin Math in November, 2007.  As a dual major in Computer Science and Applied Mathematics, I have always loved using computers to advance the field of mathematics.  Influenced by the amazing capabilities of commercial CAS programs, I decided to make a math language of my own.  And thus, Franklin Math was born.  
+
+
+= Author Information =
+
+  * Allen Jordan
+  * allen.jordan@gmail.com
+  * Senior at Metropolitan State College of Denver, working on a dual major in Computer Science and Applied Mathematics.  
+  * 4.0 GPA, President's Honor Roll
+  * Currently employed as a technician at the National Oceanic and Atmospheric Administration (about 6 years total).  
+  * Programming skills:  Java, C++, C (AVR embedded), IDL, Ruby on Rails, Perl.  
+  * Electronic skills:  circuit board design in Altium DXP, lots of soldering iron experience, SMT soldering.  
+
+Currently looking for a job after my graduation this December.  
