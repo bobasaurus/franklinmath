@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--<!DOCTYPE function [
+	<!ELEMENT function (name, category*, is_math_function?, description?, example*)>
+	<!ELEMENT name				(#PCDATA)>
+	<!ELEMENT category			(#PCDATA)>
+	<!ELEMENT is_math_function	(#PCDATA)>
+	<!ELEMENT description		(#PCDATA)>
+	<!ELEMENT example (input, result)>
+		<!ELEMENT input			(#PCDATA)>
+		<!ELEMENT result		(#PCDATA)>
+]>-->
+
+<functionlist>
+
+<function>
+	<name>Sin</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Sine trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Sin[2]</input>
+		<result>0.90930</result>
+	</example>
+</function>
+
+<function>
+	<name>Cos</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Cosine trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Cos[2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>Tan</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Tangent trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Tan[2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>ArcSin</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcSine (inverse Sine) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcSin[2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>ArcCos</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcCosine (inverse Cosine) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcCos[2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>ArcTan</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcTangent (inverse Tangent) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcTan[2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>ArcTan2</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcTangent (inverse Tangent) trigonometric function, quadrant corrected.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcTan2[2, 2]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>Pi</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Pi trigonometric constant.  
+	</description>
+	<example>
+		<input>Pi[]</input>
+		<result>3.14159</result>
+	</example>
+</function>
+
+<function>
+	<name>RandomExpression</name>
+	<category>Trigonometry</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Calculates a random expression.  
+	</description>
+	<example>
+		<input>RandomExpression[]</input>
+		<result></result>
+	</example>
+</function>
+
+</functionlist>
