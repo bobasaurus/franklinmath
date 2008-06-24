@@ -6,7 +6,7 @@ I decided to create Franklin Math in November, 2007.  As a dual major in Compute
 
 = Author Information =
 
-  * Allen Jordan
+  * Allen Franklin Jordan
   * allen.jordan@gmail.com
   * Senior at Metropolitan State College of Denver, working on a dual major in Computer Science and Applied Mathematics.  
   * 4.0 GPA, President's Honor Roll
