@@ -24,7 +24,7 @@ public class ExpressionToolsTest {
 
     protected TreeExecutor executor;
     protected MathContext context;
-    protected BigDecimal threshold;
+    protected FMNumber threshold;
     protected Random random;
 
     public ExpressionToolsTest() {
@@ -50,7 +50,7 @@ public class ExpressionToolsTest {
     public void setUp() throws ExecutionException {
         executor = new TreeExecutor();
         context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
-        threshold = new BigDecimal("10E-14");
+        threshold = new FMNumber("10E-14");
         random = new Random();
     }
 
@@ -71,54 +71,54 @@ public class ExpressionToolsTest {
 
         String strInput = String.format("%d + %d", 0, 0);
         Expression resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ZERO, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ZERO, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", 0, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ONE, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ONE, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", 1, 0);
         resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ONE, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ONE, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", -1, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ZERO, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ZERO, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", -2, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(-1), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(-1), resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", 1, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(2), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(2), resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d", -19, 15);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(-4), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(-4), resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d + %d", 1, 2, 3);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(6), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(6), resultExpr.GetSingleNumber());
 
         strInput = String.format("%d + %d + %d", 3, 2, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(6), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(6), resultExpr.GetSingleNumber());
 
         strInput = String.format("%f + %f", 1.1, 1.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new BigDecimal(2.2, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(2.2, context), context).abs().compareTo(threshold) < 0);
 
         strInput = String.format("%f + %f", 1.2, 2.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new BigDecimal(3.3, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(3.3, context), context).abs().compareTo(threshold) < 0);
 
         //now perform input fuzzing
 
         //adding two integers
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = new BigDecimal(random.nextInt());
-            BigDecimal num2 = (new BigDecimal(random.nextInt())).abs();
+            FMNumber num1 = new FMNumber(random.nextInt());
+            FMNumber num2 = (new FMNumber(random.nextInt())).abs();
             strInput = String.format("%d + %d", num1.intValue(), num2.intValue());
             resultExpr = ProcessString(strInput);
             assertEquals(num1.add(num2, context), resultExpr.GetSingleNumber());
@@ -127,10 +127,10 @@ public class ExpressionToolsTest {
         //adding multiple integers
         for (int i = 0; i < 100; i++) {
             int count = random.nextInt(100) + 2;
-            BigDecimal result = BigDecimal.ZERO;
+            FMNumber result = FMNumber.ZERO;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                BigDecimal num = (new BigDecimal(random.nextInt())).abs();
+                FMNumber num = (new FMNumber(random.nextInt())).abs();
                 if ((j == 0) && (random.nextBoolean())) {
                     num = num.negate();
                 }
@@ -146,10 +146,10 @@ public class ExpressionToolsTest {
 
         //adding two doubles
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = new BigDecimal(random.nextDouble());
-            BigDecimal num2 = new BigDecimal(random.nextDouble());
-            num1 = num1.multiply(new BigDecimal(random.nextInt(100)), context);
-            num2 = num2.multiply(new BigDecimal(random.nextInt(100)), context).abs();
+            FMNumber num1 = new FMNumber(random.nextDouble());
+            FMNumber num2 = new FMNumber(random.nextDouble());
+            num1 = num1.multiply(new FMNumber(random.nextInt(100)), context);
+            num2 = num2.multiply(new FMNumber(random.nextInt(100)), context).abs();
             strInput = String.format("%.100f + %.100f", num1, num2);
             resultExpr = ProcessString(strInput);
             assertTrue(resultExpr.GetSingleNumber().subtract(num1.add(num2, context)).abs().compareTo(threshold) < 0);
@@ -158,11 +158,11 @@ public class ExpressionToolsTest {
         //adding multiple doubles
         for (int i = 0; i < 100; i++) {
             int count = random.nextInt(100) + 2;
-            BigDecimal result = BigDecimal.ZERO;
+            FMNumber result = FMNumber.ZERO;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                BigDecimal num = new BigDecimal(random.nextDouble());
-                num = num.multiply(new BigDecimal(random.nextInt(100)), context).abs();
+                FMNumber num = new FMNumber(random.nextDouble());
+                num = num.multiply(new FMNumber(random.nextInt(100)), context).abs();
                 if ((j == 0) && (random.nextBoolean())) {
                     num = num.negate();
                 }
@@ -190,34 +190,34 @@ public class ExpressionToolsTest {
 
         String strInput = String.format("%d - %d", 0, 0);
         Expression resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ZERO, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ZERO, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d - %d", 0, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(-1), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(-1), resultExpr.GetSingleNumber());
 
         strInput = String.format("%d - %d", 1, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ZERO, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ZERO, resultExpr.GetSingleNumber());
 
         strInput = String.format("%d - %d", 2, 1);
         resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ONE, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ONE, resultExpr.GetSingleNumber());
 
         strInput = String.format("%f - %f", 1.1, 1.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(BigDecimal.ZERO, context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().subtract(FMNumber.ZERO, context).abs().compareTo(threshold) < 0);
 
         strInput = String.format("%f - %f", 1.1, 2.2);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new BigDecimal(-1.1, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(-1.1, context), context).abs().compareTo(threshold) < 0);
 
         //now perform input fuzzing
 
         //subtracting two integers
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = new BigDecimal(random.nextInt());
-            BigDecimal num2 = (new BigDecimal(random.nextInt())).abs();
+            FMNumber num1 = new FMNumber(random.nextInt());
+            FMNumber num2 = (new FMNumber(random.nextInt())).abs();
             strInput = String.format("%d - %d", num1.intValue(), num2.intValue());
             resultExpr = ProcessString(strInput);
             assertEquals(num1.subtract(num2, context), resultExpr.GetSingleNumber());
@@ -225,11 +225,11 @@ public class ExpressionToolsTest {
 
         //subtracting multiple integers
         for (int i = 0; i < 100; i++) {
-            BigDecimal result = BigDecimal.ZERO;
+            FMNumber result = FMNumber.ZERO;
             int count = random.nextInt(100) + 2;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                BigDecimal num = (new BigDecimal(random.nextInt())).abs();
+                FMNumber num = (new FMNumber(random.nextInt())).abs();
                 if (j == 0) {
                     result = num;
                 } else {
@@ -244,10 +244,10 @@ public class ExpressionToolsTest {
 
         //subtracting two doubles
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = new BigDecimal(random.nextDouble());
-            BigDecimal num2 = new BigDecimal(random.nextDouble());
-            num1 = num1.multiply(new BigDecimal(random.nextInt(100)), context);
-            num2 = num2.multiply(new BigDecimal(random.nextInt(100)), context).abs();
+            FMNumber num1 = new FMNumber(random.nextDouble());
+            FMNumber num2 = new FMNumber(random.nextDouble());
+            num1 = num1.multiply(new FMNumber(random.nextInt(100)), context);
+            num2 = num2.multiply(new FMNumber(random.nextInt(100)), context).abs();
             strInput = String.format("%.100f - %.100f", num1, num2);
             resultExpr = ProcessString(strInput);
             assertTrue(resultExpr.GetSingleNumber().subtract(num1.subtract(num2, context)).abs().compareTo(threshold) < 0);
@@ -255,11 +255,11 @@ public class ExpressionToolsTest {
 
         //subtracting multiple doubles
         for (int i = 0; i < 100; i++) {
-            BigDecimal result = BigDecimal.ZERO;
+            FMNumber result = FMNumber.ZERO;
             int count = random.nextInt(100) + 2;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                BigDecimal num = (new BigDecimal(random.nextDouble())).multiply(new BigDecimal(random.nextInt(100))).abs();
+                FMNumber num = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100))).abs();
                 if (j == 0) {
                     result = num;
                 } else {
@@ -282,13 +282,13 @@ public class ExpressionToolsTest {
 
         String strInput = String.format("%d * %d", 0, 0);
         Expression resultExpr = ProcessString(strInput);
-        assertEquals(BigDecimal.ZERO, resultExpr.GetSingleNumber());
+        assertEquals(FMNumber.ZERO, resultExpr.GetSingleNumber());
 
         //now perform input fuzzing
 
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = new BigDecimal(random.nextInt());
-            BigDecimal num2 = new BigDecimal(random.nextInt()).abs().add(BigDecimal.ONE);
+            FMNumber num1 = new FMNumber(random.nextInt());
+            FMNumber num2 = new FMNumber(random.nextInt()).abs().add(FMNumber.ONE);
             String mulStr = String.format("%d * %d", num1.intValue(), num2.intValue());
             String divStr = String.format("%d / %d", num1.intValue(), num2.intValue());
 
@@ -300,8 +300,8 @@ public class ExpressionToolsTest {
         }
 
         for (int i = 0; i < 1000; i++) {
-            BigDecimal num1 = (new BigDecimal(random.nextDouble())).multiply(new BigDecimal(random.nextInt(100)));
-            BigDecimal num2 = (new BigDecimal(random.nextDouble())).multiply(new BigDecimal(random.nextInt(100))).abs().add(BigDecimal.ONE);
+            FMNumber num1 = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100)));
+            FMNumber num2 = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100))).abs().add(FMNumber.ONE);
             String mulStr = String.format("%.100f * %.100f", num1, num2);
             String divStr = String.format("%.100f / %.100f", num1, num2);
 
@@ -318,7 +318,7 @@ public class ExpressionToolsTest {
         //test -1+2+3+1-2-4
         String strInput = String.format("%d + %d + %d + %d - %d - %d", -1, 2, 3, 1, 2, 4);
         Expression resultExpr = ProcessString(strInput);
-        assertEquals(new BigDecimal(-1), resultExpr.GetSingleNumber());
+        assertEquals(new FMNumber(-1), resultExpr.GetSingleNumber());
     }
 
     @Test
@@ -371,7 +371,7 @@ public class ExpressionToolsTest {
     public void testSymbolicSubtract() throws Exception {
         String strInput = "x - x";
         Expression resultExpr = ProcessString(strInput);
-        Term expectedTerm = new Term(new Power(new Factor(BigDecimal.ZERO)));
+        Term expectedTerm = new Term(new Power(new Factor(FMNumber.ZERO)));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
 
         strInput = "x - x - x";
@@ -387,7 +387,7 @@ public class ExpressionToolsTest {
         strInput = "x - y - y";
         resultExpr = ProcessString(strInput);
         expectedExpr = new Expression(new Term(new Power(new Factor("x", true))), TermOperator.NONE);
-        expectedTerm = new Term(new Power(new Factor(new BigDecimal(2))));
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(2))));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("y", true)), PowerOperator.MULTIPLY);
         expectedExpr = expectedExpr.AppendTerm(expectedTerm, TermOperator.SUBTRACT);
         assertEquals(expectedExpr, resultExpr);
@@ -404,13 +404,13 @@ public class ExpressionToolsTest {
 
         strInput = "11x - 3x";
         resultExpr = ProcessString(strInput);
-        expectedTerm = new Term(new Power(new Factor(new BigDecimal(8))));
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(8))));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("x", true)), PowerOperator.MULTIPLY);
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
 
         strInput = "3x - 11x";
         resultExpr = ProcessString(strInput);
-        expectedTerm = new Term(new Power(new Factor(new BigDecimal(8))));
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(8))));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("x", true)), PowerOperator.MULTIPLY);
         assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
     }
@@ -427,8 +427,13 @@ public class ExpressionToolsTest {
     public void testNestingRemoval() throws Exception {
         String strInput = "(-1)";
         Expression resultExpr = ProcessString(strInput);
-        Term expectedTerm = new Term(new Power(new Factor(new BigDecimal(-1))));
+        Term expectedTerm = new Term(new Power(new Factor(new FMNumber(-1))));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        strInput = "(1)";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor(FMNumber.ONE)));
+        assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
         
         strInput = "(-x)";
         resultExpr = ProcessString(strInput);
@@ -442,25 +447,25 @@ public class ExpressionToolsTest {
         term = term.AppendPower(new Power(new Factor(12)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(2)), PowerOperator.MULTIPLY);
         Term resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, 0);
-        assertEquals(new BigDecimal(24), resultTerm.GetSingleFactor().GetNumber());
+        assertEquals(new FMNumber(24), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(-52)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(46)), PowerOperator.MULTIPLY);
         resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, 0);
-        assertEquals(new BigDecimal(-2392), resultTerm.GetSingleFactor().GetNumber());
+        assertEquals(new FMNumber(-2392), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(0)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(7)), PowerOperator.MULTIPLY);
         resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, 0);
-        assertEquals(new BigDecimal(0), resultTerm.GetSingleFactor().GetNumber());
+        assertEquals(new FMNumber(0), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(1)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(42)), PowerOperator.MULTIPLY);
         resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, 0);
-        assertEquals(new BigDecimal(42), resultTerm.GetSingleFactor().GetNumber());
+        assertEquals(new FMNumber(42), resultTerm.GetSingleFactor().GetNumber());
 
         int count = 1000;
         for (int i = 0; i < count; i++) {
@@ -472,9 +477,9 @@ public class ExpressionToolsTest {
             term = term.AppendPower(new Power(new Factor(int2)), operator);
             resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
-                assertEquals((new BigDecimal(int1)).divide(new BigDecimal(int2), context), resultTerm.GetSingleFactor().GetNumber());
+                assertEquals((new FMNumber(int1)).divide(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
             } else {
-                assertEquals((new BigDecimal(int1)).multiply(new BigDecimal(int2), context), resultTerm.GetSingleFactor().GetNumber());
+                assertEquals((new FMNumber(int1)).multiply(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
             }
 
             term = new Term();
@@ -485,10 +490,10 @@ public class ExpressionToolsTest {
             term = term.AppendPower(new Power(new Factor(double2)), operator);
             resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
-                BigDecimal expected = (new BigDecimal(double1)).divide(new BigDecimal(double2), context);
+                FMNumber expected = (new FMNumber(double1)).divide(new FMNumber(double2), context);
                 assertTrue(resultTerm.GetSingleFactor().GetNumber().subtract(expected).abs().compareTo(threshold) < 0);
             } else {
-                BigDecimal expected = (new BigDecimal(double1)).multiply(new BigDecimal(double2), context);
+                FMNumber expected = (new FMNumber(double1)).multiply(new FMNumber(double2), context);
                 assertTrue(resultTerm.GetSingleFactor().GetNumber().subtract(expected).abs().compareTo(threshold) < 0);
             }
         }
@@ -513,40 +518,40 @@ public class ExpressionToolsTest {
     @Test
     public void testFlattenPower() throws ExpressionException, ExecutionException {
         Power power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(2)));
-        power = power.AppendFactor(new Factor(new BigDecimal(8)));
+        power = power.AppendFactor(new Factor(new FMNumber(2)));
+        power = power.AppendFactor(new Factor(new FMNumber(8)));
         Power resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(256));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(256));
 
         power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(16)));
-        power = power.AppendFactor(new Factor(new BigDecimal(0.5)));
+        power = power.AppendFactor(new Factor(new FMNumber(16)));
+        power = power.AppendFactor(new Factor(new FMNumber(0.5)));
         resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(4));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(4));
 
         power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(-1)));
-        power = power.AppendFactor(new Factor(new BigDecimal(2)));
+        power = power.AppendFactor(new Factor(new FMNumber(-1)));
+        power = power.AppendFactor(new Factor(new FMNumber(2)));
         resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(1));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(-12)));
-        power = power.AppendFactor(new Factor(new BigDecimal(-1)));
+        power = power.AppendFactor(new Factor(new FMNumber(-12)));
+        power = power.AppendFactor(new Factor(new FMNumber(-1)));
         resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(1.0 / -12));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1.0 / -12));
 
         power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(0)));
-        power = power.AppendFactor(new Factor(new BigDecimal(0)));
+        power = power.AppendFactor(new Factor(new FMNumber(0)));
+        power = power.AppendFactor(new Factor(new FMNumber(0)));
         resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(1));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         power = new Power();
-        power = power.AppendFactor(new Factor(new BigDecimal(12)));
-        power = power.AppendFactor(new Factor(new BigDecimal(0)));
+        power = power.AppendFactor(new Factor(new FMNumber(12)));
+        power = power.AppendFactor(new Factor(new FMNumber(0)));
         resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
-        assertEquals(resultPower.GetSingleFactor().GetNumber(), new BigDecimal(1));
+        assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         int count = 1000;
         for (int i = 0; i < count; i++) {
@@ -554,45 +559,45 @@ public class ExpressionToolsTest {
             int num2 = random.nextInt(100);
 
             power = new Power();
-            power = power.AppendFactor(new Factor(new BigDecimal(num1)));
-            power = power.AppendFactor(new Factor(new BigDecimal(num2)));
+            power = power.AppendFactor(new Factor(new FMNumber(num1)));
+            power = power.AppendFactor(new Factor(new FMNumber(num2)));
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             double expectedResult = StrictMath.pow((double) num1, (double) num2);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new BigDecimal(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
 
             int num3 = random.nextInt(100) + 1;
             double num4 = random.nextDouble() * random.nextInt(100) * ((random.nextBoolean()) ? 1 : -1);
 
             power = new Power();
-            power = power.AppendFactor(new Factor(new BigDecimal(num3)));
-            power = power.AppendFactor(new Factor(new BigDecimal(num4)));
+            power = power.AppendFactor(new Factor(new FMNumber(num3)));
+            power = power.AppendFactor(new Factor(new FMNumber(num4)));
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num3, (double) num4);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new BigDecimal(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
 
             double num5 = (random.nextDouble() * random.nextInt(100) + 0.01) * ((random.nextBoolean()) ? 1 : -1);
             int num6 = random.nextInt(100) * ((random.nextBoolean()) ? 1 : -1);
 
             power = new Power();
-            power = power.AppendFactor(new Factor(new BigDecimal(num5)));
-            power = power.AppendFactor(new Factor(new BigDecimal(num6)));
+            power = power.AppendFactor(new Factor(new FMNumber(num5)));
+            power = power.AppendFactor(new Factor(new FMNumber(num6)));
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num5, (double) num6);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new BigDecimal(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
 
             int num7 = 0;
             int num8 = random.nextInt(1000) + 1;
 
             power = new Power();
-            power = power.AppendFactor(new Factor(new BigDecimal(num7)));
-            power = power.AppendFactor(new Factor(new BigDecimal(num8)));
+            power = power.AppendFactor(new Factor(new FMNumber(num7)));
+            power = power.AppendFactor(new Factor(new FMNumber(num8)));
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num7, (double) num8);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new BigDecimal(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
         }
 
     }
@@ -605,12 +610,12 @@ public class ExpressionToolsTest {
     public void testVariableValueRetainment() throws Exception {
         ProcessString("testvar = 2");
         Expression result = ProcessString("testvar");
-        assertEquals(BuildExpression(new BigDecimal(2)), result);
+        assertEquals(BuildExpression(new FMNumber(2)), result);
         Expression result2 = ProcessString("testvar");
-        assertEquals(BuildExpression(new BigDecimal(2)), result2);
+        assertEquals(BuildExpression(new FMNumber(2)), result2);
     }
 
-    protected Expression BuildExpression(BigDecimal value) throws ExpressionException {
+    protected Expression BuildExpression(FMNumber value) throws ExpressionException {
         return new Expression(new Term(new Power(new Factor(value))), TermOperator.NONE);
     }
 

@@ -95,7 +95,7 @@
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="Franklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  &#xa;&#xa;Technologies Used:&#xa;Java 6, and JavaCC with JJTree"/>
+                <Property name="text" type="java.lang.String" value="Franklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  &#xa;&#xa;Technologies Used:&#xa;Java 6, JavaCC with JJTree, and HotEqn"/>
                 <Property name="wrapStyleWord" type="boolean" value="true"/>
               </Properties>
             </Component>

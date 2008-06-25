@@ -18,7 +18,7 @@ public class PiCommand extends Command {
     @Override public FMResult Execute(Vector<Equation> args) throws CommandException {
         CheckArgsLength(args, 0);
         try {
-            return new FMResult(new Factor(new BigDecimal(StrictMath.PI)));
+            return new FMResult(new Factor(new FMNumber(StrictMath.PI)));
         }
         catch (ExpressionException ex) {
             throw new CommandException(ex.toString(), GetName());

@@ -189,16 +189,16 @@ public class ExpressionTools {
         }
         inExpr = new Expression(termListCopy, operatorListCopy);
 
-        Hashtable<Term, BigDecimal> termTable = new Hashtable<Term, BigDecimal>();
-        BigDecimal numTotal = BigDecimal.ZERO;
+        Hashtable<Term, FMNumber> termTable = new Hashtable<Term, FMNumber>();
+        FMNumber numTotal = FMNumber.ZERO;
         int numTerms = inExpr.NumTerms();
         for (int i = 0; i < numTerms; i++) {
             Term term = inExpr.GetTerm(i);
             TermOperator termOp = inExpr.GetOperator(i);
 
-            BigDecimal currentValue = termTable.get(term);
+            FMNumber currentValue = termTable.get(term);
             if (currentValue == null) {
-                currentValue = BigDecimal.ZERO;
+                currentValue = FMNumber.ZERO;
             }
 
             //now the constant, if any, should be the first element of the term, so collect it.  
@@ -209,10 +209,10 @@ public class ExpressionTools {
                 Factor single = firstPower.GetSingleFactor();
                 //check to see if we've found a number constant
                 if (single.IsNumber()) {
-                    BigDecimal value = single.GetNumber();
+                    FMNumber value = single.GetNumber();
                     if (term.NumPowers() > 1) {
                         if (term.GetOperator(1).compareTo(PowerOperator.DIVIDE) == 0) {
-                            term = new Term(term.GetPowers(), term.GetOperators(), 0, new Power(new Factor(BigDecimal.ONE)), PowerOperator.MULTIPLY, false);
+                            term = new Term(term.GetPowers(), term.GetOperators(), 0, new Power(new Factor(FMNumber.ONE)), PowerOperator.MULTIPLY, false);
                         } else {
                             term = term.RemovePower(0);
                         }
@@ -223,7 +223,7 @@ public class ExpressionTools {
                     //get a new current value since the term changed
                     currentValue = termTable.get(term);
                     if (currentValue == null) {
-                        currentValue = BigDecimal.ZERO;
+                        currentValue = FMNumber.ZERO;
                     }
                     //if the term is not just a single number
                     if (term.NumPowers() > 0) {
@@ -241,7 +241,7 @@ public class ExpressionTools {
                         }
                     }
                 } else {
-                    BigDecimal addValue = BigDecimal.ONE;
+                    FMNumber addValue = FMNumber.ONE;
                     if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
                         addValue = addValue.negate();
                     }
@@ -250,7 +250,7 @@ public class ExpressionTools {
                     termTable.put(term, currentValue);
                 }
             } catch (ExpressionException ex) {
-                BigDecimal addValue = BigDecimal.ONE;
+                FMNumber addValue = FMNumber.ONE;
                 if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
                     addValue = addValue.negate();
                 }
@@ -263,23 +263,23 @@ public class ExpressionTools {
         //transform the term table back into an expression
         Expression resultExpr = new Expression();
         //first insert the constant, if any
-        if (numTotal.compareTo(BigDecimal.ZERO) != 0) {
+        if (numTotal.compareTo(FMNumber.ZERO) != 0) {
             resultExpr = resultExpr.AppendTerm(new Term(new Power(new Factor(numTotal))), TermOperator.NONE);
         }
         //now insert the combined terms
         Enumeration<Term> terms = termTable.keys();
         while (terms.hasMoreElements()) {
             Term term = terms.nextElement();
-            BigDecimal coeff = termTable.get(term);
+            FMNumber coeff = termTable.get(term);
             TermOperator op = TermOperator.ADD;
 
-            if (coeff.compareTo(BigDecimal.ZERO) != 0) {
-                if (coeff.compareTo(BigDecimal.ZERO) < 0) {
+            if (coeff.compareTo(FMNumber.ZERO) != 0) {
+                if (coeff.compareTo(FMNumber.ZERO) < 0) {
                     coeff = coeff.abs();
                     op = TermOperator.SUBTRACT;
                 }
                 Term newTerm = new Term();
-                if (coeff.compareTo(BigDecimal.ONE) != 0) {
+                if (coeff.compareTo(FMNumber.ONE) != 0) {
                     newTerm = newTerm.AppendPower(new Power(new Factor(coeff)), PowerOperator.NONE);
                 }
                 int numExistingTerms = term.NumPowers();
@@ -292,7 +292,7 @@ public class ExpressionTools {
             }
         }
         if (resultExpr.NumTerms() == 0) {
-            resultExpr = resultExpr.AppendTerm(new Term(new Power(new Factor(BigDecimal.ZERO))), TermOperator.NONE);
+            resultExpr = resultExpr.AppendTerm(new Term(new Power(new Factor(FMNumber.ZERO))), TermOperator.NONE);
         }
 
 
@@ -331,7 +331,7 @@ public class ExpressionTools {
                         Term nestedTerm = nestedExpr.GetTerm(0);
                         TermOperator nestedTermOp = nestedExpr.GetOperator(0);
                         if (nestedTermOp == TermOperator.SUBTRACT) {
-                            powerIterator.set(new Power(new Factor(new BigDecimal(-1))));
+                            powerIterator.set(new Power(new Factor(new FMNumber(-1))));
                             powerOpIterator.set(PowerOperator.MULTIPLY);
                         } else {
                             powerIterator.remove();
@@ -388,7 +388,7 @@ public class ExpressionTools {
         }
 
         //split out the constants from the multiplied powers
-        BigDecimal numTotal = BigDecimal.ONE;
+        FMNumber numTotal = FMNumber.ONE;
         Vector<Power> multiplyList = new Vector<Power>();
         Enumeration<Power> multiplyEnumeration = powerMultiplyTable.keys();
         while (multiplyEnumeration.hasMoreElements()) {
@@ -397,7 +397,7 @@ public class ExpressionTools {
             try {
                 Factor single = power.GetSingleFactor();
                 if (single.IsNumber()) {
-                    BigDecimal resultNum = single.GetNumber().pow(powerCount);
+                    FMNumber resultNum = single.GetNumber().pow(powerCount);
                     numTotal = numTotal.multiply(resultNum, context);
                 } else {
                     if (powerCount != 1) {
@@ -422,7 +422,7 @@ public class ExpressionTools {
             try {
                 Factor single = power.GetSingleFactor();
                 if (single.IsNumber()) {
-                    BigDecimal resultNum = single.GetNumber().pow(powerCount);
+                    FMNumber resultNum = single.GetNumber().pow(powerCount);
                     numTotal = numTotal.divide(resultNum, context);
                 } else {
                     if (powerCount != 1) {
@@ -443,12 +443,12 @@ public class ExpressionTools {
         int numMultiplies = multiplyList.size();
         int numDivides = divideList.size();
         //first put in the constant
-        if (numTotal.compareTo(BigDecimal.ZERO) == 0) {
+        if (numTotal.compareTo(FMNumber.ZERO) == 0) {
             resultTerm = resultTerm.AppendPower(new Power(new Factor(numTotal)), PowerOperator.NONE);
             //return a zero value right away
             return resultTerm;
         }
-        if (numTotal.compareTo(BigDecimal.ONE) != 0) {
+        if (numTotal.compareTo(FMNumber.ONE) != 0) {
             resultTerm = resultTerm.AppendPower(new Power(new Factor(numTotal)), PowerOperator.NONE);
         } else if (numMultiplies == 0) {
             resultTerm = resultTerm.AppendPower(new Power(new Factor(numTotal)), PowerOperator.NONE);
@@ -489,9 +489,9 @@ public class ExpressionTools {
             Factor factor = (Factor) powerIterator.previous();
             factor = FlattenFactor(factor, context, lookupTable, userFunctionTable, functionTable, depth);
             if (previousFactor.IsNumber() && factor.IsNumber()) {
-                BigDecimal base = factor.GetNumber();
-                BigDecimal exp = previousFactor.GetNumber();
-                BigDecimal result = new BigDecimal(StrictMath.pow(base.doubleValue(), exp.doubleValue()));
+                FMNumber base = factor.GetNumber();
+                FMNumber exp = previousFactor.GetNumber();
+                FMNumber result = new FMNumber(StrictMath.pow(base.doubleValue(), exp.doubleValue()));
                 factor = new Factor(result);
 
                 powerIterator.remove();
@@ -602,7 +602,7 @@ public class ExpressionTools {
             Factor factor = single.SingleValue();
             if (single.IsSingleNegative()) {
                 if (factor.IsNumber()) {
-                    BigDecimal num = factor.GetNumber();
+                    FMNumber num = factor.GetNumber();
                     return new Factor(num.negate());
                 } else {
                     throw new Exception();

@@ -355,7 +355,7 @@ public class TreeExecutor {
                     //for now, ignore imaginary numbers
                     return new Factor("i", true);
                 } else {
-                    BigDecimal number = new BigDecimal(numberStr);
+                    FMNumber number = new FMNumber(numberStr);
                     return new Factor(number);
                 }
             } catch (NumberFormatException ex) {

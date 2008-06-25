@@ -153,11 +153,11 @@ public class FMProperties {
         return Double.parseDouble(properties.getProperty(name));
     }
 
-    protected static void SetBigDecimal(String name, BigDecimal value) {
+    protected static void SetFMNumber(String name, FMNumber value) {
         properties.setProperty(name, value.toString());
     }
 
-    protected static BigDecimal GetBigDecimal(String name) throws NumberFormatException {
-        return new BigDecimal(properties.getProperty(name));
+    protected static FMNumber GetFMNumber(String name) throws NumberFormatException {
+        return new FMNumber(properties.getProperty(name));
     }
 }

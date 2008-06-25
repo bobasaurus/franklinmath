@@ -22,11 +22,11 @@ public class TanCommand extends Command {
             SingleExpression single = GetSingleArgument(args);
             
             Factor factor = single.SingleValue();
-            BigDecimal number = factor.GetNumber();
-            if (single.IsSingleNegative()) number = number.multiply(new BigDecimal(-1));
+            FMNumber number = factor.GetNumber();
+            if (single.IsSingleNegative()) number = number.multiply(new FMNumber(-1));
             
             double result = StrictMath.tan(number.doubleValue());
-            return new FMResult(new Factor(new BigDecimal(result)));
+            return new FMResult(new Factor(new FMNumber(result)));
         } catch (ExpressionException ex) {
             try {
                 return new FMResult(new Factor(new SymbolicFunction(GetName(), args, isMathFunction)));
