@@ -13,7 +13,7 @@ import franklinmath.util.*;
 public final class Factor implements LatexOutput {
 
     final private FactorType type;
-    final private BigDecimal numValue;
+    final private FMNumber numValue;
     final private String symbolID;
     final private String stringValue;
     final private Expression nestedExpr;
@@ -22,7 +22,7 @@ public final class Factor implements LatexOutput {
 
     public Factor() {
         type = FactorType.NUMBER;
-        numValue = BigDecimal.ZERO;
+        numValue = FMNumber.ZERO;
         symbolID = null;
         stringValue = null;
         nestedExpr = null;
@@ -32,7 +32,7 @@ public final class Factor implements LatexOutput {
 
     public Factor(long number) {
         type = FactorType.NUMBER;
-        numValue = new BigDecimal(number);
+        numValue = new FMNumber(number);
         symbolID = null;
         stringValue = null;
         nestedExpr = null;
@@ -42,7 +42,7 @@ public final class Factor implements LatexOutput {
 
     public Factor(double number) {
         type = FactorType.NUMBER;
-        numValue = new BigDecimal(number);
+        numValue = new FMNumber(number);
         symbolID = null;
         stringValue = null;
         nestedExpr = null;
@@ -50,7 +50,7 @@ public final class Factor implements LatexOutput {
         symbolicFunction = null;
     }
 
-    public Factor(BigDecimal number) {
+    public Factor(FMNumber number) {
         type = FactorType.NUMBER;
         numValue = number;
         symbolID = null;
@@ -71,7 +71,7 @@ public final class Factor implements LatexOutput {
             symbolicFunction = null;
         } else {
             type = FactorType.NUMBER;
-            numValue = new BigDecimal(0);
+            numValue = new FMNumber(0);
             symbolID = null;
             stringValue = null;
             nestedExpr = null;
@@ -162,7 +162,7 @@ public final class Factor implements LatexOutput {
         return (type == FactorType.SYMBOLIC_FUNCTION);
     }
 
-    public BigDecimal GetNumber() throws ExpressionException {
+    public FMNumber GetNumber() throws ExpressionException {
         CheckType(FactorType.NUMBER);
         return numValue;
     }

@@ -34,17 +34,17 @@ public class ArcTan2Command extends Command {
 
             Factor factor1 = single1.SingleValue();
             Factor factor2 = single2.SingleValue();
-            BigDecimal number1 = factor1.GetNumber();
-            BigDecimal number2 = factor2.GetNumber();
+            FMNumber number1 = factor1.GetNumber();
+            FMNumber number2 = factor2.GetNumber();
             if (single1.IsSingleNegative()) {
-                number1 = number1.multiply(new BigDecimal(-1));
+                number1 = number1.multiply(new FMNumber(-1));
             }
             if (single2.IsSingleNegative()) {
-                number2 = number2.multiply(new BigDecimal(-1));
+                number2 = number2.multiply(new FMNumber(-1));
             }
 
             double result = StrictMath.atan2(number1.doubleValue(), number2.doubleValue());
-            return new FMResult(new Factor(new BigDecimal(result)));
+            return new FMResult(new Factor(new FMNumber(result)));
         } catch (ExpressionException ex) {
             try {
                 return new FMResult(new Factor(new SymbolicFunction(GetName(), args, isMathFunction)));

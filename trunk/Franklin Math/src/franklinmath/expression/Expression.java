@@ -171,9 +171,9 @@ public final class Expression implements LatexOutput {
         return (Vector<TermOperator>) operatorList.clone();
     }
 
-    public BigDecimal GetSingleNumber() throws ExpressionException {
+    public FMNumber GetSingleNumber() throws ExpressionException {
         SingleExpression single = GetSingle();
-        BigDecimal number = single.SingleValue().GetNumber();
+        FMNumber number = single.SingleValue().GetNumber();
         if (single.IsSingleNegative()) {
             number = number.negate();
         }

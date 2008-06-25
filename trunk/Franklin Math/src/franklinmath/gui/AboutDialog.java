@@ -47,7 +47,7 @@ public class AboutDialog extends javax.swing.JDialog {
         jTextArea1.setEditable(false);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("Franklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  \n\nTechnologies Used:\nJava 6, and JavaCC with JJTree");
+        jTextArea1.setText("Franklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  \n\nTechnologies Used:\nJava 6, JavaCC with JJTree, and HotEqn");
         jTextArea1.setWrapStyleWord(true);
         jScrollPane1.setViewportView(jTextArea1);
 
