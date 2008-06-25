@@ -1,8 +1,10 @@
 package franklinmath.expression;
 
-import franklinmath.executor.*;
 import java.math.*;
 import java.util.*;
+
+import franklinmath.executor.*;
+import franklinmath.util.*;
 
 /**
  * This class provides a set of tools to help with expressions and equations
@@ -12,6 +14,12 @@ public class ExpressionTools {
 
     protected static int depthLimit = 256;
     protected static int breadthLimit = 32768;
+    
+    //public final static MathContext defaultContext = MathContext.DECIMAL128;
+    
+    public static MathContext GetMathContext() {
+        return new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
+    }
 
     /**
      * Generate a random expression (possibly for use with fuzzing)

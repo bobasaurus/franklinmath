@@ -152,10 +152,12 @@ public final class FMNumber implements Comparable, LatexOutput {
     public FMNumber Negate(MathContext context) {
         return new FMNumber(real.negate(context), imag.negate(context));
     }
-    
+
     public FMNumber Pow(int n, MathContext context) throws ExpressionException {
         //todo: change this to support complex
-        if (IsImaginary()) throw new ExpressionException("Invalid (imaginary) base");
+        if (IsImaginary()) {
+            throw new ExpressionException("Invalid (imaginary) base");
+        }
         return new FMNumber(real.pow(n, context));
     }
 
@@ -290,7 +292,23 @@ public final class FMNumber implements Comparable, LatexOutput {
 
     public int compareTo(Object obj) {
         FMNumber compareNumber = (FMNumber) obj;
-        //kind of a crude comparison
-        return Abs(defaultContext).RealValue().compareTo(compareNumber.Abs(defaultContext).RealValue());
+        if (IsImaginary() || compareNumber.IsImaginary()) {
+            //kind of a crude comparison
+            return Abs(defaultContext).RealValue().compareTo(compareNumber.Abs(defaultContext).RealValue());
+        } else {
+            return real.compareTo(compareNumber.RealValue());
+        }
+    }
+    
+    @Override public boolean equals(Object obj) {
+        FMNumber compareNumber = (FMNumber) obj;
+        if ( (real.compareTo(compareNumber.RealValue()) == 0) && (imag.compareTo(compareNumber.ImaginaryValue()) == 0) ) return true;
+        return false;
+    }
+    
+    @Override public int hashCode() {
+        BigDecimal result = real.multiply(new BigDecimal(7));
+        result = result.add(imag);
+        return result.intValue();
     }
 }

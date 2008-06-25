@@ -26,7 +26,7 @@ public class ArcCosCommand extends Command {
             Factor factor = single.SingleValue();
             FMNumber number = factor.GetNumber();
             if (single.IsSingleNegative()) {
-                number = number.Negate(context);
+                number = number.Negate(ExpressionTools.GetMathContext());
             }
 
             double result = StrictMath.acos(number.doubleValue());
