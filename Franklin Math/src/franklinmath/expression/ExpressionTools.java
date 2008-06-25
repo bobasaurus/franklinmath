@@ -228,33 +228,33 @@ public class ExpressionTools {
                     //if the term is not just a single number
                     if (term.NumPowers() > 0) {
                         if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
-                            currentValue = currentValue.subtract(value, context);
+                            currentValue = currentValue.Subtract(value, context);
                         } else {
-                            currentValue = currentValue.add(value, context);
+                            currentValue = currentValue.Add(value, context);
                         }
                         termTable.put(term, currentValue);
                     } else {
                         if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
-                            numTotal = numTotal.subtract(value, context);
+                            numTotal = numTotal.Subtract(value, context);
                         } else {
-                            numTotal = numTotal.add(value, context);
+                            numTotal = numTotal.Add(value, context);
                         }
                     }
                 } else {
                     FMNumber addValue = FMNumber.ONE;
                     if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
-                        addValue = addValue.negate();
+                        addValue = addValue.Negate(context);
                     }
-                    currentValue = currentValue.add(addValue, context);
+                    currentValue = currentValue.Add(addValue, context);
 
                     termTable.put(term, currentValue);
                 }
             } catch (ExpressionException ex) {
                 FMNumber addValue = FMNumber.ONE;
                 if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
-                    addValue = addValue.negate();
+                    addValue = addValue.Negate(context);
                 }
-                currentValue = currentValue.add(addValue, context);
+                currentValue = currentValue.Add(addValue, context);
 
                 termTable.put(term, currentValue);
             }
@@ -275,7 +275,7 @@ public class ExpressionTools {
 
             if (coeff.compareTo(FMNumber.ZERO) != 0) {
                 if (coeff.compareTo(FMNumber.ZERO) < 0) {
-                    coeff = coeff.abs();
+                    coeff = coeff.Abs(context);
                     op = TermOperator.SUBTRACT;
                 }
                 Term newTerm = new Term();
@@ -397,8 +397,8 @@ public class ExpressionTools {
             try {
                 Factor single = power.GetSingleFactor();
                 if (single.IsNumber()) {
-                    FMNumber resultNum = single.GetNumber().pow(powerCount);
-                    numTotal = numTotal.multiply(resultNum, context);
+                    FMNumber resultNum = single.GetNumber().Pow(powerCount, context);
+                    numTotal = numTotal.Multiply(resultNum, context);
                 } else {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
@@ -422,8 +422,8 @@ public class ExpressionTools {
             try {
                 Factor single = power.GetSingleFactor();
                 if (single.IsNumber()) {
-                    FMNumber resultNum = single.GetNumber().pow(powerCount);
-                    numTotal = numTotal.divide(resultNum, context);
+                    FMNumber resultNum = single.GetNumber().Pow(powerCount, context);
+                    numTotal = numTotal.Divide(resultNum, context);
                 } else {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
@@ -524,7 +524,7 @@ public class ExpressionTools {
                 if (lookupTable.Exists(symbol)) {
                     Expression expr = lookupTable.Get(symbol);
                     expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, depth);
-                    return ExpressionToFactor(expr);
+                    return ExpressionToFactor(expr, context);
                 }
             }
         }//end symbol processing
@@ -564,7 +564,7 @@ public class ExpressionTools {
                     }
                 }
                 if (expr != null) {
-                    return ExpressionToFactor(expr);
+                    return ExpressionToFactor(expr, context);
                 }
 
             } catch (Exception ex) {
@@ -575,7 +575,7 @@ public class ExpressionTools {
             Expression expr = inFactor.GetNestedExpr();
             expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, depth);
 
-            return ExpressionToFactor(expr);
+            return ExpressionToFactor(expr, context);
         }//end nested expression processing
         else if (inFactor.IsExprList()) {
             Vector<Expression> exprList = inFactor.GetExprList();
@@ -594,7 +594,7 @@ public class ExpressionTools {
      * @param expr  The expression (hopefully pre-flattened) needing to be converted into a factor.  
      * @return      The resulting factor created from the given expression.  
      */
-    protected static Factor ExpressionToFactor(Expression expr) {
+    protected static Factor ExpressionToFactor(Expression expr, MathContext context) {
         assert expr != null;
 
         try {
@@ -603,7 +603,7 @@ public class ExpressionTools {
             if (single.IsSingleNegative()) {
                 if (factor.IsNumber()) {
                     FMNumber num = factor.GetNumber();
-                    return new Factor(num.negate());
+                    return new Factor(num.Negate(context));
                 } else {
                     throw new Exception();
                 }

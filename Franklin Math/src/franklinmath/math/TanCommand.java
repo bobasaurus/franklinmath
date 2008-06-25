@@ -23,7 +23,7 @@ public class TanCommand extends Command {
             
             Factor factor = single.SingleValue();
             FMNumber number = factor.GetNumber();
-            if (single.IsSingleNegative()) number = number.multiply(new FMNumber(-1));
+            if (single.IsSingleNegative()) number = number.Negate(context);
             
             double result = StrictMath.tan(number.doubleValue());
             return new FMResult(new Factor(new FMNumber(result)));
