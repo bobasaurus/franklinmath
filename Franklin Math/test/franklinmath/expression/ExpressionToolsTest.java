@@ -366,24 +366,24 @@ public class ExpressionToolsTest {
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("y", true)), PowerOperator.MULTIPLY);
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
     }
-    
+
     @Test
     public void testSymbolicSubtract() throws Exception {
         String strInput = "x - x";
         Expression resultExpr = ProcessString(strInput);
         Term expectedTerm = new Term(new Power(new Factor(BigDecimal.ZERO)));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
-        
+
         strInput = "x - x - x";
         resultExpr = ProcessString(strInput);
         Expression expectedExpr = new Expression(new Term(new Power(new Factor("x", true))), TermOperator.SUBTRACT);
         assertEquals(expectedExpr, resultExpr);
-        
+
         strInput = "x - x - y";
         resultExpr = ProcessString(strInput);
         expectedExpr = new Expression(new Term(new Power(new Factor("y", true))), TermOperator.SUBTRACT);
         assertEquals(expectedExpr, resultExpr);
-        
+
         strInput = "x - y - y";
         resultExpr = ProcessString(strInput);
         expectedExpr = new Expression(new Term(new Power(new Factor("x", true))), TermOperator.NONE);
@@ -391,6 +391,49 @@ public class ExpressionToolsTest {
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("y", true)), PowerOperator.MULTIPLY);
         expectedExpr = expectedExpr.AppendTerm(expectedTerm, TermOperator.SUBTRACT);
         assertEquals(expectedExpr, resultExpr);
+
+        strInput = "3x - 2x";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor("x", true)));
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+
+        strInput = "2x - 3x";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor("x", true)));
+        assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
+
+        strInput = "11x - 3x";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor(new BigDecimal(8))));
+        expectedTerm = expectedTerm.AppendPower(new Power(new Factor("x", true)), PowerOperator.MULTIPLY);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+
+        strInput = "3x - 11x";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor(new BigDecimal(8))));
+        expectedTerm = expectedTerm.AppendPower(new Power(new Factor("x", true)), PowerOperator.MULTIPLY);
+        assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
+    }
+
+    @Test
+    public void testSymbolicMixed() throws Exception {
+        String strInput = "-1*(-x)";
+        Expression resultExpr = ProcessString(strInput);
+        Term expectedTerm = new Term(new Power(new Factor("x", true)));
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+    }
+
+    @Test
+    public void testNestingRemoval() throws Exception {
+        String strInput = "(-1)";
+        Expression resultExpr = ProcessString(strInput);
+        Term expectedTerm = new Term(new Power(new Factor(new BigDecimal(-1))));
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        strInput = "(-x)";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor("x", true)));
+        assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
     }
 
     @Test
