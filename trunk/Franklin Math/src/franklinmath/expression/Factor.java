@@ -209,32 +209,7 @@ public final class Factor implements LatexOutput {
     @Override
     public String toString() {
         if (IsNumber()) {
-            StringBuilder strBuilder = new StringBuilder();
-
-            try {
-                BigInteger integer = numValue.toBigIntegerExact();
-                strBuilder.append(integer.toString());
-            } catch (ArithmeticException arithExc) {
-                try {
-                    java.text.DecimalFormat f = (java.text.DecimalFormat) java.text.DecimalFormat.getNumberInstance();
-                    f.setRoundingMode(FMProperties.GetRoundingMode());
-                    int displayPrecision = FMProperties.GetDisplayPrecision();
-                    f.setMaximumFractionDigits(displayPrecision);
-                    f.setMinimumFractionDigits(displayPrecision);
-                    String numberStr = f.format(numValue);
-
-                    String fractional = numberStr.substring(numberStr.length() - displayPrecision);
-                    if (Double.parseDouble(fractional) == 0) {
-                        strBuilder.append(numValue.toEngineeringString());
-                    } else {
-                        strBuilder.append(numberStr);
-                    }
-                } catch (Exception e) {
-                    strBuilder.append(numValue.toPlainString());
-                }
-            }
-
-            return strBuilder.toString();
+            return numValue.toString();
         }
         if (IsImaginary()) {
             return "i";

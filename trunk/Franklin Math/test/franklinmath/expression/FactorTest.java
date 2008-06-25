@@ -1,6 +1,5 @@
 package franklinmath.expression;
 
-import java.math.FMNumber;
 import java.util.Vector;
 import java.util.Random;
 import org.junit.After;

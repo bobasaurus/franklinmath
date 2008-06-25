@@ -26,7 +26,7 @@ public class ArcTanCommand extends Command {
             Factor factor = single.SingleValue();
             FMNumber number = factor.GetNumber();
             if (single.IsSingleNegative()) {
-                number = number.multiply(new FMNumber(-1));
+                number = number.Negate(context);
             }
 
             double result = StrictMath.atan(number.doubleValue());

@@ -4,6 +4,8 @@ import java.util.Properties;
 import java.io.*;
 import java.math.*;
 
+import franklinmath.expression.*;
+
 /**
  * Class to handle the loading and saving of properties.  Making these methods static is kind of tacky, but it saves lots of reference passing.  
  * @author Allen Jordan

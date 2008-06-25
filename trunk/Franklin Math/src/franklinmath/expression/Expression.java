@@ -175,7 +175,7 @@ public final class Expression implements LatexOutput {
         SingleExpression single = GetSingle();
         FMNumber number = single.SingleValue().GetNumber();
         if (single.IsSingleNegative()) {
-            number = number.negate();
+            number = number.Negate(new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode()));
         }
         return number;
     }

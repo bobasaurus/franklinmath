@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.math.*;
 
 import franklinmath.expression.*;
+import franklinmath.util.*;
 
 /**
  * Abstract base class for all commands, including function calls.  Follows the command design pattern.  
@@ -12,6 +13,9 @@ import franklinmath.expression.*;
 public abstract class Command {
     protected String name;
     protected boolean isMathFunction;
+    
+    //todo:  check to see if this really reloads with setting changes
+    protected final MathContext context = new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
     
     public abstract FMResult Execute(Vector<Equation> args) throws CommandException;
     

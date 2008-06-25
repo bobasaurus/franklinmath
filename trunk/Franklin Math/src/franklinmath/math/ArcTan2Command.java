@@ -37,10 +37,10 @@ public class ArcTan2Command extends Command {
             FMNumber number1 = factor1.GetNumber();
             FMNumber number2 = factor2.GetNumber();
             if (single1.IsSingleNegative()) {
-                number1 = number1.multiply(new FMNumber(-1));
+                number1 = number1.Negate(context);
             }
             if (single2.IsSingleNegative()) {
-                number2 = number2.multiply(new FMNumber(-1));
+                number2 = number2.Negate(context);
             }
 
             double result = StrictMath.atan2(number1.doubleValue(), number2.doubleValue());
