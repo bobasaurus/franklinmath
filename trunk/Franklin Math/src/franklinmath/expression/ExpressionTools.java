@@ -327,10 +327,16 @@ public class ExpressionTools {
                 if (single.IsNestedExpr()) {
                     Expression nestedExpr = single.GetNestedExpr();
                     if (nestedExpr.NumTerms() == 1) {
-                        Term nestedTerm = nestedExpr.GetTerm(0);
                         //nesting is unnecessary, so remove it
-                        powerIterator.remove();
-                        powerOpIterator.remove();
+                        Term nestedTerm = nestedExpr.GetTerm(0);
+                        TermOperator nestedTermOp = nestedExpr.GetOperator(0);
+                        if (nestedTermOp == TermOperator.SUBTRACT) {
+                            powerIterator.set(new Power(new Factor(new BigDecimal(-1))));
+                            powerOpIterator.set(PowerOperator.MULTIPLY);
+                        } else {
+                            powerIterator.remove();
+                            powerOpIterator.remove();
+                        }
                         for (int i = 0; i < nestedTerm.NumPowers(); i++) {
                             Power nestedPower = nestedTerm.GetPower(i);
                             PowerOperator newOp = nestedTerm.GetOperator(i);
