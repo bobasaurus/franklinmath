@@ -14,9 +14,6 @@ public abstract class Command {
     protected String name;
     protected boolean isMathFunction;
     
-    //todo:  check to see if this really reloads with setting changes
-    protected final MathContext context = new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
-    
     public abstract FMResult Execute(Vector<Equation> args) throws CommandException;
     
     public String GetName() {

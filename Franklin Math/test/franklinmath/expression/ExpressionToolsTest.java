@@ -107,21 +107,21 @@ public class ExpressionToolsTest {
 
         strInput = String.format("%f + %f", 1.1, 1.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(2.2, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().Subtract(new FMNumber(2.2), context).Abs(context).compareTo(threshold) < 0);
 
         strInput = String.format("%f + %f", 1.2, 2.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(3.3, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().Subtract(new FMNumber(3.3), context).Abs(context).compareTo(threshold) < 0);
 
         //now perform input fuzzing
 
         //adding two integers
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
-            FMNumber num2 = (new FMNumber(random.nextInt())).abs();
+            FMNumber num2 = (new FMNumber(random.nextInt())).Abs(context);
             strInput = String.format("%d + %d", num1.intValue(), num2.intValue());
             resultExpr = ProcessString(strInput);
-            assertEquals(num1.add(num2, context), resultExpr.GetSingleNumber());
+            assertEquals(num1.Add(num2, context), resultExpr.GetSingleNumber());
         }
 
         //adding multiple integers
@@ -130,11 +130,11 @@ public class ExpressionToolsTest {
             FMNumber result = FMNumber.ZERO;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                FMNumber num = (new FMNumber(random.nextInt())).abs();
+                FMNumber num = (new FMNumber(random.nextInt())).Abs(context);
                 if ((j == 0) && (random.nextBoolean())) {
-                    num = num.negate();
+                    num = num.Negate(context);
                 }
-                result = result.add(num, context);
+                result = result.Add(num, context);
                 if (j != 0) {
                     builder.append("+");
                 }
@@ -148,11 +148,11 @@ public class ExpressionToolsTest {
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextDouble());
             FMNumber num2 = new FMNumber(random.nextDouble());
-            num1 = num1.multiply(new FMNumber(random.nextInt(100)), context);
-            num2 = num2.multiply(new FMNumber(random.nextInt(100)), context).abs();
-            strInput = String.format("%.100f + %.100f", num1, num2);
+            num1 = num1.Multiply(new FMNumber(random.nextInt(100)), context);
+            num2 = num2.Multiply(new FMNumber(random.nextInt(100)), context).Abs(context);
+            strInput = String.format("%.100f + %.100f", num1.BigDecimalValue(), num2.BigDecimalValue());
             resultExpr = ProcessString(strInput);
-            assertTrue(resultExpr.GetSingleNumber().subtract(num1.add(num2, context)).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(num1.Add(num2, context), context).Abs(context).compareTo(threshold) < 0);
         }
 
         //adding multiple doubles
@@ -162,18 +162,18 @@ public class ExpressionToolsTest {
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
                 FMNumber num = new FMNumber(random.nextDouble());
-                num = num.multiply(new FMNumber(random.nextInt(100)), context).abs();
+                num = num.Multiply(new FMNumber(random.nextInt(100)), context).Abs(context);
                 if ((j == 0) && (random.nextBoolean())) {
-                    num = num.negate();
+                    num = num.Negate(context);
                 }
-                result = result.add(num, context);
+                result = result.Add(num, context);
                 if (j != 0) {
                     builder.append("+");
                 }
-                builder.append(String.format("%.100f", num));
+                builder.append(String.format("%.100f", num.BigDecimalValue()));
             }
             resultExpr = ProcessString(builder.toString());
-            assertTrue(resultExpr.GetSingleNumber().subtract(result).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(result, context).Abs(context).compareTo(threshold) < 0);
         }
 
     }
@@ -206,21 +206,21 @@ public class ExpressionToolsTest {
 
         strInput = String.format("%f - %f", 1.1, 1.1);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(FMNumber.ZERO, context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().Subtract(FMNumber.ZERO, context).Abs(context).compareTo(threshold) < 0);
 
         strInput = String.format("%f - %f", 1.1, 2.2);
         resultExpr = ProcessString(strInput);
-        assertTrue(resultExpr.GetSingleNumber().subtract(new FMNumber(-1.1, context), context).abs().compareTo(threshold) < 0);
+        assertTrue(resultExpr.GetSingleNumber().Subtract(new FMNumber(-1.1), context).Abs(context).compareTo(threshold) < 0);
 
         //now perform input fuzzing
 
         //subtracting two integers
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
-            FMNumber num2 = (new FMNumber(random.nextInt())).abs();
+            FMNumber num2 = (new FMNumber(random.nextInt())).Abs(context);
             strInput = String.format("%d - %d", num1.intValue(), num2.intValue());
             resultExpr = ProcessString(strInput);
-            assertEquals(num1.subtract(num2, context), resultExpr.GetSingleNumber());
+            assertEquals(num1.Subtract(num2, context), resultExpr.GetSingleNumber());
         }
 
         //subtracting multiple integers
@@ -229,11 +229,11 @@ public class ExpressionToolsTest {
             int count = random.nextInt(100) + 2;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                FMNumber num = (new FMNumber(random.nextInt())).abs();
+                FMNumber num = (new FMNumber(random.nextInt())).Abs(context);
                 if (j == 0) {
                     result = num;
                 } else {
-                    result = result.subtract(num, context);
+                    result = result.Subtract(num, context);
                     builder.append("-");
                 }
                 builder.append(num.intValue());
@@ -246,11 +246,11 @@ public class ExpressionToolsTest {
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextDouble());
             FMNumber num2 = new FMNumber(random.nextDouble());
-            num1 = num1.multiply(new FMNumber(random.nextInt(100)), context);
-            num2 = num2.multiply(new FMNumber(random.nextInt(100)), context).abs();
-            strInput = String.format("%.100f - %.100f", num1, num2);
+            num1 = num1.Multiply(new FMNumber(random.nextInt(100)), context);
+            num2 = num2.Multiply(new FMNumber(random.nextInt(100)), context).Abs(context);
+            strInput = String.format("%.100f - %.100f", num1.BigDecimalValue(), num2.BigDecimalValue());
             resultExpr = ProcessString(strInput);
-            assertTrue(resultExpr.GetSingleNumber().subtract(num1.subtract(num2, context)).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(num1.Subtract(num2, context), context).Abs(context).compareTo(threshold) < 0);
         }
 
         //subtracting multiple doubles
@@ -259,17 +259,17 @@ public class ExpressionToolsTest {
             int count = random.nextInt(100) + 2;
             StringBuilder builder = new StringBuilder();
             for (int j = 0; j < count; j++) {
-                FMNumber num = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100))).abs();
+                FMNumber num = (new FMNumber(random.nextDouble())).Multiply(new FMNumber(random.nextInt(100)), context).Abs(context);
                 if (j == 0) {
                     result = num;
                 } else {
-                    result = result.subtract(num, context);
+                    result = result.Subtract(num, context);
                     builder.append("-");
                 }
-                builder.append(String.format("%.100f", num));
+                builder.append(String.format("%.100f", num.BigDecimalValue()));
             }
             resultExpr = ProcessString(builder.toString());
-            assertTrue(resultExpr.GetSingleNumber().subtract(result).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(result, context).Abs(context).compareTo(threshold) < 0);
         }
 
 
@@ -288,28 +288,28 @@ public class ExpressionToolsTest {
 
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
-            FMNumber num2 = new FMNumber(random.nextInt()).abs().add(FMNumber.ONE);
+            FMNumber num2 = new FMNumber(random.nextInt()).Abs(context).Add(FMNumber.ONE, context);
             String mulStr = String.format("%d * %d", num1.intValue(), num2.intValue());
             String divStr = String.format("%d / %d", num1.intValue(), num2.intValue());
 
             resultExpr = ProcessString(mulStr);
-            assertEquals(resultExpr.GetSingleNumber(), num1.multiply(num2, context));
+            assertEquals(resultExpr.GetSingleNumber(), num1.Multiply(num2, context));
 
             resultExpr = ProcessString(divStr);
-            assertEquals(resultExpr.GetSingleNumber(), num1.divide(num2, context));
+            assertEquals(resultExpr.GetSingleNumber(), num1.Divide(num2, context));
         }
 
         for (int i = 0; i < 1000; i++) {
-            FMNumber num1 = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100)));
-            FMNumber num2 = (new FMNumber(random.nextDouble())).multiply(new FMNumber(random.nextInt(100))).abs().add(FMNumber.ONE);
-            String mulStr = String.format("%.100f * %.100f", num1, num2);
-            String divStr = String.format("%.100f / %.100f", num1, num2);
+            FMNumber num1 = (new FMNumber(random.nextDouble())).Multiply(new FMNumber(random.nextInt(100)), context);
+            FMNumber num2 = (new FMNumber(random.nextDouble())).Multiply(new FMNumber(random.nextInt(100)), context).Abs(context).Add(FMNumber.ONE, context);
+            String mulStr = String.format("%.100f * %.100f", num1.BigDecimalValue(), num2.BigDecimalValue());
+            String divStr = String.format("%.100f / %.100f", num1.BigDecimalValue(), num2.BigDecimalValue());
 
             resultExpr = ProcessString(mulStr);
-            assertTrue(resultExpr.GetSingleNumber().subtract(num1.multiply(num2, context)).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(num1.Multiply(num2, context), context).Abs(context).compareTo(threshold) < 0);
 
             resultExpr = ProcessString(divStr);
-            assertTrue(resultExpr.GetSingleNumber().subtract(num1.divide(num2, context)).abs().compareTo(threshold) < 0);
+            assertTrue(resultExpr.GetSingleNumber().Subtract(num1.Divide(num2, context), context).Abs(context).compareTo(threshold) < 0);
         }
     }
 
@@ -433,7 +433,7 @@ public class ExpressionToolsTest {
         strInput = "(1)";
         resultExpr = ProcessString(strInput);
         expectedTerm = new Term(new Power(new Factor(FMNumber.ONE)));
-        assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
         
         strInput = "(-x)";
         resultExpr = ProcessString(strInput);
@@ -477,9 +477,9 @@ public class ExpressionToolsTest {
             term = term.AppendPower(new Power(new Factor(int2)), operator);
             resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
-                assertEquals((new FMNumber(int1)).divide(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
+                assertEquals((new FMNumber(int1)).Divide(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
             } else {
-                assertEquals((new FMNumber(int1)).multiply(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
+                assertEquals((new FMNumber(int1)).Multiply(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
             }
 
             term = new Term();
@@ -490,11 +490,11 @@ public class ExpressionToolsTest {
             term = term.AppendPower(new Power(new Factor(double2)), operator);
             resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
-                FMNumber expected = (new FMNumber(double1)).divide(new FMNumber(double2), context);
-                assertTrue(resultTerm.GetSingleFactor().GetNumber().subtract(expected).abs().compareTo(threshold) < 0);
+                FMNumber expected = (new FMNumber(double1)).Divide(new FMNumber(double2), context);
+                assertTrue(resultTerm.GetSingleFactor().GetNumber().Subtract(expected, context).Abs(context).compareTo(threshold) < 0);
             } else {
-                FMNumber expected = (new FMNumber(double1)).multiply(new FMNumber(double2), context);
-                assertTrue(resultTerm.GetSingleFactor().GetNumber().subtract(expected).abs().compareTo(threshold) < 0);
+                FMNumber expected = (new FMNumber(double1)).Multiply(new FMNumber(double2), context);
+                assertTrue(resultTerm.GetSingleFactor().GetNumber().Subtract(expected, context).Abs(context).compareTo(threshold) < 0);
             }
         }
     }
@@ -564,7 +564,7 @@ public class ExpressionToolsTest {
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             double expectedResult = StrictMath.pow((double) num1, (double) num2);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
 
             int num3 = random.nextInt(100) + 1;
             double num4 = random.nextDouble() * random.nextInt(100) * ((random.nextBoolean()) ? 1 : -1);
@@ -575,7 +575,7 @@ public class ExpressionToolsTest {
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num3, (double) num4);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
 
             double num5 = (random.nextDouble() * random.nextInt(100) + 0.01) * ((random.nextBoolean()) ? 1 : -1);
             int num6 = random.nextInt(100) * ((random.nextBoolean()) ? 1 : -1);
@@ -586,7 +586,7 @@ public class ExpressionToolsTest {
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num5, (double) num6);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
 
             int num7 = 0;
             int num8 = random.nextInt(1000) + 1;
@@ -597,7 +597,7 @@ public class ExpressionToolsTest {
             resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, 0);
             expectedResult = StrictMath.pow((double) num7, (double) num8);
 
-            assertTrue(resultPower.GetSingleFactor().GetNumber().subtract(new FMNumber(expectedResult)).abs().compareTo(threshold) < 0);
+            assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
         }
 
     }
