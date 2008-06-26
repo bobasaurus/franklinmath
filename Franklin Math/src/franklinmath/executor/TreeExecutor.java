@@ -352,8 +352,8 @@ public class TreeExecutor {
             try {
                 String numberStr = tokenList.get(0).toString();
                 if (numberStr.equals("i")) {
-                    //for now, ignore imaginary numbers
-                    return new Factor("i", true);
+                    //complex number
+                    return new Factor(new FMNumber(0, 1));
                 } else {
                     FMNumber number = new FMNumber(numberStr);
                     return new Factor(number);

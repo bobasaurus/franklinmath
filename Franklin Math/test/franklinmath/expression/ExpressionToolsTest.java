@@ -50,7 +50,7 @@ public class ExpressionToolsTest {
     public void setUp() throws ExecutionException {
         executor = new TreeExecutor();
         context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
-        threshold = new FMNumber("10E-14");
+        threshold = new FMNumber("10E-15");
         random = new Random();
     }
 

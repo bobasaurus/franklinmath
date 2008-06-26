@@ -153,6 +153,9 @@ public class MainWindow extends JFrame {
         }
 
         threadRunning.set(false);
+        
+        FMNumber number = new FMNumber(0, 1);
+        System.out.println(number.toString());
     }
     
 /*    protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {

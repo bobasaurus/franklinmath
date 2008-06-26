@@ -251,9 +251,11 @@ public final class FMNumber implements Comparable, LatexOutput {
             }
         }
 
+        StringBuilder resultBuilder = new StringBuilder();
+
         if (IsImaginary()) {
             try {
-                BigInteger imagInteger = real.toBigIntegerExact();
+                BigInteger imagInteger = imag.toBigIntegerExact();
                 imagStrBuilder.append(imagInteger.toString());
             } catch (ArithmeticException arithExc) {
                 try {
@@ -274,20 +276,32 @@ public final class FMNumber implements Comparable, LatexOutput {
                     imagStrBuilder.append(real.toPlainString());
                 }
             }
-        }
 
-        String resultStr;
-        if (IsReal()) {
-            resultStr = realStrBuilder.toString();
-        } else {
-            resultStr = "(" + realStrBuilder.toString() + " ";
-            if (imag.compareTo(BigDecimal.ZERO) > 0) {
-                resultStr += "+ ";
+            boolean realExists = (real.compareTo(BigDecimal.ZERO) != 0);
+
+            if (realExists) {
+                resultBuilder.append('(');
+                resultBuilder.append(realStrBuilder.toString());
+                if (imag.compareTo(BigDecimal.ZERO) > 0) {
+                    resultBuilder.append(" + ");
+                } else {
+                    resultBuilder.append(" ");
+                }
+                if (imag.compareTo(BigDecimal.ONE) != 0) {
+                    resultBuilder.append(imagStrBuilder.toString());
+                }
+                resultBuilder.append("i)");
+            } else {
+                if (imag.compareTo(BigDecimal.ONE) != 0) {
+                    resultBuilder.append(imagStrBuilder.toString());
+                }
+                resultBuilder.append('i');
             }
-            resultStr += ")";
+        } else {
+            resultBuilder.append(realStrBuilder.toString());
         }
 
-        return resultStr;
+        return resultBuilder.toString();
     }
 
     public int compareTo(Object obj) {
@@ -299,14 +313,18 @@ public final class FMNumber implements Comparable, LatexOutput {
             return real.compareTo(compareNumber.RealValue());
         }
     }
-    
-    @Override public boolean equals(Object obj) {
+
+    @Override
+    public boolean equals(Object obj) {
         FMNumber compareNumber = (FMNumber) obj;
-        if ( (real.compareTo(compareNumber.RealValue()) == 0) && (imag.compareTo(compareNumber.ImaginaryValue()) == 0) ) return true;
+        if ((real.compareTo(compareNumber.RealValue()) == 0) && (imag.compareTo(compareNumber.ImaginaryValue()) == 0)) {
+            return true;
+        }
         return false;
     }
-    
-    @Override public int hashCode() {
+
+    @Override
+    public int hashCode() {
         BigDecimal result = real.multiply(new BigDecimal(7));
         result = result.add(imag);
         return result.intValue();
