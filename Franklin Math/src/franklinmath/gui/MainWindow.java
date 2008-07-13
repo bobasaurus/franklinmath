@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
-import java.io.*;
-import java.math.*;
+//import java.io.*;
+//import java.math.*;
 
 import com.Ostermiller.Syntax.*;
-import atp.cHotEqn;
+//import atp.cHotEqn;
 
 import franklinmath.parser.*;
 import franklinmath.executor.*;
@@ -28,7 +28,7 @@ public class MainWindow extends JFrame {
     protected FancyTextPane outputPane;
     private TreeExecutor executor;
     private java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
-    protected cHotEqn hotEqn;
+//    protected cHotEqn hotEqn;
 
     public MainWindow() {
         setTitle("Franklin Math");
@@ -112,9 +112,9 @@ public class MainWindow extends JFrame {
                 Evaluate();
             }
         });
-        
+
         //create the latex equation renderer
-        hotEqn = new atp.cHotEqn();
+//        hotEqn = new atp.cHotEqn();
 
         GridBagLayout gbLayout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -132,10 +132,10 @@ public class MainWindow extends JFrame {
         gbc.gridy = 2;
         gbLayout.setConstraints(outputScrollPane, gbc);
         add(outputScrollPane);
-        
+
         gbc.gridy = 3;
-        gbLayout.setConstraints(hotEqn, gbc);
-        add(hotEqn);
+//        gbLayout.setConstraints(hotEqn, gbc);
+//        add(hotEqn);
 
         setLayout(gbLayout);
         pack();
@@ -154,11 +154,9 @@ public class MainWindow extends JFrame {
 
         threadRunning.set(false);
         
-        FMNumber number = new FMNumber(0, 1);
-        System.out.println(number.toString());
     }
-    
-/*    protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {
+
+    protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {
         java.io.StringReader strReader = new java.io.StringReader(str);
         java.io.Reader reader = new java.io.BufferedReader(strReader);
         FMParser parser = new FMParser(reader);
@@ -167,7 +165,7 @@ public class MainWindow extends JFrame {
             throw new ExecutionException("Too many results");
         }
         return resultList.get(0).GetExpression();
-    }*/
+    }
 
     private void OpenSettingsDialog() {
         SettingsDialog settings = new SettingsDialog(this, true);
@@ -242,7 +240,7 @@ public class MainWindow extends JFrame {
                     if (result.IsExpression()) {
                         String exprString = result.GetExpression().toString();
                         outputPane.Append(exprString);
-                        hotEqn.setEquation(exprString);
+//                        hotEqn.setEquation(exprString);
                     //DisplayExpression(result.GetExpression());
                     } else if (result.IsEquation()) {
                         String equString = result.GetEquation().toString();
