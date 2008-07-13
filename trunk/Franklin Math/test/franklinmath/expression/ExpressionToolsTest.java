@@ -6,7 +6,7 @@ import franklinmath.util.*;
 
 import java.util.*;
 import java.math.*;
-import java.io.*;
+//import java.io.*;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -416,11 +416,33 @@ public class ExpressionToolsTest {
     }
 
     @Test
+    public void testSymbolicPowerArithmatic() throws Exception {
+        Expression resultExpr = ProcessString("x*x^2");
+        Power expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(3)));
+        assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
+    }
+    
+    @Test public void testSymbolicCancel() throws Exception {
+        Expression resultExpr = ProcessString("x/x");
+        Term expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+    }
+
+    @Test
     public void testSymbolicMixed() throws Exception {
         String strInput = "-1*(-x)";
         Expression resultExpr = ProcessString(strInput);
         Term expectedTerm = new Term(new Power(new Factor("x", true)));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+
+        resultExpr = ProcessString("-(-1+x^2-5+3)");
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(3))));
+        Power expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(2)));
+        Expression expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
+        expectedExpr = expectedExpr.AppendTerm(new Term(expectedPower), TermOperator.SUBTRACT);
+        assertEquals(expectedExpr, resultExpr);
     }
 
     @Test
@@ -429,16 +451,24 @@ public class ExpressionToolsTest {
         Expression resultExpr = ProcessString(strInput);
         Term expectedTerm = new Term(new Power(new Factor(new FMNumber(-1))));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
-        
+
         strInput = "(1)";
         resultExpr = ProcessString(strInput);
         expectedTerm = new Term(new Power(new Factor(FMNumber.ONE)));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
-        
+
         strInput = "(-x)";
         resultExpr = ProcessString(strInput);
         expectedTerm = new Term(new Power(new Factor("x", true)));
         assertEquals(new Expression(expectedTerm, TermOperator.SUBTRACT), resultExpr);
+
+        strInput = "(-1+x)";
+        resultExpr = ProcessString(strInput);
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(-1))));
+        Term expectedTerm2 = new Term(new Power(new Factor("x", true)));
+        Expression expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
+        expectedExpr = expectedExpr.AppendTerm(expectedTerm2, TermOperator.ADD);
+        assertEquals(expectedExpr, resultExpr);
     }
 
     @Test
@@ -613,16 +643,123 @@ public class ExpressionToolsTest {
         assertEquals(BuildExpression(new FMNumber(2)), result);
         Expression result2 = ProcessString("testvar");
         assertEquals(BuildExpression(new FMNumber(2)), result2);
+        Expression result3 = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber(2)), result3);
+
+        ProcessString("testvar = 1.1");
+        result = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber("1.1")), result);
+        result2 = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber("1.1")), result2);
+        result3 = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber("1.1")), result3);
+
+        ProcessString("testvar = 0");
+        result = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber(0)), result);
+        result2 = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber(0)), result2);
+        result3 = ProcessString("testvar");
+        assertEquals(BuildExpression(new FMNumber(0)), result3);
     }
 
+    @Test
+    public void testDirectNumberOutput() throws Exception {
+        Expression expr = ProcessString("1.1");
+        assertEquals(expr.GetSingleNumber(), new FMNumber("1.1"));
+
+        expr = ProcessString("-2.3");
+        assertEquals(expr.GetSingleNumber(), new FMNumber("-2.3"));
+
+        expr = ProcessString("0");
+        assertEquals(expr.GetSingleNumber(), new FMNumber("0"));
+
+        expr = ProcessString("1");
+        assertEquals(expr.GetSingleNumber(), new FMNumber("1"));
+
+        expr = ProcessString("-1");
+        assertEquals(expr.GetSingleNumber(), new FMNumber("-1"));
+    }
+    
+    @Test
+    public void testFunctionCalls() throws Exception {
+        Expression resultExpr = ProcessString("Sin[2]");
+        FMNumber resultNumber = resultExpr.GetSingleNumber();
+        FMNumber expectedNumber = new FMNumber("0.90929742682568169539601986591174");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[1.1]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("0.8912073600614353399518025778717");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[-3]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("-0.14112000805986722210074480280811");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Pi[]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("3.14159265358979323846");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Cos[2]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("-0.41614683654714238699756822950076");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+    }
+    
+    @Test public void testFunctionArithmatic() throws Exception {
+        Expression resultExpr = ProcessString("Sin[2] + Cos[2]");
+        FMNumber resultNumber = resultExpr.GetSingleNumber();
+        FMNumber expectedNumber = new FMNumber("0.49315059027853930839845163641098");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[-1] + Cos[-1]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("-0.301168678939757");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[1.1]^2 + Cos[1.1]^2");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = FMNumber.ONE;
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[2]/Cos[2]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("-2.18503986326152");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        assertTrue(resultNumber.Subtract(ProcessString("Tan[2]").GetSingleNumber(), context).compareTo(threshold) < 0);
+    }
+
+    /**
+     * Create an expression from a number.  
+     * @param value     The number to use when building the expression.  
+     * @return          The newly built expression.  
+     * @throws franklinmath.expression.ExpressionException
+     */
     protected Expression BuildExpression(FMNumber value) throws ExpressionException {
         return new Expression(new Term(new Power(new Factor(value))), TermOperator.NONE);
     }
 
+    /**
+     * Create an expression from a Factor.  
+     * @param value     The factor to use when building the expression.  
+     * @return          The newly built expression.  
+     * @throws franklinmath.expression.ExpressionException
+     */
     protected Expression BuildExpression(Factor value) throws ExpressionException {
         return new Expression(new Term(new Power(value)), TermOperator.NONE);
     }
 
+    /**
+     * Process a string input to the Franklin Math parser/executor/flattener system.  
+     * @param str       The input string to process.  
+     * @return          The resulting expression.  
+     * @throws franklinmath.parser.ParseException
+     * @throws franklinmath.executor.ExecutionException
+     * @throws franklinmath.expression.ExpressionException
+     */
     protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {
         java.io.StringReader strReader = new java.io.StringReader(str);
         java.io.Reader reader = new java.io.BufferedReader(strReader);
