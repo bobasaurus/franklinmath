@@ -11,7 +11,7 @@ import franklinmath.expression.*;
  * @author Allen Jordan
  */
 public class FMProperties {
-    protected static String filename = "FMProperties.properties";
+    protected static String filename = "fmproperties.xml";
     protected static Properties properties = new Properties();
     protected static boolean isLoaded = false;
 
@@ -19,7 +19,8 @@ public class FMProperties {
         File file = new File(filename);
         if (file.exists()) {
             FileInputStream stream = new FileInputStream(file);
-            properties.load(stream);
+            
+            properties.loadFromXML(stream);
             stream.close();
             isLoaded = true;
         } else {
@@ -128,7 +129,7 @@ public class FMProperties {
     
     public static synchronized void SaveProperties() throws IOException {
         FileOutputStream stream = new FileOutputStream(filename);
-        properties.store(stream, "Options/Properties for Franklin Math");
+        properties.storeToXML(stream, "Options/Properties for Franklin Math");
     }
 
     protected static void SetString(String name, String str) {
