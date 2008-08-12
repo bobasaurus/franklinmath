@@ -707,6 +707,15 @@ public class ExpressionToolsTest {
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("-0.41614683654714238699756822950076");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        int count = 1000;
+        for (int i=0; i<count; i++) {
+            FMNumber number = new FMNumber(random.nextDouble()*random.nextInt(100));
+            resultExpr = ProcessString(String.format("Sin[%.100f]", number.doubleValue()));
+            resultNumber = resultExpr.GetSingleNumber();
+            expectedNumber = new FMNumber(StrictMath.sin(number.doubleValue()));
+            assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        }
     }
     
     @Test public void testFunctionArithmatic() throws Exception {
@@ -730,6 +739,16 @@ public class ExpressionToolsTest {
         expectedNumber = new FMNumber("-2.18503986326152");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
         assertTrue(resultNumber.Subtract(ProcessString("Tan[2]").GetSingleNumber(), context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("-Sin[Pi[]/4] + Cos[Pi[]/6]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = new FMNumber("0.158918622597891");
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
+        
+        resultExpr = ProcessString("Sin[Pi[]] - Cos[Pi[]]");
+        resultNumber = resultExpr.GetSingleNumber();
+        expectedNumber = FMNumber.ONE;
+        assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
     }
 
     /**
