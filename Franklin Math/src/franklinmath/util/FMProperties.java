@@ -11,29 +11,44 @@ import franklinmath.expression.*;
  * @author Allen Jordan
  */
 public class FMProperties {
+
     protected static String filename = "fmproperties.xml";
     protected static Properties properties = new Properties();
     protected static boolean isLoaded = false;
 
+    //Prevent instantiation
+    protected FMProperties() {
+    }
+
     public static synchronized void LoadProperties() throws IOException {
         File file = new File(filename);
-        if (file.exists()) {
-            FileInputStream stream = new FileInputStream(file);
-            
-            properties.loadFromXML(stream);
-            stream.close();
-            isLoaded = true;
-        } else {
-            throw new IOException("Can't locate the properties file: " + filename);
+        //create the properties file if it doesn't exist
+        if (!file.exists()) {
+            file.createNewFile();
+            LoadDefaults();
+            SaveProperties();
         }
+        FileInputStream stream = new FileInputStream(file);
+        properties.loadFromXML(stream);
+        stream.close();
+        isLoaded = true;
     }
-    
+
+    /**
+     * Check to see if the properties file has been loaded.  
+     * @return  Returns true if the properties file is loaded.  
+     */
     public static synchronized boolean IsLoaded() {
         return isLoaded;
     }
 
+    /**
+     * Load the default property settings.  
+     */
     public static synchronized void LoadDefaults() {
-        SetPrecision(16);
+        SetPrecision(34);
+        SetRoundingMode(java.math.RoundingMode.HALF_EVEN);
+        SetDisplayPrecision(15);
     }
 
     public static synchronized void SetPrecision(int value) {
@@ -126,10 +141,10 @@ public class FMProperties {
 
     ////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
-    
     public static synchronized void SaveProperties() throws IOException {
         FileOutputStream stream = new FileOutputStream(filename);
         properties.storeToXML(stream, "Options/Properties for Franklin Math");
+        stream.close();
     }
 
     protected static void SetString(String name, String str) {
