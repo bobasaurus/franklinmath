@@ -750,6 +750,12 @@ public class ExpressionToolsTest {
         expectedNumber = FMNumber.ONE;
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
     }
+    
+    @Test public void testImaginaryArithmatic() throws Exception {
+        Expression resultExpr = ProcessString("(2+3i)+(4+5i)");
+        FMNumber resultNumber = new FMNumber(6, 8);
+        assertEquals(BuildExpression(resultNumber), resultExpr);
+    }
 
     /**
      * Create an expression from a number.  
