@@ -29,7 +29,6 @@ public class MainWindow extends JFrame {
     private TreeExecutor executor;
     private java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
 //    protected cHotEqn hotEqn;
-
     public MainWindow() {
         setTitle("Franklin Math");
 
@@ -152,10 +151,51 @@ public class MainWindow extends JFrame {
             outputPane.Append(ex.toString());
         }
 
+        //run test cases
+        //boolean testResult = TestCases();
+        //assert (testResult == true);
+
         threadRunning.set(false);
-        
+
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    //Testing Code:
+    protected boolean TestCases() {
+        try {
+            Expression resultExpr = ProcessString("(2+3i)+(4+5i)");
+            Expression expectedExpr = BuildExpression(new FMNumber(6));
+            Term expectedTerm = new Term(new Power(new Factor(8)));
+            expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new FMNumber(0, 1))), PowerOperator.MULTIPLY);
+            expectedExpr = expectedExpr.AppendTerm(expectedTerm, TermOperator.ADD);
+            boolean result = expectedExpr.equals(resultExpr);
+            if (result) {
+                return true;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.toString());
+        }
+
+        return false;
     }
 
+    /**
+     * Create an expression from a number.  
+     * @param value     The number to use when building the expression.  
+     * @return          The newly built expression.  
+     * @throws franklinmath.expression.ExpressionException
+     */
+    protected Expression BuildExpression(FMNumber value) throws ExpressionException {
+        return new Expression(new Term(new Power(new Factor(value))), TermOperator.NONE);
+    }
+
+    /**
+     * Provides the ability to execute a line of the Franklin Math language, if the result is an expression.  
+     * @param str   The FM code line string to be executed
+     * @return      The resulting expression
+     * @throws franklinmath.parser.ParseException
+     * @throws franklinmath.executor.ExecutionException
+     * @throws franklinmath.expression.ExpressionException
+     */
     protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {
         java.io.StringReader strReader = new java.io.StringReader(str);
         java.io.Reader reader = new java.io.BufferedReader(strReader);
@@ -166,7 +206,8 @@ public class MainWindow extends JFrame {
         }
         return resultList.get(0).GetExpression();
     }
-
+    //End testing code
+    ////////////////////////////////////////////////////////////////////////////
     private void OpenSettingsDialog() {
         SettingsDialog settings = new SettingsDialog(this, true);
         settings.setVisible(true);
