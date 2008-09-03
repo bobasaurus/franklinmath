@@ -17,7 +17,7 @@ public final class SymbolicFunction implements LatexOutput {
     public SymbolicFunction() {
         name = "unknown";
         paramList = new Vector<Equation>();
-        isMathFunction = false;
+        isMathFunction = true;
     }
 
     public SymbolicFunction(String nameStr, Vector<Equation> list, boolean isMathFunc) {
