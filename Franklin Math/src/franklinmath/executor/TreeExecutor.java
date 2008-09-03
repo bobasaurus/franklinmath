@@ -341,7 +341,7 @@ public class TreeExecutor {
                 SimpleNode equnListNode = (SimpleNode) node.jjtGetChild(1);
                 CheckValidTree(equnListNode, "EqunList");
                 Vector<Equation> args = ExecuteEqunList(equnListNode);
-                return new Factor(new SymbolicFunction(id, args, false));
+                return new Factor(new SymbolicFunction(id, args, true));
             }
         } //number
         else if (factorChildType.equals("Number")) {
