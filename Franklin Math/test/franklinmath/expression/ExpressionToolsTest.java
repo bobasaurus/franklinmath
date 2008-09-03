@@ -422,8 +422,9 @@ public class ExpressionToolsTest {
         expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(3)));
         assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
     }
-    
-    @Test public void testSymbolicCancel() throws Exception {
+
+    @Test
+    public void testSymbolicCancel() throws Exception {
         Expression resultExpr = ProcessString("x/x");
         Term expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
@@ -680,81 +681,88 @@ public class ExpressionToolsTest {
         expr = ProcessString("-1");
         assertEquals(expr.GetSingleNumber(), new FMNumber("-1"));
     }
-    
+
     @Test
     public void testFunctionCalls() throws Exception {
         Expression resultExpr = ProcessString("Sin[2]");
         FMNumber resultNumber = resultExpr.GetSingleNumber();
         FMNumber expectedNumber = new FMNumber("0.90929742682568169539601986591174");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[1.1]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("0.8912073600614353399518025778717");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[-3]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("-0.14112000805986722210074480280811");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Pi[]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("3.14159265358979323846");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Cos[2]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("-0.41614683654714238699756822950076");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         int count = 1000;
-        for (int i=0; i<count; i++) {
-            FMNumber number = new FMNumber(random.nextDouble()*random.nextInt(100));
+        for (int i = 0; i < count; i++) {
+            FMNumber number = new FMNumber(random.nextDouble() * random.nextInt(100));
             resultExpr = ProcessString(String.format("Sin[%.100f]", number.doubleValue()));
             resultNumber = resultExpr.GetSingleNumber();
             expectedNumber = new FMNumber(StrictMath.sin(number.doubleValue()));
             assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
         }
     }
-    
-    @Test public void testFunctionArithmatic() throws Exception {
+
+    @Test
+    public void testFunctionArithmatic() throws Exception {
         Expression resultExpr = ProcessString("Sin[2] + Cos[2]");
         FMNumber resultNumber = resultExpr.GetSingleNumber();
         FMNumber expectedNumber = new FMNumber("0.49315059027853930839845163641098");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[-1] + Cos[-1]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("-0.301168678939757");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[1.1]^2 + Cos[1.1]^2");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = FMNumber.ONE;
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[2]/Cos[2]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("-2.18503986326152");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
         assertTrue(resultNumber.Subtract(ProcessString("Tan[2]").GetSingleNumber(), context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("-Sin[Pi[]/4] + Cos[Pi[]/6]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = new FMNumber("0.158918622597891");
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
-        
+
         resultExpr = ProcessString("Sin[Pi[]] - Cos[Pi[]]");
         resultNumber = resultExpr.GetSingleNumber();
         expectedNumber = FMNumber.ONE;
         assertTrue(resultNumber.Subtract(expectedNumber, context).compareTo(threshold) < 0);
     }
-    
-    @Test public void testImaginaryArithmatic() throws Exception {
+
+    @Test
+    public void testImaginaryArithmatic() throws Exception {
+        //todo: need to work on expression<->imaginary equality
+
         Expression resultExpr = ProcessString("(2+3i)+(4+5i)");
-        FMNumber resultNumber = new FMNumber(6, 8);
-        assertEquals(BuildExpression(resultNumber), resultExpr);
+        Expression expectedExpr = BuildExpression(new FMNumber(6));
+        Term expectedTerm = new Term(new Power(new Factor(8)));
+        expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new FMNumber(0, 1))), PowerOperator.MULTIPLY);
+        expectedExpr = expectedExpr.AppendTerm(expectedTerm, TermOperator.ADD);
+        assertEquals(expectedExpr, resultExpr);
     }
 
     /**
