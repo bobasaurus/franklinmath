@@ -14,9 +14,7 @@ public class ExpressionTools {
 
     protected static int depthLimit = 256;
     protected static int breadthLimit = 32768;
-    
     //public final static MathContext defaultContext = MathContext.DECIMAL128;
-    
     public static MathContext GetMathContext() {
         return new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
     }
@@ -192,7 +190,6 @@ public class ExpressionTools {
                     }
                 }
             } catch (ExpressionException ex) {
-
             }
         }
         inExpr = new Expression(termListCopy, operatorListCopy);
@@ -436,13 +433,17 @@ public class ExpressionTools {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
                     }
-                    divideList.add(power);
+                    if (!CheckCancel(multiplyList, power)) {
+                        divideList.add(power);
+                    }
                 }
             } catch (ExpressionException ex) {
                 if (powerCount != 1) {
                     power = power.AppendFactor(new Factor(powerCount));
                 }
-                divideList.add(power);
+                if (!CheckCancel(multiplyList, power)) {
+                    divideList.add(power);
+                }
             }
         }
 
@@ -557,7 +558,7 @@ public class ExpressionTools {
                         if (result.IsExpression()) {
                             expr = result.GetExpression();
                         } else {
-                        //todo:  handle other FMResult values
+                            //todo:  handle other FMResult values
                         }
                     }
                 }
@@ -622,5 +623,25 @@ public class ExpressionTools {
         }
 
         return new Factor(expr);
+    }
+
+    /**
+     * Check to see if a dividing Power can cancel anything in the nominator.  
+     * @param mulList       List of powers multiplied in the nominator.  Will be modified if cancellation is possible.  
+     * @param divValue      The dividing value in the denominator.  
+     * @return              If cancellation occurs, returns true (the denominator power should then be removed).  
+     */
+    protected static boolean CheckCancel(Vector<Power> mulList, Power divValue) {
+        boolean isCancelled = false;
+        ListIterator<Power> mulIterator = mulList.listIterator();
+        while (mulIterator.hasNext() && (!isCancelled)) {
+            Power mulPower = mulIterator.next();
+            if (mulPower.equals(divValue)) {
+                mulIterator.remove();
+                isCancelled = true;
+            }
+        }
+
+        return isCancelled;
     }
 }
