@@ -652,6 +652,7 @@ public class ExpressionTools {
             }
             //check for partial cancellation
             else if (mulPower.GetFactor(0).equals(divValue.GetFactor(0))) {
+                //check cancellation when both powers have two factors
                 if ((mulPower.NumFactors() == 2) && (divValue.NumFactors() == 2)) {
                     Factor secondMulFactor = mulPower.GetFactor(1);
                     Factor secondDivFactor = divValue.GetFactor(1);
@@ -673,6 +674,30 @@ public class ExpressionTools {
                         }
                     }
                 }
+                //check cancellation when mul power has 2 factors and div power has 1 factor
+                else if ((mulPower.NumFactors() == 2) && (divValue.NumFactors() == 1)) {
+                    Factor secondMulFactor = mulPower.GetFactor(1);
+                    if (secondMulFactor.IsNumber()) {
+                        FMNumber mulNum = secondMulFactor.GetNumber();
+                        divValue = null;
+                        Power newMulPower = new Power(mulPower.GetFactor(0));
+                        newMulPower = newMulPower.AppendFactor(new Factor(mulNum.Subtract(FMNumber.ONE, context)));
+                        mulIterator.set(newMulPower);
+                        done = true;
+                    }
+                }
+                //check cancellation when mul power has 1 factor and div power has 2 factors
+                else if ((mulPower.NumFactors() == 1) && (divValue.NumFactors() == 2)) {
+                    Factor secondDivFactor = divValue.GetFactor(1);
+                    if (secondDivFactor.IsNumber()) {
+                        FMNumber divNum = secondDivFactor.GetNumber();
+                        mulIterator.remove();
+                        divValue = new Power(divValue.GetFactor(0));
+                        divValue = divValue.AppendFactor(new Factor(divNum.Subtract(FMNumber.ONE, context)));
+                        done = true;
+                    }
+                }
+                
             }
         }
 
