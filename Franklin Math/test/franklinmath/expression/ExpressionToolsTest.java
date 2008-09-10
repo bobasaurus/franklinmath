@@ -428,6 +428,11 @@ public class ExpressionToolsTest {
         Expression resultExpr = ProcessString("x/x");
         Term expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("2x*y/(4*x)");
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(.5))));
+        expectedTerm = expectedTerm.AppendPower(new Power(new Factor("y", true)), PowerOperator.MULTIPLY);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
     }
 
     @Test

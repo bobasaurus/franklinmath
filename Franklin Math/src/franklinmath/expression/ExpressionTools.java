@@ -433,6 +433,7 @@ public class ExpressionTools {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
                     }
+                    //first check for any cancellation, then append the power to the divide list
                     if (!CheckCancel(multiplyList, power)) {
                         divideList.add(power);
                     }
@@ -441,6 +442,7 @@ public class ExpressionTools {
                 if (powerCount != 1) {
                     power = power.AppendFactor(new Factor(powerCount));
                 }
+                //first check for any cancellation, then append the power to the divide list
                 if (!CheckCancel(multiplyList, power)) {
                     divideList.add(power);
                 }
