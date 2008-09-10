@@ -434,8 +434,9 @@ public class ExpressionTools {
                         power = power.AppendFactor(new Factor(powerCount));
                     }
                     //first check for any cancellation, then append the power to the divide list
-                    if (!CheckCancel(multiplyList, power)) {
-                        divideList.add(power);
+                    Power newDividePower = CheckCancel(multiplyList, power, context);
+                    if (newDividePower != null) {
+                        divideList.add(newDividePower);
                     }
                 }
             } catch (ExpressionException ex) {
@@ -443,8 +444,9 @@ public class ExpressionTools {
                     power = power.AppendFactor(new Factor(powerCount));
                 }
                 //first check for any cancellation, then append the power to the divide list
-                if (!CheckCancel(multiplyList, power)) {
-                    divideList.add(power);
+                Power newDividePower = CheckCancel(multiplyList, power, context);
+                if (newDividePower != null) {
+                    divideList.add(newDividePower);
                 }
             }
         }
@@ -631,19 +633,49 @@ public class ExpressionTools {
      * Check to see if a dividing Power can cancel anything in the nominator.  
      * @param mulList       List of powers multiplied in the nominator.  Will be modified if cancellation is possible.  
      * @param divValue      The dividing value in the denominator.  
-     * @return              If cancellation occurs, returns true (the denominator power should then be removed).  
+     * @return              Null if total cancellation removed the power, otherwise returns the proper divide power to use.  
      */
-    protected static boolean CheckCancel(Vector<Power> mulList, Power divValue) {
-        boolean isCancelled = false;
+    protected static Power CheckCancel(Vector<Power> mulList, Power divValue, MathContext context) throws ExpressionException {
+        boolean done = false;
         ListIterator<Power> mulIterator = mulList.listIterator();
-        while (mulIterator.hasNext() && (!isCancelled)) {
+        while (mulIterator.hasNext() && (!done)) {
             Power mulPower = mulIterator.next();
+
+            assert mulPower.NumFactors() > 0;
+            assert divValue.NumFactors() > 0;
+
+            //check for total cancellation
             if (mulPower.equals(divValue)) {
                 mulIterator.remove();
-                isCancelled = true;
+                divValue = null;
+                done = true;
+            }
+            //check for partial cancellation
+            else if (mulPower.GetFactor(0).equals(divValue.GetFactor(0))) {
+                if ((mulPower.NumFactors() == 2) && (divValue.NumFactors() == 2)) {
+                    Factor secondMulFactor = mulPower.GetFactor(1);
+                    Factor secondDivFactor = divValue.GetFactor(1);
+                    if (secondMulFactor.IsNumber() && secondDivFactor.IsNumber()) {
+                        FMNumber mulNum = secondMulFactor.GetNumber();
+                        FMNumber divNum = secondDivFactor.GetNumber();
+                        if (mulNum.compareTo(divNum) < 0) {
+                            mulIterator.remove();
+                            divValue = new Power(divValue.GetFactor(0));
+                            divValue = divValue.AppendFactor(new Factor(divNum.Subtract(mulNum, context)));
+                            done = true;
+                        }
+                        else {
+                            divValue = null;
+                            Power newMulPower = new Power(mulPower.GetFactor(0));
+                            newMulPower = newMulPower.AppendFactor(new Factor(mulNum.Subtract(divNum, context)));
+                            mulIterator.set(newMulPower);
+                            done = true;
+                        }
+                    }
+                }
             }
         }
 
-        return isCancelled;
+        return divValue;
     }
 }
