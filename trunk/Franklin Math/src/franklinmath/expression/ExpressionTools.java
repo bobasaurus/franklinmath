@@ -12,7 +12,9 @@ import franklinmath.util.*;
  */
 public class ExpressionTools {
 
+    //limit the problem recursion depth
     protected static int depthLimit = 256;
+    //limit the problem looping breadth
     protected static int breadthLimit = 32768;
     //public final static MathContext defaultContext = MathContext.DECIMAL128;
     public static MathContext GetMathContext() {
@@ -101,10 +103,32 @@ public class ExpressionTools {
         return result;
     }
 
+    /**
+     * Flatten a given equation by performing some arithmetic reduction, both symbolic and numerical.  
+     * @param mainEqu               The equation to flatten.  
+     * @param context               The math context, with rounding mode and precision, for performing numerical operations.  
+     * @param lookupTable           The lookup table for both user-defined and system variables.  
+     * @param userFunctionTable     The function table containing user functions.  
+     * @param functionTable         The function table containing system functions.  
+     * @return                      Returns the flattened equation.  
+     * @throws franklinmath.expression.ExpressionException
+     * @throws franklinmath.executor.ExecutionException
+     */
     public static Equation Flatten(Equation mainEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable) throws ExpressionException, ExecutionException {
         return FlattenEquation(mainEqu, context, lookupTable, userFunctionTable, functionTable, 0);
     }
 
+    /**
+     * Flatten a given expression by performing some arithmetic reduction, both symbolic and numerical.  
+     * @param mainExpr              The expression to flatten.  
+     * @param context               The math context, with rounding mode and precision, for performing numerical operations.  
+     * @param lookupTable           The lookup table for both user-defined and system variables.  
+     * @param userFunctionTable     The function table containing user functions.  
+     * @param functionTable         The function table containing system functions.  
+     * @return                      Returns the flattened expression.  
+     * @throws franklinmath.expression.ExpressionException
+     * @throws franklinmath.executor.ExecutionException
+     */
     public static Expression Flatten(Expression mainExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable) throws ExpressionException, ExecutionException {
         return FlattenExpression(mainExpr, context, lookupTable, userFunctionTable, functionTable, 0);
     }
@@ -194,6 +218,7 @@ public class ExpressionTools {
         }
         inExpr = new Expression(termListCopy, operatorListCopy);
 
+        //combine equal terms using a hash table
         Hashtable<Term, FMNumber> termTable = new Hashtable<Term, FMNumber>();
         FMNumber numTotal = FMNumber.ZERO;
         int numTerms = inExpr.NumTerms();
@@ -498,9 +523,19 @@ public class ExpressionTools {
         Factor previousFactor = (Factor) powerIterator.previous();
         previousFactor = FlattenFactor(previousFactor, context, lookupTable, userFunctionTable, functionTable, depth);
         powerIterator.set(previousFactor);
+        
         while (powerIterator.hasPrevious()) {
             Factor factor = (Factor) powerIterator.previous();
             factor = FlattenFactor(factor, context, lookupTable, userFunctionTable, functionTable, depth);
+            
+            //check for zero powers
+            if (previousFactor.IsNumber()) {
+                FMNumber num = previousFactor.GetNumber();
+                if (num.equals(FMNumber.ZERO)) {
+                    return new Power(new Factor(FMNumber.ONE));
+                }
+            }
+            
             if (previousFactor.IsNumber() && factor.IsNumber()) {
                 FMNumber base = factor.GetNumber();
                 FMNumber exp = previousFactor.GetNumber();
@@ -630,7 +665,7 @@ public class ExpressionTools {
     }
 
     /**
-     * Check to see if a dividing Power can cancel anything in the nominator.  
+     * Check to see if cancellation is possible between a list of nominator powers and a dividing power.  
      * @param mulList       List of powers multiplied in the nominator.  Will be modified if cancellation is possible.  
      * @param divValue      The dividing value in the denominator.  
      * @return              Null if total cancellation removed the power, otherwise returns the proper divide power to use.  
@@ -649,8 +684,7 @@ public class ExpressionTools {
                 mulIterator.remove();
                 divValue = null;
                 done = true;
-            }
-            //check for partial cancellation
+            } //check for partial cancellation
             else if (mulPower.GetFactor(0).equals(divValue.GetFactor(0))) {
                 //check cancellation when both powers have two factors
                 if ((mulPower.NumFactors() == 2) && (divValue.NumFactors() == 2)) {
@@ -664,8 +698,7 @@ public class ExpressionTools {
                             divValue = new Power(divValue.GetFactor(0));
                             divValue = divValue.AppendFactor(new Factor(divNum.Subtract(mulNum, context)));
                             done = true;
-                        }
-                        else {
+                        } else {
                             divValue = null;
                             Power newMulPower = new Power(mulPower.GetFactor(0));
                             newMulPower = newMulPower.AppendFactor(new Factor(mulNum.Subtract(divNum, context)));
@@ -673,8 +706,7 @@ public class ExpressionTools {
                             done = true;
                         }
                     }
-                }
-                //check cancellation when mul power has 2 factors and div power has 1 factor
+                } //check cancellation when mul power has 2 factors and div power has 1 factor
                 else if ((mulPower.NumFactors() == 2) && (divValue.NumFactors() == 1)) {
                     Factor secondMulFactor = mulPower.GetFactor(1);
                     if (secondMulFactor.IsNumber()) {
@@ -685,8 +717,7 @@ public class ExpressionTools {
                         mulIterator.set(newMulPower);
                         done = true;
                     }
-                }
-                //check cancellation when mul power has 1 factor and div power has 2 factors
+                } //check cancellation when mul power has 1 factor and div power has 2 factors
                 else if ((mulPower.NumFactors() == 1) && (divValue.NumFactors() == 2)) {
                     Factor secondDivFactor = divValue.GetFactor(1);
                     if (secondDivFactor.IsNumber()) {
@@ -697,7 +728,7 @@ public class ExpressionTools {
                         done = true;
                     }
                 }
-                
+
             }
         }
 

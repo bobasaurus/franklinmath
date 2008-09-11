@@ -429,10 +429,64 @@ public class ExpressionToolsTest {
         Term expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
         
+        resultExpr = ProcessString("x^3/x^3");
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
         resultExpr = ProcessString("2x*y/(4*x)");
         expectedTerm = new Term(new Power(new Factor(new FMNumber(.5))));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor("y", true)), PowerOperator.MULTIPLY);
         assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^10/x^7");
+        Power expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(3)));
+        assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^10/x");
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(9)));
+        assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^2/x^6");
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(4)));
+        expectedTerm = expectedTerm.AppendPower(expectedPower, PowerOperator.DIVIDE);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x/x^3");
+        expectedTerm = new Term(new Power(new Factor(new FMNumber(1))));
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(2)));
+        expectedTerm = expectedTerm.AppendPower(expectedPower, PowerOperator.DIVIDE);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("y^3*x^2/(y*x^5)");
+        expectedPower = new Power(new Factor("y", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(2)));
+        expectedTerm = new Term(expectedPower);
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(3)));
+        expectedTerm = expectedTerm.AppendPower(expectedPower, PowerOperator.DIVIDE);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^(-4)/x^(-7)");
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(3)));
+        assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^(-4)/x^7");
+        expectedTerm = new Term(new Power(new Factor(FMNumber.ONE)));
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(11)));
+        expectedTerm = expectedTerm.AppendPower(expectedPower, PowerOperator.DIVIDE);
+        assertEquals(new Expression(expectedTerm, TermOperator.NONE), resultExpr);
+        
+        resultExpr = ProcessString("x^5/x^(-3)");
+        expectedPower = new Power(new Factor("x", true));
+        expectedPower = expectedPower.AppendFactor(new Factor(new FMNumber(8)));
+        assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
     }
 
     @Test
