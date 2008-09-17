@@ -57,7 +57,7 @@ public class UserFunction extends Command {
         }
 
         try {
-            Expression resultExpr = null;
+            Expression resultExpr = expr;
             for (int i = 0; i < args.size(); i++) {
                 String symbol = symbolArgs.get(i);
                 Equation equ = args.get(i);
@@ -65,7 +65,7 @@ public class UserFunction extends Command {
                     throw new CommandException("Equations are invalid arguments to user functions");
                 }
                 Expression lhsExpr = equ.GetLHS();
-                resultExpr = expr.Replace(symbol, lhsExpr);
+                resultExpr = resultExpr.Replace(symbol, lhsExpr);
             }
 
             return new FMResult(resultExpr);
