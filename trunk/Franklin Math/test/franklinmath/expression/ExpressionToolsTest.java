@@ -824,6 +824,15 @@ public class ExpressionToolsTest {
         assertEquals(expectedExpr, resultExpr);
     }
 
+    @Test
+    public void testUserFunctionArgumentReplacement() throws Exception {
+        Expression resultExpr = ProcessString("f[x, y] = x+y");
+        resultExpr = ProcessString("f[2, q]");
+        Expression expectedExpr = new Expression(new Term(new Power(new Factor(new FMNumber(2)))), TermOperator.NONE);
+        expectedExpr = expectedExpr.AppendTerm(new Term(new Power(new Factor("q", true))), TermOperator.ADD);
+        assertEquals(expectedExpr, resultExpr);
+    }
+    
     /**
      * Create an expression from a number.  
      * @param value     The number to use when building the expression.  
