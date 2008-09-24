@@ -84,7 +84,9 @@ public class MainWindow extends JFrame {
         outDocument = new HighlightedDocument();
         outDocument.setHighlightStyle(HighlightedDocument.JAVA_STYLE);
         inputPane = new FancyTextPane(inDocument);
+        inputPane.setBackground(Color.WHITE);
         outputPane = new FancyTextPane(outDocument);
+        outputPane.setBackground(Color.WHITE);
         JScrollPane inputScrollPane = new JScrollPane(inputPane);
         JScrollPane outputScrollPane = new JScrollPane(outputPane);
 
