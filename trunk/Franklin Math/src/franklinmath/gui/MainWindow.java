@@ -7,14 +7,13 @@ import java.util.Vector;
 //import java.io.*;
 //import java.math.*;
 
-import com.Ostermiller.Syntax.*;
-//import atp.cHotEqn;
-
 import franklinmath.parser.*;
 import franklinmath.executor.*;
 import franklinmath.expression.*;
 import franklinmath.util.*;
 import franklinmath.gui.highlighting.*;
+
+import javax.swing.text.DefaultStyledDocument;
 
 /**
  * The primary gui window of the Franklin Math applicaiton
@@ -22,13 +21,13 @@ import franklinmath.gui.highlighting.*;
  */
 public class MainWindow extends JFrame {
 
-    protected HighlightedDocument inDocument;
-    protected HighlightedDocument outDocument;
+    protected DefaultStyledDocument inDocument;
+    protected DefaultStyledDocument outDocument;
     protected FancyTextPane inputPane;
     protected FancyTextPane outputPane;
     private TreeExecutor executor;
     private java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
-//    protected cHotEqn hotEqn;
+
     public MainWindow() {
         setTitle("Franklin Math");
 
@@ -79,10 +78,8 @@ public class MainWindow extends JFrame {
         //set this frame's menu bar
         setJMenuBar(menuBar);
 
-        inDocument = new HighlightedDocument();
-        inDocument.setHighlightStyle(HighlightedDocument.JAVA_STYLE);
-        outDocument = new HighlightedDocument();
-        outDocument.setHighlightStyle(HighlightedDocument.JAVA_STYLE);
+        inDocument = new DefaultStyledDocument();
+        outDocument = new DefaultStyledDocument();
         inputPane = new FancyTextPane(inDocument);
         inputPane.setBackground(Color.WHITE);
         outputPane = new FancyTextPane(outDocument);
@@ -114,9 +111,6 @@ public class MainWindow extends JFrame {
             }
         });
 
-        //create the latex equation renderer
-//        hotEqn = new atp.cHotEqn();
-
         GridBagLayout gbLayout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -135,8 +129,6 @@ public class MainWindow extends JFrame {
         add(outputScrollPane);
 
         gbc.gridy = 3;
-//        gbLayout.setConstraints(hotEqn, gbc);
-//        add(hotEqn);
 
         setLayout(gbLayout);
         pack();
@@ -289,7 +281,10 @@ public class MainWindow extends JFrame {
                         String equString = result.GetEquation().toString();
                         outputPane.Append(equString);
                     } else if (result.IsString()) {
-                        outputPane.Append(result.GetString());
+                        outputPane.Append("\"" + result.GetString() + "\"");
+                    } else if (result.IsImage()) {
+                        Image img = result.GetImage();
+                        outputPane.Append(img);
                     } else {
                         outputPane.Append("Could not display result");
                     }

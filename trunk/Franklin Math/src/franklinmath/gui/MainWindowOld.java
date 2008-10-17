@@ -14,8 +14,6 @@ import franklinmath.executor.*;
 import franklinmath.expression.*;
 import franklinmath.util.*;
 
-import com.Ostermiller.Syntax.*;
-
 /**
  * The main GUI window for this program.  
  * @author  Allen Jordan

@@ -132,8 +132,10 @@ public class TreeExecutor {
 
         //if the statement is just an expression, finish up here
         if (numChildren == 1) {
-            lhsExpr = ExpressionTools.Flatten(lhsExpr, context, lookupTable, userFunctionTable, functionTable);
-            results.add(new FMResult(lhsExpr));
+            lhsExpr = ExpressionTools.Flatten(lhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
+            if (lhsExpr.NumTerms() > 0) {
+                results.add(new FMResult(lhsExpr));
+            }
         } //else, the statement is an assignment
         else {
             //get the RHS node
@@ -158,7 +160,7 @@ public class TreeExecutor {
                 CheckReserved(symbol);
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
-                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable);
+                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
 
                 lookupTable.Set(symbol, rhsExpr);
                 results.add(new FMResult(rhsExpr));
@@ -168,7 +170,7 @@ public class TreeExecutor {
                 Vector<Equation> params = sf.GetParamList();
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
-                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable);
+                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
 
                 userFunctionTable.Set(sf.GetName(), new UserFunction(rhsExpr, params));
                 results.add(new FMResult(rhsExpr));
@@ -371,7 +373,10 @@ public class TreeExecutor {
             if (tokenList.size() != 1) {
                 throw new ExecutionException("Invalid string");
             }
-            return new Factor(tokenList.get(0).toString(), false);
+            String str = tokenList.get(0).toString();
+            //remove quotation marks
+            str = str.substring(1, str.length() - 1);
+            return new Factor(str, false);
         } //escape sequence
         else if (factorChildType.equals("EscSeq")) {
             //todo: implement escape sequences

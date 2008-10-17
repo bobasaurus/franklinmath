@@ -3,7 +3,6 @@ package franklinmath.gui.highlighting;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import com.Ostermiller.Syntax.*;
 
 /**
  * A handy extension of JTextPane that highlights Franklin Math syntax
@@ -11,12 +10,11 @@ import com.Ostermiller.Syntax.*;
  */
 public class FancyTextPane extends JTextPane {
 
-    protected HighlightedDocument document;
+    protected StyledDocument document;
 
-    public FancyTextPane(HighlightedDocument doc) {
+    public FancyTextPane(StyledDocument doc) {
         super(doc);
         document = doc;
-        doc.setHighlightStyle(HighlightedDocument.JAVA_STYLE);
 
         //try to avoid unwanted beeps (probably does nothing useful)
         document.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
@@ -26,6 +24,16 @@ public class FancyTextPane extends JTextPane {
         try {
             AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
             document.insertString(document.getLength(), value, attribSet);
+        } catch (BadLocationException ex) {
+        }
+    }
+
+    public void Append(Image image) {
+        try {
+            StyledDocument doc = (StyledDocument) this.getDocument();
+            Style style = doc.addStyle("ImageStyle", null);
+            StyleConstants.setIcon(style, new ImageIcon(image));
+            doc.insertString(doc.getLength(), " ", style);
         } catch (BadLocationException ex) {
         }
     }

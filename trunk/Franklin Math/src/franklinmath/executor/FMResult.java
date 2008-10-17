@@ -2,6 +2,7 @@ package franklinmath.executor;
 
 import franklinmath.expression.*;
 import java.awt.Image;
+import java.awt.Canvas;
 
 /**
  *

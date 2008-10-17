@@ -21,8 +21,8 @@ public final class Factor implements LatexOutput {
     final private SymbolicFunction symbolicFunction;
 
     public Factor() {
-        type = FactorType.NUMBER;
-        numValue = FMNumber.ZERO;
+        type = FactorType.EMPTY;
+        numValue = null;
         symbolID = null;
         stringValue = null;
         nestedExpr = null;
@@ -162,6 +162,10 @@ public final class Factor implements LatexOutput {
         return (type == FactorType.SYMBOLIC_FUNCTION);
     }
 
+    public boolean IsEmpty() {
+        return (type == FactorType.EMPTY);
+    }
+
     public FMNumber GetNumber() throws ExpressionException {
         CheckType(FactorType.NUMBER);
         return numValue;
@@ -218,7 +222,7 @@ public final class Factor implements LatexOutput {
             return symbolID;
         }
         if (IsString()) {
-            return stringValue;
+            return "\"" + stringValue + "\"";
         }
         if (IsNestedExpr()) {
             return "(" + nestedExpr.toString() + ")";
