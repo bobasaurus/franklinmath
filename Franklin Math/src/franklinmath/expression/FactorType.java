@@ -11,5 +11,6 @@ public enum FactorType {
     STRING,
     NESTED_EXPR,
     EXPR_LIST,
-    SYMBOLIC_FUNCTION
+    SYMBOLIC_FUNCTION,
+    EMPTY
 }

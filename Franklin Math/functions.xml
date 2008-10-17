@@ -129,4 +129,17 @@
 	</example>
 </function>
 
+<function>
+	<name>DisplayImage</name>
+	<category>Display</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Display the image at the given URL.  
+	</description>
+	<example>
+		<input>DisplayImage["image.jpg"]</input>
+		<result></result>
+	</example>
+</function>
+
 </functionlist>

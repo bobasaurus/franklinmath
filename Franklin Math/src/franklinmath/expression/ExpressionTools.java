@@ -114,8 +114,8 @@ public class ExpressionTools {
      * @throws franklinmath.expression.ExpressionException
      * @throws franklinmath.executor.ExecutionException
      */
-    public static Equation Flatten(Equation mainEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable) throws ExpressionException, ExecutionException {
-        return FlattenEquation(mainEqu, context, lookupTable, userFunctionTable, functionTable, 0);
+    public static Equation Flatten(Equation mainEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList) throws ExpressionException, ExecutionException {
+        return FlattenEquation(mainEqu, context, lookupTable, userFunctionTable, functionTable, resultList, 0);
     }
 
     /**
@@ -129,11 +129,11 @@ public class ExpressionTools {
      * @throws franklinmath.expression.ExpressionException
      * @throws franklinmath.executor.ExecutionException
      */
-    public static Expression Flatten(Expression mainExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable) throws ExpressionException, ExecutionException {
-        return FlattenExpression(mainExpr, context, lookupTable, userFunctionTable, functionTable, 0);
+    public static Expression Flatten(Expression mainExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList) throws ExpressionException, ExecutionException {
+        return FlattenExpression(mainExpr, context, lookupTable, userFunctionTable, functionTable, resultList, 0);
     }
 
-    protected static Equation FlattenEquation(Equation inEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, int depth) throws ExpressionException, ExecutionException {
+    protected static Equation FlattenEquation(Equation inEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
         assert inEqu != null;
         depth++;
         if (depth > depthLimit) {
@@ -146,7 +146,7 @@ public class ExpressionTools {
         if (inEqu.IsExpression()) {
             Expression lhs = inEqu.GetLHS();
             assert lhs != null;
-            Expression exprFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, depth);
+            Expression exprFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             return new Equation(exprFlat, null);
         } else {
             Expression lhs = inEqu.GetLHS();
@@ -154,14 +154,14 @@ public class ExpressionTools {
             assert lhs != null;
             assert rhs != null;
 
-            Expression lhsFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, depth);
-            Expression rhsFlat = FlattenExpression(rhs, context, lookupTable, userFunctionTable, functionTable, depth);
+            Expression lhsFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            Expression rhsFlat = FlattenExpression(rhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
 
             return new Equation(lhsFlat, rhsFlat);
         }
     }
 
-    protected static Expression FlattenExpression(Expression inExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, int depth) throws ExpressionException, ExecutionException {
+    protected static Expression FlattenExpression(Expression inExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
         assert inExpr != null;
         depth++;
         if (depth > depthLimit) {
@@ -178,7 +178,7 @@ public class ExpressionTools {
         ListIterator<TermOperator> termOpIterator = operatorListCopy.listIterator();
         while (termIterator.hasNext()) {
             //retrieve and flatten the next term
-            Term term = FlattenTerm(termIterator.next(), context, lookupTable, userFunctionTable, functionTable, depth);
+            Term term = FlattenTerm(termIterator.next(), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             termIterator.set(term);
             termIterator.previous();
             termIterator.next();
@@ -317,7 +317,7 @@ public class ExpressionTools {
                     newTerm = newTerm.AppendPower(term.GetPower(i), term.GetOperator(i));
                 }
 
-                newTerm = FlattenTerm(newTerm, context, lookupTable, userFunctionTable, functionTable, depth);
+                newTerm = FlattenTerm(newTerm, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
                 resultExpr = resultExpr.AppendTerm(newTerm, op);
             }
         }
@@ -329,7 +329,7 @@ public class ExpressionTools {
         return resultExpr;
     }
 
-    protected static Term FlattenTerm(Term inTerm, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, int depth) throws ExpressionException, ExecutionException {
+    protected static Term FlattenTerm(Term inTerm, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
         assert inTerm != null;
         depth++;
         if (depth > depthLimit) {
@@ -347,7 +347,7 @@ public class ExpressionTools {
         ListIterator powerOpIterator = operatorListCopy.listIterator();
         while (powerIterator.hasNext()) {
             //retrieve and flatten the next power
-            Power power = FlattenPower((Power) powerIterator.next(), context, lookupTable, userFunctionTable, functionTable, depth);
+            Power power = FlattenPower((Power) powerIterator.next(), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             powerIterator.set(power);
             powerIterator.previous();
             powerIterator.next();
@@ -494,20 +494,20 @@ public class ExpressionTools {
         //insert the multiplied powers
         for (int i = 0; i < numMultiplies; i++) {
             Power power = multiplyList.get(i);
-            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, depth);
+            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             resultTerm = resultTerm.AppendPower(power, PowerOperator.MULTIPLY);
         }
         //insert the divided powers
         for (int i = 0; i < numDivides; i++) {
             Power power = divideList.get(i);
-            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, depth);
+            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             resultTerm = resultTerm.AppendPower(power, PowerOperator.DIVIDE);
         }
 
         return resultTerm;
     }
 
-    protected static Power FlattenPower(Power inPower, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, int depth) throws ExpressionException, ExecutionException {
+    protected static Power FlattenPower(Power inPower, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
         assert inPower != null;
         depth++;
         if (depth > depthLimit) {
@@ -521,13 +521,21 @@ public class ExpressionTools {
         Vector<Factor> factorListCopy = inPower.GetFactors();
         ListIterator powerIterator = factorListCopy.listIterator(inPower.NumFactors());
         Factor previousFactor = (Factor) powerIterator.previous();
-        previousFactor = FlattenFactor(previousFactor, context, lookupTable, userFunctionTable, functionTable, depth);
+        previousFactor = FlattenFactor(previousFactor, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+        if (previousFactor == null) {
+            powerIterator.remove();
+            return inPower;
+        }
         powerIterator.set(previousFactor);
-        
+
         while (powerIterator.hasPrevious()) {
             Factor factor = (Factor) powerIterator.previous();
-            factor = FlattenFactor(factor, context, lookupTable, userFunctionTable, functionTable, depth);
-            
+            factor = FlattenFactor(factor, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            if (factor == null) {
+                powerIterator.remove();
+                return inPower;
+            }
+
             //check for zero powers
             if (previousFactor.IsNumber()) {
                 FMNumber num = previousFactor.GetNumber();
@@ -535,7 +543,7 @@ public class ExpressionTools {
                     return new Power(new Factor(FMNumber.ONE));
                 }
             }
-            
+
             if (previousFactor.IsNumber() && factor.IsNumber()) {
                 FMNumber base = factor.GetNumber();
                 FMNumber exp = previousFactor.GetNumber();
@@ -556,7 +564,7 @@ public class ExpressionTools {
         return new Power(factorListCopy);
     }
 
-    protected static Factor FlattenFactor(Factor inFactor, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, int depth) throws ExpressionException, ExecutionException {
+    protected static Factor FlattenFactor(Factor inFactor, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
         assert inFactor != null;
         depth++;
         if (depth > depthLimit) {
@@ -571,7 +579,7 @@ public class ExpressionTools {
                 String symbol = inFactor.GetSymbol();
                 if (lookupTable.Exists(symbol)) {
                     Expression expr = lookupTable.Get(symbol);
-                    expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, depth);
+                    expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
                     return ExpressionToFactor(expr, context);
                 }
             }
@@ -582,7 +590,7 @@ public class ExpressionTools {
             Vector<Equation> sfArgs = sf.GetParamList();
             //flatten each function argument
             for (int i = 0; i < sfArgs.size(); i++) {
-                Equation equFlat = FlattenEquation(sfArgs.get(i), context, lookupTable, userFunctionTable, functionTable, depth);
+                Equation equFlat = FlattenEquation(sfArgs.get(i), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
                 sfArgs.set(i, equFlat);
             }
             sf = new SymbolicFunction(sfName, sfArgs, sf.IsMathFunction());
@@ -596,8 +604,17 @@ public class ExpressionTools {
                         FMResult result = functionCommand.Execute(sfArgs);
                         if (result.IsExpression()) {
                             expr = result.GetExpression();
+                        } else if (result.IsEquation()) {
+                            Equation equ = result.GetEquation();
+                            if (equ.IsExpression()) {
+                                expr = equ.GetLHS();
+                            }
+                        } else if (result.IsString()) {
+                            resultList.add(new FMResult(result.GetString()));
+                        } else if (result.IsImage()) {
+                            resultList.add(new FMResult(result.GetImage()));
                         } else {
-                            //todo:  handle other FMResult values
+                            throw new ExecutionException("Unrecognized function result type");
                         }
                     }
                 }
@@ -608,11 +625,13 @@ public class ExpressionTools {
                             throw new ExecutionException("Invalid user function result for " + sf.GetName());
                         }
                         expr = result.GetExpression();
-                        expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, depth);
+                        expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
                     }
                 }
                 if (expr != null) {
                     return ExpressionToFactor(expr, context);
+                } else {
+                    inFactor = new Factor();
                 }
 
             } catch (Exception ex) {
@@ -621,14 +640,14 @@ public class ExpressionTools {
         }//end symbolic function processing
         else if (inFactor.IsNestedExpr()) {
             Expression expr = inFactor.GetNestedExpr();
-            expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, depth);
+            expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
 
             return ExpressionToFactor(expr, context);
         }//end nested expression processing
         else if (inFactor.IsExprList()) {
             Vector<Expression> exprList = inFactor.GetExprList();
             for (int i = 0; i < exprList.size(); i++) {
-                Expression exprFlat = FlattenExpression(exprList.get(i), context, lookupTable, userFunctionTable, functionTable, depth);
+                Expression exprFlat = FlattenExpression(exprList.get(i), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
                 exprList.set(i, exprFlat);
             }
             return new Factor(exprList);
