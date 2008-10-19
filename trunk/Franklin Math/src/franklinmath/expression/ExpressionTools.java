@@ -610,9 +610,13 @@ public class ExpressionTools {
                                 expr = equ.GetLHS();
                             }
                         } else if (result.IsString()) {
-                            resultList.add(new FMResult(result.GetString()));
+                            if (resultList != null) {
+                                resultList.add(new FMResult(result.GetString()));
+                            }
                         } else if (result.IsImage()) {
-                            resultList.add(new FMResult(result.GetImage()));
+                            if (resultList != null) {
+                                resultList.add(new FMResult(result.GetImage()));
+                            }
                         } else {
                             throw new ExecutionException("Unrecognized function result type");
                         }
