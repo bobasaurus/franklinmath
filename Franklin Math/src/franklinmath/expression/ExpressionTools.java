@@ -17,6 +17,7 @@ public class ExpressionTools {
     //limit the problem looping breadth
     protected static int breadthLimit = 32768;
     //public final static MathContext defaultContext = MathContext.DECIMAL128;
+
     public static MathContext GetMathContext() {
         return new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
     }
@@ -436,8 +437,27 @@ public class ExpressionTools {
                     multiplyList.add(power);
                 }
             } catch (ExpressionException ex) {
-                if (powerCount != 1) {
-                    power = power.AppendFactor(new Factor(powerCount));
+                //deal with cases that have more than one factor in the power
+                if (powerCount > 1) {
+                    Factor rightmostFactor = power.GetFactor(power.NumFactors()-1);
+                    //if we can add powers, do it
+                    if (rightmostFactor.IsNumber()) {
+                        //add together exponents by multiplying the value by the number of equal factors
+                        FMNumber rightmostPowerNum = rightmostFactor.GetNumber();
+                        rightmostPowerNum = rightmostPowerNum.Multiply(new FMNumber(powerCount), context);
+                        //rebuild the power
+                        Power newPower = new Power(power.GetFactor(0));
+                        for (int i=1; i<(power.NumFactors()-1); i++) {
+                            newPower = newPower.AppendFactor(power.GetFactor(1));
+                        }
+                        newPower = newPower.AppendFactor(new Factor(rightmostPowerNum));
+                        power = newPower;
+                    } else {
+                        //wrap nesting parens around the power
+                        power = new Power(new Factor(new Expression(new Term(power), TermOperator.NONE)));
+                        //then exponentiate
+                        power = power.AppendFactor(new Factor(powerCount));
+                    }
                 }
                 multiplyList.add(power);
             }
