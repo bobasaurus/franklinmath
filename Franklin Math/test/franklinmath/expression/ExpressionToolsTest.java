@@ -416,7 +416,7 @@ public class ExpressionToolsTest {
     }
 
     @Test
-    public void testSimplePowerArithmatic() throws Exception {
+    public void testSimpleSymbolicPowerArithmatic() throws Exception {
         Expression resultExpr = ProcessString("x^4*x^4");
         Power expectedPower = new Power(new Factor("x", true));
         expectedPower = expectedPower.AppendFactor(new Factor(8));
