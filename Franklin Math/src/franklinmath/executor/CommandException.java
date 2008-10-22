@@ -1,22 +1,22 @@
 package franklinmath.executor;
 
 /**
- *
+ * An exception related to commands.  
  * @author Allen Jordan
  */
 public class CommandException extends Exception {
     private String msg;
     
     public CommandException() {
-        msg = "Command error";
+        msg = "";
     }
     
     public CommandException(String message) {
-        msg = "Command error: " + message;
+        msg = message;
     }
     
     public CommandException(String message, String functionName) {
-        msg = "Command error in function " + functionName + ": " + message;
+        msg = "Error in function " + functionName + ": " + message;
     }
     
     @Override public String getMessage() {

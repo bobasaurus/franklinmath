@@ -1,17 +1,17 @@
 package franklinmath.expression;
 
 /**
- *
+ * An exception related to expressions.  
  * @author Allen Jordan
  */
 public class ExpressionException extends Exception {
     protected String msg;
     
     public ExpressionException() {
-        msg = "Expression error";
+        msg = "";
     }
     public ExpressionException(String message) {
-        msg = "Expression error: " + message;
+        msg = message;
     }
     
     @Override public String getMessage() {
