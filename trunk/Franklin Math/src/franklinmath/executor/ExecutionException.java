@@ -1,17 +1,17 @@
 package franklinmath.executor;
 
 /**
- *
+ * An exception related to execution.  
  * @author Allen Jordan
  */
 public class ExecutionException extends Exception {
     protected String msg;
     
     public ExecutionException() {
-        msg = "Execution error";
+        msg = "";
     }
     public ExecutionException(String message) {
-        msg = "Execution error: " + message;
+        msg = message;
     }
     
     @Override public String getMessage() {

@@ -80,10 +80,12 @@ public class TreeExecutor {
         }
     }
 
-    protected void CheckReserved(String name) throws ExecutionException {
+    protected boolean IsReserved(String name) {
+        boolean isReserved = false;
         if (functionTable.Exists(name)) {
-            throw new ExecutionException(name + " is a reserved word");
+            isReserved = true;
         }
+        return isReserved;
     }
 
     public synchronized Vector<FMResult> Execute(SimpleNode node) {
@@ -157,7 +159,7 @@ public class TreeExecutor {
             //perform the assignment based on the LHS factor type
             if (lhsFactor.IsSymbol()) {
                 String symbol = lhsFactor.GetSymbol();
-                CheckReserved(symbol);
+                if (IsReserved(symbol)) throw new ExecutionException("The symbol \"" + symbol + "\" is reserved");
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
                 rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
@@ -166,7 +168,7 @@ public class TreeExecutor {
                 results.add(new FMResult(rhsExpr));
             } else if (lhsFactor.IsSymbolicFunction()) {
                 SymbolicFunction sf = lhsFactor.GetSymbolicFunction();
-                CheckReserved(sf.GetName());
+                if (IsReserved(sf.GetName())) throw new ExecutionException("The symbol \"" + sf.GetName() + "\" is reserved");
                 Vector<Equation> params = sf.GetParamList();
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
@@ -336,7 +338,7 @@ public class TreeExecutor {
 
             //symbol
             if (numChildren == 1) {
-                CheckReserved(id);
+                if (IsReserved(id)) throw new ExecutionException("The symbol \"" + id + "\" is reserved");
                 return new Factor(id, true);
             } //function call
             else {
