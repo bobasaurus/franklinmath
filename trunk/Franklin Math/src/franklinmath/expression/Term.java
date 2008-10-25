@@ -145,9 +145,9 @@ public final class Term implements LatexOutput {
         return (Vector<PowerOperator>) operatorList.clone();
     }
 
-    public Factor GetSingleFactor() throws ExpressionException {
+    public Factor GetSingleFactor() {
         if (powerList.size() != 1) {
-            throw new ExpressionException("Not a single value (wrong number of powers)");
+            return null;
         }
         return powerList.get(0).GetSingleFactor();
     }

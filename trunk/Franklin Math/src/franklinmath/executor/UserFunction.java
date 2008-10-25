@@ -36,6 +36,9 @@ public class UserFunction extends Command {
             }
             Expression exp = equ.GetLHS();
             SingleExpression single = exp.GetSingle();
+            if (single == null) {
+                throw new ExpressionException("Invalid symbol for creating user function: " + exp.toString());
+            }
             String symbol = single.SingleValue().GetSymbol();
             if (single.IsSingleNegative()) {
                 throw new ExpressionException("Symbols arguments can't be zero when defining a function");

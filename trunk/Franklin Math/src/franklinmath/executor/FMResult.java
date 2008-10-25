@@ -2,10 +2,9 @@ package franklinmath.executor;
 
 import franklinmath.expression.*;
 import java.awt.Image;
-import java.awt.Canvas;
 
 /**
- *
+ * A class representing a franklin math result to be displayed in the output.  
  * @author Allen Jordan
  */
 public class FMResult {
