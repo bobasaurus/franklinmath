@@ -7,7 +7,7 @@ import franklinmath.executor.*;
 import franklinmath.util.*;
 
 /**
- * This class provides a set of tools to help with expressions and equations
+ * This class provides a set of tools to help with expressions and equations.  
  * @author Allen Jordan
  */
 public class ExpressionTools {
@@ -185,8 +185,8 @@ public class ExpressionTools {
             termIterator.next();
             TermOperator termOp = termOpIterator.next();
 
-            try {
-                Factor single = term.GetSingleFactor();
+            Factor single = term.GetSingleFactor();
+            if (single != null) {
                 //if we have redundant nesting, remove it
                 if (single.IsNestedExpr()) {
                     termIterator.remove();
@@ -214,8 +214,8 @@ public class ExpressionTools {
                         termOpIterator.add(newOp);
                     }
                 }
-            } catch (ExpressionException ex) {
             }
+
         }
         inExpr = new Expression(termListCopy, operatorListCopy);
 
@@ -235,9 +235,9 @@ public class ExpressionTools {
             //now the constant, if any, should be the first element of the term, so collect it.  
             assert term.NumPowers() > 0;
             Power firstPower = term.GetPower(0);
-            try {
-                //try to pull out a single value
-                Factor single = firstPower.GetSingleFactor();
+            //try to pull out a single value
+            Factor single = firstPower.GetSingleFactor();
+            if (single != null) {
                 //check to see if we've found a number constant
                 if (single.IsNumber()) {
                     FMNumber value = single.GetNumber();
@@ -280,7 +280,7 @@ public class ExpressionTools {
 
                     termTable.put(term, currentValue);
                 }
-            } catch (ExpressionException ex) {
+            } else {
                 FMNumber addValue = FMNumber.ONE;
                 if (termOp.compareTo(TermOperator.SUBTRACT) == 0) {
                     addValue = addValue.Negate(context);
@@ -353,8 +353,9 @@ public class ExpressionTools {
             powerIterator.previous();
             powerIterator.next();
             PowerOperator powerOp = (PowerOperator) powerOpIterator.next();
-            try {
-                Factor single = power.GetSingleFactor();
+
+            Factor single = power.GetSingleFactor();
+            if (single != null) {
                 if (single.IsNestedExpr()) {
                     Expression nestedExpr = single.GetNestedExpr();
                     if (nestedExpr.NumTerms() == 1) {
@@ -393,7 +394,6 @@ public class ExpressionTools {
                         }
                     }
                 }
-            } catch (ExpressionException ex) {
             }
         }
         inTerm = new Term(powerListCopy, operatorListCopy);
@@ -425,21 +425,29 @@ public class ExpressionTools {
         while (multiplyEnumeration.hasMoreElements()) {
             Power power = multiplyEnumeration.nextElement();
             int powerCount = powerMultiplyTable.get(power);
-            try {
-                Factor single = power.GetSingleFactor();
+            Factor single = power.GetSingleFactor();
+            if (single != null) {
                 if (single.IsNumber()) {
-                    FMNumber resultNum = single.GetNumber().Pow(powerCount, context);
-                    numTotal = numTotal.Multiply(resultNum, context);
+                    FMNumber singleNumber = single.GetNumber();
+                    if (!singleNumber.IsImaginary()) {
+                        FMNumber resultNum = singleNumber.Pow(powerCount, context);
+                        numTotal = numTotal.Multiply(resultNum, context);
+                    } else {
+                        if (powerCount != 1) {
+                            power = power.AppendFactor(new Factor(powerCount));
+                        }
+                        multiplyList.add(power);
+                    }
                 } else {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
                     }
                     multiplyList.add(power);
                 }
-            } catch (ExpressionException ex) {
+            } else {
                 //deal with cases that have more than one factor in the power
                 if (powerCount > 1) {
-                    Factor rightmostFactor = power.GetFactor(power.NumFactors()-1);
+                    Factor rightmostFactor = power.GetFactor(power.NumFactors() - 1);
                     //if we can add powers, do it
                     if (rightmostFactor.IsNumber()) {
                         //add together exponents by multiplying the value by the number of equal factors
@@ -447,7 +455,7 @@ public class ExpressionTools {
                         rightmostPowerNum = rightmostPowerNum.Multiply(new FMNumber(powerCount), context);
                         //rebuild the power
                         Power newPower = new Power(power.GetFactor(0));
-                        for (int i=1; i<(power.NumFactors()-1); i++) {
+                        for (int i = 1; i < (power.NumFactors() - 1); i++) {
                             newPower = newPower.AppendFactor(power.GetFactor(1));
                         }
                         newPower = newPower.AppendFactor(new Factor(rightmostPowerNum));
@@ -469,11 +477,24 @@ public class ExpressionTools {
         while (divideEnumeration.hasMoreElements()) {
             Power power = divideEnumeration.nextElement();
             int powerCount = powerDivideTable.get(power);
-            try {
-                Factor single = power.GetSingleFactor();
+
+            Factor single = power.GetSingleFactor();
+            if (single != null) {
                 if (single.IsNumber()) {
-                    FMNumber resultNum = single.GetNumber().Pow(powerCount, context);
-                    numTotal = numTotal.Divide(resultNum, context);
+                    FMNumber singleNum = single.GetNumber();
+                    if (!singleNum.IsImaginary()) {
+                        FMNumber resultNum = singleNum.Pow(powerCount, context);
+                        numTotal = numTotal.Divide(resultNum, context);
+                    } else {
+                        if (powerCount != 1) {
+                            power = power.AppendFactor(new Factor(powerCount));
+                        }
+                        //first check for any cancellation, then append the power to the divide list
+                        Power newDividePower = CheckCancel(multiplyList, power, context);
+                        if (newDividePower != null) {
+                            divideList.add(newDividePower);
+                        }
+                    }
                 } else {
                     if (powerCount != 1) {
                         power = power.AppendFactor(new Factor(powerCount));
@@ -484,7 +505,7 @@ public class ExpressionTools {
                         divideList.add(newDividePower);
                     }
                 }
-            } catch (ExpressionException ex) {
+            } else {
                 if (powerCount != 1) {
                     power = power.AppendFactor(new Factor(powerCount));
                 }
@@ -685,23 +706,22 @@ public class ExpressionTools {
      * @param expr  The expression (hopefully pre-flattened) needing to be converted into a factor.  
      * @return      The resulting factor created from the given expression.  
      */
-    protected static Factor ExpressionToFactor(Expression expr, MathContext context) {
+    protected static Factor ExpressionToFactor(Expression expr, MathContext context) throws ExpressionException {
         assert expr != null;
 
-        try {
-            SingleExpression single = expr.GetSingle();
+        SingleExpression single = expr.GetSingle();
+        if (single != null) {
             Factor factor = single.SingleValue();
             if (single.IsSingleNegative()) {
                 if (factor.IsNumber()) {
                     FMNumber num = factor.GetNumber();
                     return new Factor(num.Negate(context));
                 } else {
-                    throw new Exception();
+                    return new Factor(expr);
                 }
             }
             return single.SingleValue();
 
-        } catch (Exception ex) {
         }
 
         return new Factor(expr);

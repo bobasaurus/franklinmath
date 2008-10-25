@@ -6,7 +6,6 @@ package franklinmath.expression;
  */
 public enum FactorType {
     NUMBER,
-    IMAGINARY,
     SYMBOL,
     STRING,
     NESTED_EXPR,

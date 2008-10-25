@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package franklinmath.executor;
 
 /**
- *
+ * Enumeration representing result types.  
  * @author Allen Jordan
  */
 public enum FMResultType {

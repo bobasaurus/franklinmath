@@ -84,9 +84,9 @@ public final class Power implements LatexOutput {
         return (Vector<Factor>) factorList.clone();
     }
 
-    public Factor GetSingleFactor() throws ExpressionException {
+    public Factor GetSingleFactor() {
         if (factorList.size() != 1) {
-            throw new ExpressionException("Not a single value (wrong number of factors)");
+            return null;
         }
         return factorList.get(0);
     }

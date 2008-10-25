@@ -146,21 +146,23 @@ public class TreeExecutor {
 
             //get a single factor representing the LHS to be assigned
             Factor lhsFactor = null;
-            try {
-                SingleExpression single = lhsExpr.GetSingle();
-                if (single.IsSingleNegative()) {
-                    throw new ExecutionException("LHS assignment value can not be negative");
-                }
-                lhsFactor = single.SingleValue();
-            } catch (ExpressionException ex) {
+
+            SingleExpression single = lhsExpr.GetSingle();
+            if (single == null) {
                 throw new ExecutionException("Invalid assignment LHS");
             }
+            if (single.IsSingleNegative()) {
+                throw new ExecutionException("LHS assignment value can not be negative");
+            }
+            lhsFactor = single.SingleValue();
+
 
             //perform the assignment based on the LHS factor type
             if (lhsFactor.IsSymbol()) {
                 String symbol = lhsFactor.GetSymbol();
-                if (IsReserved(symbol)) throw new ExecutionException("The symbol \"" + symbol + "\" is reserved");
-
+                if (IsReserved(symbol)) {
+                    throw new ExecutionException("The symbol \"" + symbol + "\" is reserved");
+                }
                 Expression rhsExpr = ExecuteExpr(rhsNode);
                 rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
 
@@ -168,7 +170,9 @@ public class TreeExecutor {
                 results.add(new FMResult(rhsExpr));
             } else if (lhsFactor.IsSymbolicFunction()) {
                 SymbolicFunction sf = lhsFactor.GetSymbolicFunction();
-                if (IsReserved(sf.GetName())) throw new ExecutionException("The symbol \"" + sf.GetName() + "\" is reserved");
+                if (IsReserved(sf.GetName())) {
+                    throw new ExecutionException("The symbol \"" + sf.GetName() + "\" is reserved");
+                }
                 Vector<Equation> params = sf.GetParamList();
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
@@ -338,7 +342,9 @@ public class TreeExecutor {
 
             //symbol
             if (numChildren == 1) {
-                if (IsReserved(id)) throw new ExecutionException("The symbol \"" + id + "\" is reserved");
+                if (IsReserved(id)) {
+                    throw new ExecutionException("The symbol \"" + id + "\" is reserved");
+                }
                 return new Factor(id, true);
             } //function call
             else {

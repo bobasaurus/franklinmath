@@ -7,7 +7,6 @@ import franklinmath.util.*;
 
 /**
  * This class represents an immutable math factor (which could be a number, symbol, etc).  
- * todo: better handling for imaginary numbers, and implement all toLatexString methods.  
  * @author Allen Jordan
  */
 public final class Factor implements LatexOutput {
@@ -58,26 +57,6 @@ public final class Factor implements LatexOutput {
         nestedExpr = null;
         exprList = null;
         symbolicFunction = null;
-    }
-
-    public Factor(boolean isImaginary) {
-        if (isImaginary) {
-            type = FactorType.IMAGINARY;
-            numValue = null;
-            symbolID = null;
-            stringValue = null;
-            nestedExpr = null;
-            exprList = null;
-            symbolicFunction = null;
-        } else {
-            type = FactorType.NUMBER;
-            numValue = new FMNumber(0);
-            symbolID = null;
-            stringValue = null;
-            nestedExpr = null;
-            exprList = null;
-            symbolicFunction = null;
-        }
     }
 
     public Factor(String value, boolean isSymbol) {
@@ -136,10 +115,6 @@ public final class Factor implements LatexOutput {
 
     public boolean IsNumber() {
         return (type == FactorType.NUMBER);
-    }
-
-    public boolean IsImaginary() {
-        return (type == FactorType.IMAGINARY);
     }
 
     public boolean IsSymbol() {
@@ -215,9 +190,6 @@ public final class Factor implements LatexOutput {
         if (IsNumber()) {
             return numValue.toString();
         }
-        if (IsImaginary()) {
-            return "i";
-        }
         if (IsSymbol()) {
             return symbolID;
         }
@@ -260,8 +232,6 @@ public final class Factor implements LatexOutput {
 
             if (type.compareTo(FactorType.NUMBER) == 0) {
                 return (compareFactor.GetNumber().compareTo(numValue) == 0);
-            } else if (type.compareTo(FactorType.IMAGINARY) == 0) {
-                return true;
             } else if (type.compareTo(FactorType.SYMBOL) == 0) {
                 return compareFactor.GetSymbol().equals(symbolID);
             } else if (type.compareTo(FactorType.STRING) == 0) {
@@ -293,8 +263,6 @@ public final class Factor implements LatexOutput {
 
         if (type.compareTo(FactorType.NUMBER) == 0) {
             hash = hash * primeNumber + ((numValue == null) ? 0 : numValue.hashCode());
-        } else if (type.compareTo(FactorType.IMAGINARY) == 0) {
-            hash = hash * primeNumber + 1;
         } else if (type.compareTo(FactorType.SYMBOL) == 0) {
             hash = hash * primeNumber + symbolID.hashCode();
         } else if (type.compareTo(FactorType.STRING) == 0) {

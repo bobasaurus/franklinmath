@@ -106,10 +106,13 @@ public final class Expression implements LatexOutput {
      */
     public Expression AppendTerm(Term term, TermOperator operator) {
         if (termList.size() == 0) {
-            if (operator == TermOperator.ADD) operator = TermOperator.NONE;
-        }
-        else {
-            if (operator == TermOperator.NONE) operator = TermOperator.ADD;
+            if (operator == TermOperator.ADD) {
+                operator = TermOperator.NONE;
+            }
+        } else {
+            if (operator == TermOperator.NONE) {
+                operator = TermOperator.ADD;
+            }
         }
         return new Expression(termList, operatorList, term, operator);
     }
@@ -173,7 +176,12 @@ public final class Expression implements LatexOutput {
 
     public FMNumber GetSingleNumber() throws ExpressionException {
         SingleExpression single = GetSingle();
-        FMNumber number = single.SingleValue().GetNumber();
+        if (single == null) return null;
+        
+        Factor singleValue = single.SingleValue();
+        if (!singleValue.IsNumber()) return null;
+        
+        FMNumber number = singleValue.GetNumber();
         if (single.IsSingleNegative()) {
             number = number.Negate(new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode()));
         }
@@ -182,7 +190,12 @@ public final class Expression implements LatexOutput {
 
     public String GetSingleString() throws ExpressionException {
         SingleExpression single = GetSingle();
-        String result = single.SingleValue().GetString();
+        if (single == null) return null;
+        
+        Factor singleValue = single.SingleValue();
+        if (!singleValue.IsString()) return null;
+        
+        String result = singleValue.GetString();
         if (single.IsSingleNegative()) {
             throw new ExpressionException("Negative character string");
         }
@@ -202,10 +215,13 @@ public final class Expression implements LatexOutput {
             Term term = ex.GetTerm(i);
             TermOperator op = ex.GetOperator(i);
             if (i == 0) {
-                if (op == TermOperator.ADD) op = TermOperator.NONE;
-            }
-            else {
-                if (op == TermOperator.NONE) op = TermOperator.ADD;
+                if (op == TermOperator.ADD) {
+                    op = TermOperator.NONE;
+                }
+            } else {
+                if (op == TermOperator.NONE) {
+                    op = TermOperator.ADD;
+                }
             }
             termListCopy.add(term);
             opListCopy.add(op);
@@ -260,12 +276,15 @@ public final class Expression implements LatexOutput {
      * @return  The single factor.
      * @throws franklinmath.expression.ExpressionException
      */
-    public SingleExpression GetSingle() throws ExpressionException {
+    public SingleExpression GetSingle() {
         if (termList.size() != 1) {
-            throw new ExpressionException("Not a single value (wrong number of terms)");
+            return null;
         }
         Term term = termList.get(0);
         Factor singleFactor = term.GetSingleFactor();
+        if (singleFactor == null) {
+            return null;
+        }
         SingleExpression single = new SingleExpression(singleFactor, (operatorList.get(0) == TermOperator.SUBTRACT) ? true : false);
         return single;
     }
