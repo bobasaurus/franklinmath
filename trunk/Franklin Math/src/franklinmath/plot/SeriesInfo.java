@@ -13,8 +13,9 @@ public class SeriesInfo {
     protected Expression expr;
     protected String varName,  xLabel,  yLabel,  title;
     protected double lowX,  highX;
-    protected Color lineColor;
-    protected int lineWidth;
+    protected Color color;
+    protected int thickness;
+    protected SeriesStyle style;
 
     public SeriesInfo() {
         SetDefaults();
@@ -54,12 +55,16 @@ public class SeriesInfo {
         this.highX = highX;
     }
 
-    public void SetLineColor(Color lineColor) {
-        this.lineColor = lineColor;
+    public void SetColor(Color color) {
+        this.color = color;
     }
 
-    public void SetLineWidth(int lineWidth) {
-        this.lineWidth = lineWidth;
+    public void SetThickness(int thickness) {
+        this.thickness = thickness;
+    }
+    
+    public void SetSeriesStyle(SeriesStyle style) {
+        this.style = style;
     }
 
     public Expression GetExpression() {
@@ -90,12 +95,16 @@ public class SeriesInfo {
         return highX;
     }
 
-    public Color GetLineColor() {
-        return lineColor;
+    public Color GetColor() {
+        return color;
     }
 
-    public int GetLineWidth() {
-        return lineWidth;
+    public int GetThickness() {
+        return thickness;
+    }
+    
+    public SeriesStyle GetSeriesStyle() {
+        return style;
     }
 
     protected void SetDefaults() {
@@ -106,7 +115,7 @@ public class SeriesInfo {
         title = "";
         lowX = 0;
         highX = 1;
-        lineColor = Color.BLACK;
-        lineWidth = 1;
+        color = Color.BLACK;
+        thickness = 1;
     }
 }

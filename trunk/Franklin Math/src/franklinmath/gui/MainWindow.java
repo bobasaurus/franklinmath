@@ -11,7 +11,7 @@ import franklinmath.parser.*;
 import franklinmath.executor.*;
 import franklinmath.expression.*;
 import franklinmath.util.*;
-import franklinmath.gui.highlighting.*;
+import franklinmath.gui.text.*;
 
 import javax.swing.text.DefaultStyledDocument;
 

@@ -5,6 +5,7 @@ package franklinmath.expression;
  * @author Allen Jordan
  */
 public enum FactorType {
+
     NUMBER,
     SYMBOL,
     STRING,

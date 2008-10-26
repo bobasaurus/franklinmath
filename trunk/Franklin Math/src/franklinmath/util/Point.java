@@ -20,4 +20,6 @@ public class Point {
         x = copyPoint.x;
         y = copyPoint.y;
     }
+    
+    public static Point BAD_POINT = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
 }
