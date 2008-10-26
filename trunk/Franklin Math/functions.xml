@@ -142,4 +142,17 @@
 	</example>
 </function>
 
+<function>
+	<name>Plot</name>
+	<category>Plotting</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Make a plot of a function.  
+	</description>
+	<example>
+		<input>Plot[x^2, {x, -10, 10}]</input>
+		<result></result>
+	</example>
+</function>
+
 </functionlist>

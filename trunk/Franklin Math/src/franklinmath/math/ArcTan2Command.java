@@ -1,7 +1,6 @@
 package franklinmath.math;
 
 import java.util.Vector;
-import java.math.*;
 
 import franklinmath.executor.*;
 import franklinmath.expression.*;
@@ -11,11 +10,6 @@ import franklinmath.expression.*;
  * @author Allen Jordan
  */
 public class ArcTan2Command extends Command {
-
-    public ArcTan2Command(String functionName, boolean isMathFunction) {
-        name = functionName;
-        this.isMathFunction = isMathFunction;
-    }
 
     @Override
     public FMResult Execute(Vector<Equation> args) throws CommandException {

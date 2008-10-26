@@ -60,11 +60,11 @@ public class TreeExecutor {
 
                 String classname = "franklinmath.math." + functionName + "Command";
                 Class function = Class.forName(classname);
-                Class[] argsClassArray = new Class[]{String.class, boolean.class};
-                Constructor functionConstructor = function.getConstructor(argsClassArray);
+                Constructor functionConstructor = function.getConstructor();
 
-                Object[] argsArray = new Object[]{functionName, isMathFunction};
-                Command functionCommand = (Command) functionConstructor.newInstance(argsArray);
+                Command functionCommand = (Command) functionConstructor.newInstance();
+                functionCommand.SetName(functionName);
+                functionCommand.SetIsMathFunction(isMathFunction);
 
                 //add the command into the function table
                 functionTable.Set(functionName, functionCommand);

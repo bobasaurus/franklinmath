@@ -1,7 +1,6 @@
 package franklinmath.math;
 
 import java.util.Vector;
-import java.math.*;
 
 import franklinmath.executor.*;
 import franklinmath.expression.*;
@@ -11,20 +10,18 @@ import franklinmath.expression.*;
  * @author Allen Jordan
  */
 public class TanCommand extends Command {
-    public TanCommand(String functionName, boolean isMathFunction) {
-        name = functionName;
-        this.isMathFunction = isMathFunction;
-    }
-    
-    @Override public FMResult Execute(Vector<Equation> args) throws CommandException {
+
+    @Override
+    public FMResult Execute(Vector<Equation> args) throws CommandException {
         CheckArgsLength(args, 1);
         try {
             SingleExpression single = GetSingleArgument(args);
-            
+
             Factor factor = single.SingleValue();
             FMNumber number = factor.GetNumber();
-            if (single.IsSingleNegative()) number = number.Negate(ExpressionTools.GetMathContext());
-            
+            if (single.IsSingleNegative()) {
+                number = number.Negate(ExpressionTools.GetMathContext());
+            }
             double result = StrictMath.tan(number.doubleValue());
             return new FMResult(new Factor(new FMNumber(result)));
         } catch (ExpressionException ex) {

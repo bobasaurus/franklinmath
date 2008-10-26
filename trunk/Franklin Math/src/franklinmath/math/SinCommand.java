@@ -1,7 +1,6 @@
 package franklinmath.math;
 
 import java.util.Vector;
-import java.math.*;
 
 import franklinmath.executor.*;
 import franklinmath.expression.*;
@@ -12,11 +11,6 @@ import franklinmath.expression.*;
  */
 public class SinCommand extends Command {
 
-    public SinCommand(String functionName, boolean isMathFunction) {
-        name = functionName;
-        this.isMathFunction = isMathFunction;
-    }
-    
     @Override
     public FMResult Execute(Vector<Equation> args) throws CommandException {
         CheckArgsLength(args, 1);
