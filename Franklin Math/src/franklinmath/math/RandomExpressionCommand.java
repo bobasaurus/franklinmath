@@ -14,11 +14,6 @@ import franklinmath.expression.*;
  */
 public class RandomExpressionCommand extends Command {
 
-    public RandomExpressionCommand(String functionName, boolean isMathFunction) {
-        name = functionName;
-        this.isMathFunction = isMathFunction;
-    }
-
     @Override
     public FMResult Execute(Vector<Equation> args) throws CommandException {
         try {

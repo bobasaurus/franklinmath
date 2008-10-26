@@ -1,10 +1,8 @@
 package franklinmath.executor;
 
 import java.util.Vector;
-import java.math.*;
 
 import franklinmath.expression.*;
-import franklinmath.util.*;
 
 /**
  * Abstract base class for all commands, including function calls.  Follows the command design pattern.  
@@ -12,10 +10,20 @@ import franklinmath.util.*;
  */
 public abstract class Command {
 
-    protected String name;
-    protected boolean isMathFunction;
+    protected String name = "";
+    protected boolean isMathFunction = false;
 
     public abstract FMResult Execute(Vector<Equation> args) throws CommandException;
+
+    //Typically used only during initialization.  
+    public void SetName(String functionName) {
+        name = functionName;
+    }
+
+    //Typically used only during initialization.  
+    public void SetIsMathFunction(boolean isMathFunc) {
+        isMathFunction = isMathFunc;
+    }
 
     public String GetName() {
         return name;

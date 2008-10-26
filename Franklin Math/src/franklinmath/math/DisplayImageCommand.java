@@ -1,7 +1,6 @@
 package franklinmath.math;
 
 import java.util.Vector;
-import java.math.*;
 import java.awt.*;
 import javax.swing.*;
 
@@ -13,11 +12,7 @@ import franklinmath.expression.*;
  * @author Allen Jordan
  */
 public class DisplayImageCommand extends Command {
-    public DisplayImageCommand(String functionName, boolean isMathFunction) {
-        name = functionName;
-        this.isMathFunction = isMathFunction;
-    }
-    
+
     @Override
     public FMResult Execute(Vector<Equation> args) throws CommandException {
         CheckArgsLength(args, 1);
@@ -26,8 +21,7 @@ public class DisplayImageCommand extends Command {
             String imageURL = single.SingleValue().GetString();
             Image image = new ImageIcon(imageURL).getImage();
             return new FMResult(image);
-        }
-        catch (ExpressionException ex) {
+        } catch (ExpressionException ex) {
             try {
                 return new FMResult(new Factor(new SymbolicFunction(GetName(), args, isMathFunction)));
             } catch (ExpressionException ex2) {
