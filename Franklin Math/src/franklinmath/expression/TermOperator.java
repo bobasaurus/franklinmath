@@ -5,7 +5,8 @@ package franklinmath.expression;
  * @author Allen Jordan
  */
 public enum TermOperator {
-    NONE,       //none should only be used for the first term
+
+    NONE, //none should only be used for the first term
     ADD,
     SUBTRACT
 }

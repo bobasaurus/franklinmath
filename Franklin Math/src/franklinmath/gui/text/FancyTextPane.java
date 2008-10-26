@@ -1,4 +1,4 @@
-package franklinmath.gui.highlighting;
+package franklinmath.gui.text;
 
 import javax.swing.*;
 import javax.swing.text.*;

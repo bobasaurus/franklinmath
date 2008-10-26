@@ -8,7 +8,7 @@ import franklinmath.util.*;
 import franklinmath.plot.*;
 
 /**
- *
+ * Command for plotting a function.  
  * @author Allen Jordan
  */
 public class PlotCommand extends Command {
@@ -61,9 +61,10 @@ public class PlotCommand extends Command {
             
             //build the series data
             SeriesInfo info = new SeriesInfo(functionExpr, variableName, lowXNum.RealValue().doubleValue(), highXNum.RealValue().doubleValue());
+            SeriesData data = new SeriesData(info);
+            Plot plot = new Plot(data);
 
-
-            return new FMResult("Plot Command Called :P");
+            return new FMResult(plot);
         } catch (ExpressionException ex) {
             throw new CommandException(ex.toString());
         }
