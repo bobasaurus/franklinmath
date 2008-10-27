@@ -116,6 +116,7 @@ public class SeriesInfo {
         lowX = 0;
         highX = 1;
         color = Color.BLACK;
-        thickness = 1;
+        thickness = 2;
+        style = SeriesStyle.SOLID_LINE;
     }
 }

@@ -56,8 +56,8 @@ public class SeriesData {
         double xIncrement = (highX - lowX) / ((double) numPoints);
 
         //keep track of lowest and highest y values
-        lowY = Double.MAX_VALUE;
-        highY = Double.MIN_VALUE;
+        lowY = Double.POSITIVE_INFINITY;
+        highY = Double.NEGATIVE_INFINITY;
 
         for (double currentX = lowX; currentX < highX; currentX += xIncrement) {
             try {

@@ -34,6 +34,7 @@ public class Plot extends JPanel {
             //set the graphic options
             int thickness = seriesInfo.GetThickness();
             BasicStroke stroke = new BasicStroke(thickness);
+            g2d.setStroke(stroke);
             g2d.setColor(seriesInfo.GetColor());
 
             Vector<franklinmath.util.Point> pointData = seriesData.GetData();
@@ -43,23 +44,38 @@ public class Plot extends JPanel {
             double aspectX = ((double) windowWidth) / (seriesInfo.GetHighX() - seriesInfo.GetLowX());
             double aspectY = ((double) windowHeight) / (seriesData.GetHighY() - seriesData.GetLowY());
 
+
+
             //render the data series
-            int currentX = (int) (pointData.get(0).x * aspectX);
-            int currentY = (int) (pointData.get(0).y * aspectY);
+            franklinmath.util.Point point;
+            int index = 0;
+            //locate a good first point
+            do {
+                point = pointData.get(index);
+                index++;
+            } while (point == franklinmath.util.Point.BAD_POINT);
+
+            int currentX = (int) (point.x * aspectX);
+            int currentY = windowHeight - ((int) (point.y * aspectY));
             if (seriesInfo.GetSeriesStyle() == SeriesStyle.POINTS) {
                 g2d.fillRect(currentX, currentY, thickness, thickness);
             }
-            for (int j = 1; j < pointData.size(); j++) {
+
+            for (int j = index; j < pointData.size(); j++) {
                 int prevX = currentX;
                 int prevY = currentY;
-                currentX = (int) (pointData.get(j).x * aspectX);
-                currentY = (int) (pointData.get(j).y * aspectY);
 
-                SeriesStyle style = seriesInfo.GetSeriesStyle();
-                if (style == SeriesStyle.POINTS) {
-                    g2d.fillRect(currentX, currentY, thickness, thickness);
-                } else if (style == SeriesStyle.SOLID_LINE) {
-                    g2d.drawLine(prevX, prevY, currentX, currentY);
+                point = pointData.get(j);
+                if (point != franklinmath.util.Point.BAD_POINT) {
+                    currentX = (int) (point.x * aspectX);
+                    currentY = windowHeight - ((int) (point.y * aspectY));
+
+                    SeriesStyle style = seriesInfo.GetSeriesStyle();
+                    if (style == SeriesStyle.POINTS) {
+                        g2d.fillRect(currentX, currentY, thickness, thickness);
+                    } else if (style == SeriesStyle.SOLID_LINE) {
+                        g2d.drawLine(prevX, prevY, currentX, currentY);
+                    }
                 }
             }
         }

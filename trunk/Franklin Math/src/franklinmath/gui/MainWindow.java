@@ -4,19 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
-//import java.io.*;
-//import java.math.*;
 
 import franklinmath.parser.*;
 import franklinmath.executor.*;
 import franklinmath.expression.*;
+import franklinmath.plot.*;
 import franklinmath.util.*;
 import franklinmath.gui.text.*;
 
 import javax.swing.text.DefaultStyledDocument;
 
 /**
- * The primary gui window of the Franklin Math applicaiton
+ * The primary gui window of the Franklin Math computer algebra system.  
  * @author Allen Jordan
  */
 public class MainWindow extends JFrame {
@@ -25,7 +24,9 @@ public class MainWindow extends JFrame {
     protected DefaultStyledDocument outDocument;
     protected FancyTextPane inputPane;
     protected FancyTextPane outputPane;
+    protected JPanel outputPanel;
     private TreeExecutor executor;
+    //atomic boolean to help ensure proper concurrency
     private java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
 
     public MainWindow() {
@@ -92,6 +93,7 @@ public class MainWindow extends JFrame {
 
         inputPane.addKeyListener(new KeyAdapter() {
             //protected boolean altPressed = false;
+
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.isShiftDown()) {
@@ -129,79 +131,32 @@ public class MainWindow extends JFrame {
         add(outputScrollPane);
 
         gbc.gridy = 3;
+        outputPanel = new JPanel();
+        outputPanel.setBackground(Color.WHITE);
+        gbLayout.setConstraints(outputPanel, gbc);
+        add(outputPanel);
 
         setLayout(gbLayout);
         pack();
 
         try {
+            //load in the project settings
             FMProperties.LoadProperties();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading in user properties/settings: " + ex.toString());
         }
 
         try {
+            //create the tree executor, loading in the list of built-in functions
             executor = new TreeExecutor();
         } catch (Exception ex) {
             outputPane.Append(ex.toString());
         }
 
-        //run test cases
-        //boolean testResult = TestCases();
-        //assert (testResult == true);
-
         threadRunning.set(false);
 
     }
-    ////////////////////////////////////////////////////////////////////////////
-    //Testing Code:
-    protected boolean TestCases() {
-        try {
-            Expression resultExpr = ProcessString("(2+3i)+(4+5i)");
-            Expression expectedExpr = BuildExpression(new FMNumber(6));
-            Term expectedTerm = new Term(new Power(new Factor(8)));
-            expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new FMNumber(0, 1))), PowerOperator.MULTIPLY);
-            expectedExpr = expectedExpr.AppendTerm(expectedTerm, TermOperator.ADD);
-            boolean result = expectedExpr.equals(resultExpr);
-            if (result) {
-                return true;
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.toString());
-        }
 
-        return false;
-    }
-
-    /**
-     * Create an expression from a number.  
-     * @param value     The number to use when building the expression.  
-     * @return          The newly built expression.  
-     * @throws franklinmath.expression.ExpressionException
-     */
-    protected Expression BuildExpression(FMNumber value) throws ExpressionException {
-        return new Expression(new Term(new Power(new Factor(value))), TermOperator.NONE);
-    }
-
-    /**
-     * Provides the ability to execute a line of the Franklin Math language, if the result is an expression.  
-     * @param str   The FM code line string to be executed
-     * @return      The resulting expression
-     * @throws franklinmath.parser.ParseException
-     * @throws franklinmath.executor.ExecutionException
-     * @throws franklinmath.expression.ExpressionException
-     */
-    protected Expression ProcessString(String str) throws ParseException, ExecutionException, ExpressionException {
-        java.io.StringReader strReader = new java.io.StringReader(str);
-        java.io.Reader reader = new java.io.BufferedReader(strReader);
-        FMParser parser = new FMParser(reader);
-        Vector<FMResult> resultList = executor.Execute(parser.Program());
-        if (resultList.size() != 1) {
-            throw new ExecutionException("Too many results");
-        }
-        return resultList.get(0).GetExpression();
-    }
-    //End testing code
-    ////////////////////////////////////////////////////////////////////////////
     private void OpenSettingsDialog() {
         SettingsDialog settings = new SettingsDialog(this, true);
         settings.setVisible(true);
@@ -209,11 +164,15 @@ public class MainWindow extends JFrame {
 
     private void OpenAboutDialog() {
         AboutDialog aboutDialog = new AboutDialog(this, true);
+
         aboutDialog.setVisible(true);
     }
 
     private synchronized void Evaluate() {
         outputPane.setText("");
+        //todo: this panel removal doesn't seem to clear everything
+        outputPanel.removeAll();
+
         if (threadRunning.get()) {
             outputPane.Append("Evaluation thread is already running.  Try again later.  \n");
             return;
@@ -224,7 +183,8 @@ public class MainWindow extends JFrame {
             outputPane.Append("No input provided.  \n");
             return;
         }
-        javax.swing.SwingWorker worker = new EvaluationWorker(text);
+        javax.swing.SwingWorker worker =
+                new EvaluationWorker(text);
         worker.execute();
 
         threadRunning.set(true);
@@ -268,6 +228,7 @@ public class MainWindow extends JFrame {
 
         @Override
         protected void done() {
+
             try {
                 Vector<FMResult> resultList = get();
                 for (int i = 0; i < resultList.size(); i++) {
@@ -280,21 +241,33 @@ public class MainWindow extends JFrame {
                     } else if (result.IsEquation()) {
                         String equString = result.GetEquation().toString();
                         outputPane.Append(equString);
+
                     } else if (result.IsString()) {
                         outputPane.Append("\"" + result.GetString() + "\"");
                     } else if (result.IsImage()) {
                         Image img = result.GetImage();
                         outputPane.Append(img);
+                    } else if (result.IsPanel()) {
+                        JPanel resultPanel = result.GetPanel();
+                        resultPanel.setPreferredSize(new Dimension(300, 200));
+                        outputPanel.add(resultPanel);
+                        PackWindow();
                     } else {
                         outputPane.Append("Could not display result");
                     }
                     outputPane.Append("\n");
+
                 }
             } catch (Exception ex) {
-                outputPane.Append("Error: " + ex.toString() + "\n");
+                outputPane.Append(
+                        "Error: " + ex.toString() + "\n");
             }
             threadRunning.set(false);
         }
+    }
+
+    private void PackWindow() {
+        this.pack();
     }
 
     public static void main(String args[]) {

@@ -179,7 +179,8 @@ public class ExpressionTools {
         ListIterator<TermOperator> termOpIterator = operatorListCopy.listIterator();
         while (termIterator.hasNext()) {
             //retrieve and flatten the next term
-            Term term = FlattenTerm(termIterator.next(), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            Term term = termIterator.next();
+            term = FlattenTerm(term, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
             termIterator.set(term);
             termIterator.previous();
             termIterator.next();
@@ -652,13 +653,18 @@ public class ExpressionTools {
                             }
                         } else if (result.IsString()) {
                             if (resultList != null) {
-                                resultList.add(new FMResult(result.GetString()));
+                                resultList.add(result);
                             }
                         } else if (result.IsImage()) {
                             if (resultList != null) {
-                                resultList.add(new FMResult(result.GetImage()));
+                                resultList.add(result);
                             }
-                        } else {
+                        } else if (result.IsPanel()) {
+                            if (resultList != null) {
+                                resultList.add(result);
+                            }
+                        }
+                        else {
                             throw new ExecutionException("Unrecognized function result type");
                         }
                     }
