@@ -25,6 +25,7 @@ public class SeriesInfo {
         SetDefaults();
         this.expr = expr;
         this.varName = varName;
+        this.xLabel = varName;
         this.lowX = lowX;
         this.highX = highX;
     }
@@ -115,8 +116,8 @@ public class SeriesInfo {
         title = "";
         lowX = 0;
         highX = 1;
-        color = Color.BLACK;
-        thickness = 2;
+        color = Color.BLUE;
+        thickness = 1;
         style = SeriesStyle.SOLID_LINE;
     }
 }

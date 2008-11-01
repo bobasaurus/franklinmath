@@ -127,7 +127,7 @@ public class AboutDialog extends javax.swing.JDialog {
         if (JOptionPane.showConfirmDialog(this, "Visit the Franklin Math home page?", "Open Browser", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             try {
                 Desktop desktop = Desktop.getDesktop();
-                desktop.browse(new URI("http://sourceforge.net/users/bobasaurus/"));
+                desktop.browse(new URI("http://www.franklinmath.com/"));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.toString());
             }

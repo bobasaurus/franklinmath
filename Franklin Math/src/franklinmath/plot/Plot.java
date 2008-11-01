@@ -11,20 +11,39 @@ import java.awt.*;
 public class Plot extends JPanel {
 
     protected Vector<SeriesData> seriesCollection;
+    //graph coordinate variables
+    protected int borderSize,  windowWidth,  windowHeight,  plotWidth,  plotHeight,  plotStartX,  plotStartY,  plotEndX,  plotEndY;
 
     public Plot() {
         seriesCollection = new Vector<SeriesData>();
+        borderSize = 10;
+        InitializeCoordinateData();
         this.repaint();
     }
 
     public Plot(SeriesData series) {
         seriesCollection = new Vector<SeriesData>();
+        borderSize = 10;
+        InitializeCoordinateData();
         AddSeries(series);
+    }
+
+    private void InitializeCoordinateData() {
+        windowWidth = this.getWidth();
+        windowHeight = this.getHeight();
+        plotWidth = windowWidth - 2 * borderSize;
+        plotHeight = windowHeight - 2 * borderSize;
+        plotStartX = borderSize;
+        plotStartY = borderSize;
+        plotEndX = windowWidth - borderSize;
+        plotEndY = windowHeight - borderSize;
     }
 
     @Override
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+
+        InitializeCoordinateData();
 
         //render each data series
         for (int i = 0; i < seriesCollection.size(); i++) {
@@ -39,12 +58,16 @@ public class Plot extends JPanel {
 
             Vector<franklinmath.util.Point> pointData = seriesData.GetData();
             //determine sizing information
-            int windowWidth = this.getWidth();
-            int windowHeight = this.getHeight();
-            double aspectX = ((double) windowWidth) / (seriesInfo.GetHighX() - seriesInfo.GetLowX());
-            double aspectY = ((double) windowHeight) / (seriesData.GetHighY() - seriesData.GetLowY());
+            double lowX = seriesInfo.GetLowX();
+            double lowY = seriesData.GetLowY();
+            double aspectX = ((double) plotWidth) / (seriesInfo.GetHighX() - lowX);
+            double aspectY = ((double) plotHeight) / (seriesData.GetHighY() - lowY);
 
 
+            DrawAxis(g2d, borderSize, windowWidth, windowHeight, seriesInfo.GetLowX(), seriesInfo.GetHighX(), seriesData.GetLowY(), seriesData.GetHighY());
+
+            //antialias the line
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             //render the data series
             franklinmath.util.Point point;
@@ -53,10 +76,17 @@ public class Plot extends JPanel {
             do {
                 point = pointData.get(index);
                 index++;
+                if (index >= pointData.size()) {
+                    g2d.drawString("Series contains entirely bad points", 20, 20);
+                    return;
+                }
             } while (point == franklinmath.util.Point.BAD_POINT);
 
-            int currentX = (int) (point.x * aspectX);
-            int currentY = windowHeight - ((int) (point.y * aspectY));
+            //transform to plot coordinates
+            point = DataToPlotTransform(point, aspectX, aspectY, lowX, lowY);
+            int currentX = (int) Math.round(point.x);
+            int currentY = (int) Math.round(point.y);
+
             if (seriesInfo.GetSeriesStyle() == SeriesStyle.POINTS) {
                 g2d.fillRect(currentX, currentY, thickness, thickness);
             }
@@ -67,8 +97,11 @@ public class Plot extends JPanel {
 
                 point = pointData.get(j);
                 if (point != franklinmath.util.Point.BAD_POINT) {
-                    currentX = (int) (point.x * aspectX);
-                    currentY = windowHeight - ((int) (point.y * aspectY));
+
+                    //transform to plot coordinates
+                    point = DataToPlotTransform(point, aspectX, aspectY, lowX, lowY);
+                    currentX = (int) Math.round(point.x);
+                    currentY = (int) Math.round(point.y);
 
                     SeriesStyle style = seriesInfo.GetSeriesStyle();
                     if (style == SeriesStyle.POINTS) {
@@ -79,6 +112,34 @@ public class Plot extends JPanel {
                 }
             }
         }
+    }
+
+    private void DrawAxis(Graphics2D g2d, int borderSize, int windowWidth, int windowHeight, double lowX, double highX, double lowY, double highY) {
+        int startWidth = borderSize;
+        int endWidth = windowWidth - borderSize;
+        int startHeight = borderSize;
+        int endHeight = windowHeight - borderSize;
+
+        Color backupColor = g2d.getColor();
+        Stroke strokeBackup = g2d.getStroke();
+        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(1));
+
+        //draw straight axis lines
+        g2d.drawLine(startWidth, startHeight, startWidth, endHeight);
+        g2d.drawLine(startWidth, endHeight, endWidth, endHeight);
+
+
+        g2d.setColor(backupColor);
+        g2d.setStroke(strokeBackup);
+    }
+
+    private franklinmath.util.Point DataToPlotTransform(franklinmath.util.Point dataPoint, double aspectX, double aspectY, double lowX, double lowY) {
+        double normalizedDataX = dataPoint.x - lowX;
+        double normalizedDataY = dataPoint.y - lowY;
+        double plotX = normalizedDataX * aspectX + borderSize;
+        double plotY = plotHeight - normalizedDataY * aspectY + borderSize;
+        return new franklinmath.util.Point(plotX, plotY);
     }
 
     /**
