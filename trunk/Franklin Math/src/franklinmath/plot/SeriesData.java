@@ -24,7 +24,7 @@ public class SeriesData {
         lowY = 0;
         highY = 1;
 
-        long numPoints = 100;
+        long numPoints = 40;
         GenerateData(numPoints);
     }
 
@@ -53,7 +53,7 @@ public class SeriesData {
         double lowX = seriesInfo.GetLowX();
         double highX = seriesInfo.GetHighX();
         assert highX >= lowX;
-        double xIncrement = (highX - lowX) / ((double) numPoints);
+        double xIncrement = (highX - lowX) / ((double) numPoints - 1);
 
         //keep track of lowest and highest y values
         lowY = Double.POSITIVE_INFINITY;
@@ -61,6 +61,10 @@ public class SeriesData {
 
         for (double currentX = lowX; currentX < highX; currentX += xIncrement) {
             try {
+                //try to reduce the propagated arithmetic error at the endpoint
+                if ((currentX + xIncrement) >= highX) {
+                    currentX = highX;
+                }
                 Expression replacedExpr = expr.Replace(seriesInfo.GetVariableName(), new Expression(new Term(new Power(new Factor(currentX))), TermOperator.NONE));
                 Expression resultExpr = ExpressionTools.Flatten(replacedExpr, null, null, null, null, null);
                 FMNumber yValue = resultExpr.GetSingleNumber();
@@ -81,6 +85,8 @@ public class SeriesData {
             } catch (ExpressionException ex) {
                 pointData.add(Point.BAD_POINT);
             } catch (ExecutionException ex) {
+                pointData.add(Point.BAD_POINT);
+            } catch (ArithmeticException ex) {
                 pointData.add(Point.BAD_POINT);
             }
         }
