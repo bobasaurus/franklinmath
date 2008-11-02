@@ -58,13 +58,13 @@ public class Plot extends JPanel {
 
             Vector<franklinmath.util.Point> pointData = seriesData.GetData();
             //determine sizing information
-            double lowX = seriesInfo.GetLowX();
-            double lowY = seriesData.GetLowY();
-            double aspectX = ((double) plotWidth) / (seriesInfo.GetHighX() - lowX);
-            double aspectY = ((double) plotHeight) / (seriesData.GetHighY() - lowY);
+            franklinmath.util.Range xRange = seriesInfo.GetXRange();
+            franklinmath.util.Range yRange = seriesInfo.GetYRange();
+            double aspectX = ((double) plotWidth) / (xRange.GetWidth());
+            double aspectY = ((double) plotHeight) / (yRange.GetWidth());
 
 
-            DrawAxis(g2d, borderSize, windowWidth, windowHeight, seriesInfo.GetLowX(), seriesInfo.GetHighX(), seriesData.GetLowY(), seriesData.GetHighY());
+            //DrawAxis(g2d, borderSize, windowWidth, windowHeight, seriesInfo.GetLowX(), seriesInfo.GetHighX(), seriesData.GetLowY(), seriesData.GetHighY());
 
             //antialias the line
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -83,7 +83,7 @@ public class Plot extends JPanel {
             } while (point == franklinmath.util.Point.BAD_POINT);
 
             //transform to plot coordinates
-            point = DataToPlotTransform(point, aspectX, aspectY, lowX, lowY);
+            point = DataToPlotTransform(point, aspectX, aspectY, xRange, yRange);
             int currentX = (int) Math.round(point.x);
             int currentY = (int) Math.round(point.y);
 
@@ -99,7 +99,7 @@ public class Plot extends JPanel {
                 if (point != franklinmath.util.Point.BAD_POINT) {
 
                     //transform to plot coordinates
-                    point = DataToPlotTransform(point, aspectX, aspectY, lowX, lowY);
+                    point = DataToPlotTransform(point, aspectX, aspectY, xRange, yRange);
                     currentX = (int) Math.round(point.x);
                     currentY = (int) Math.round(point.y);
 
@@ -134,9 +134,9 @@ public class Plot extends JPanel {
         g2d.setStroke(strokeBackup);
     }
 
-    private franklinmath.util.Point DataToPlotTransform(franklinmath.util.Point dataPoint, double aspectX, double aspectY, double lowX, double lowY) {
-        double normalizedDataX = dataPoint.x - lowX;
-        double normalizedDataY = dataPoint.y - lowY;
+    private franklinmath.util.Point DataToPlotTransform(franklinmath.util.Point dataPoint, double aspectX, double aspectY, franklinmath.util.Range xRange, franklinmath.util.Range yRange) {
+        double normalizedDataX = dataPoint.x - xRange.low;
+        double normalizedDataY = dataPoint.y - yRange.low;
         double plotX = normalizedDataX * aspectX + borderSize;
         double plotY = plotHeight - normalizedDataY * aspectY + borderSize;
         return new franklinmath.util.Point(plotX, plotY);
