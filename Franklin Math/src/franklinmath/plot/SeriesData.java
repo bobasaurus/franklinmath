@@ -13,16 +13,14 @@ import franklinmath.util.*;
 public class SeriesData {
 
     protected Vector<Point> pointData;
-    protected double lowY,  highY;
     protected SeriesInfo seriesInfo;
 
     public SeriesData(SeriesInfo info) {
         assert info != null;
         assert (info.GetExpression() != null);
+        
         seriesInfo = info;
         pointData = new Vector<Point>();
-        lowY = 0;
-        highY = 1;
 
         long numPoints = 40;
         GenerateData(numPoints);
@@ -36,28 +34,20 @@ public class SeriesData {
         return seriesInfo;
     }
 
-    public double GetLowY() {
-        return lowY;
-    }
-
-    public double GetHighY() {
-        return highY;
-    }
-
     /**
      * Generate point data from the series expression.  
      * @param numPoints
      */
     public void GenerateData(long numPoints) {
         Expression expr = seriesInfo.GetExpression();
-        double lowX = seriesInfo.GetLowX();
-        double highX = seriesInfo.GetHighX();
-        assert highX >= lowX;
+        Range xRange = seriesInfo.GetXRange();
+        double lowX = xRange.low;
+        double highX = xRange.high;
         double xIncrement = (highX - lowX) / ((double) numPoints - 1);
 
         //keep track of lowest and highest y values
-        lowY = Double.POSITIVE_INFINITY;
-        highY = Double.NEGATIVE_INFINITY;
+        double lowY = Double.POSITIVE_INFINITY;
+        double highY = Double.NEGATIVE_INFINITY;
 
         for (double currentX = lowX; currentX < highX; currentX += xIncrement) {
             try {
@@ -89,6 +79,11 @@ public class SeriesData {
             } catch (ArithmeticException ex) {
                 pointData.add(Point.BAD_POINT);
             }
+        }
+        
+        //if no range was specified, use the max and min from the data
+        if (seriesInfo.GetYRange() == Range.BAD_RANGE) {
+            seriesInfo.SetYRange(new Range(lowY, highY));
         }
 
     }

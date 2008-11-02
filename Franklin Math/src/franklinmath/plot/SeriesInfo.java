@@ -3,6 +3,7 @@ package franklinmath.plot;
 import java.awt.Color;
 
 import franklinmath.expression.*;
+import franklinmath.util.*;
 
 /**
  * Container for information about a data series.  
@@ -12,7 +13,8 @@ public class SeriesInfo {
 
     protected Expression expr;
     protected String varName,  xLabel,  yLabel,  title;
-    protected double lowX,  highX;
+    protected Range xRange;
+    protected Range yRange;
     protected Color color;
     protected int thickness;
     protected SeriesStyle style;
@@ -20,14 +22,41 @@ public class SeriesInfo {
     public SeriesInfo() {
         SetDefaults();
     }
+    
+    public SeriesInfo(Expression expr, String varName, Range xRange) {
+        SetDefaults();
+        this.expr = expr;
+        this.varName = varName;
+        this.xLabel = varName;
+        this.xRange = xRange;
+        yRange = Range.BAD_RANGE;
+    }
+    
+    public SeriesInfo(Expression expr, String varName, Range xRange, Range yRange) {
+        SetDefaults();
+        this.expr = expr;
+        this.varName = varName;
+        this.xLabel = varName;
+        this.xRange = xRange;
+        this.yRange = yRange;
+    }
 
     public SeriesInfo(Expression expr, String varName, double lowX, double highX) {
         SetDefaults();
         this.expr = expr;
         this.varName = varName;
         this.xLabel = varName;
-        this.lowX = lowX;
-        this.highX = highX;
+        xRange = new Range(lowX, highX);
+        yRange = Range.BAD_RANGE;
+    }
+    
+    public SeriesInfo(Expression expr, String varName, double lowX, double highX, double lowY, double highY) {
+        SetDefaults();
+        this.expr = expr;
+        this.varName = varName;
+        this.xLabel = varName;
+        xRange = new Range(lowX, highX);
+        yRange = new Range(lowY, highY);
     }
 
     /*public void SetExpression(Expression expr) {
@@ -48,12 +77,12 @@ public class SeriesInfo {
         this.title = title;
     }
 
-    public void SetLowX(double lowX) {
-        this.lowX = lowX;
+    public void SetXRange(Range xRange) {
+        this.xRange = xRange;
     }
-
-    public void SetHighX(double highX) {
-        this.highX = highX;
+    
+    public void SetYRange(Range yRange) {
+        this.yRange = yRange;
     }
 
     public void SetColor(Color color) {
@@ -88,12 +117,12 @@ public class SeriesInfo {
         return title;
     }
 
-    public double GetLowX() {
-        return lowX;
+    public Range GetXRange() {
+        return xRange;
     }
-
-    public double GetHighX() {
-        return highX;
+    
+    public Range GetYRange() {
+        return yRange;
     }
 
     public Color GetColor() {
@@ -109,13 +138,9 @@ public class SeriesInfo {
     }
 
     protected void SetDefaults() {
-        expr = null;
-        varName = "x";
         xLabel = "x";
         yLabel = "y";
         title = "";
-        lowX = 0;
-        highX = 1;
         color = Color.BLUE;
         thickness = 1;
         style = SeriesStyle.SOLID_LINE;
