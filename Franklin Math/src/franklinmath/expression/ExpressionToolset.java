@@ -18,9 +18,9 @@ public class ExpressionToolset {
     protected int breadthLimit = 32768;
     protected MathContext context;
     protected LookupTable lookupTable;
-    protected FunctionTable userFunctionTable, systemFunctionTable;
+    protected FunctionTable userFunctionTable,  systemFunctionTable;
     protected Vector<FMResult> resultList;
-    
+
     public ExpressionToolset() {
         context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
         lookupTable = null;
@@ -28,7 +28,7 @@ public class ExpressionToolset {
         systemFunctionTable = null;
         resultList = null;
     }
-    
+
     public ExpressionToolset(MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable systemFunctionTable, Vector<FMResult> resultList) {
         this.context = context;
         this.lookupTable = lookupTable;
@@ -649,9 +649,13 @@ public class ExpressionToolset {
 
             try {
                 Expression expr = null;
-                //call the function
-                if (systemFunctionTable != null) {
-                    if (systemFunctionTable.Exists(sf.GetName())) {
+
+                String functionName = sf.GetName();
+
+                if ((userFunctionTable != null) && (systemFunctionTable != null)) {
+
+                    //call the function
+                    if (systemFunctionTable.Exists(functionName)) {
                         Command functionCommand = systemFunctionTable.Get(sfName);
                         FMResult result = functionCommand.Execute(sfArgs, this);
                         if (result.IsExpression()) {
@@ -673,14 +677,11 @@ public class ExpressionToolset {
                             if (resultList != null) {
                                 resultList.add(result);
                             }
-                        }
-                        else {
+                        } else {
                             throw new ExecutionException("Unrecognized function result type");
                         }
                     }
-                }
-                if (userFunctionTable != null) {
-                    if (userFunctionTable.Exists(sf.GetName())) {
+                    else if (userFunctionTable.Exists(functionName)) {
                         FMResult result = userFunctionTable.Get(sfName).Execute(sfArgs, this);
                         if (!result.IsExpression()) {
                             throw new ExecutionException("Invalid user function result for " + sf.GetName());
@@ -688,7 +689,12 @@ public class ExpressionToolset {
                         expr = result.GetExpression();
                         expr = FlattenExpression(expr, depth);
                     }
+                    else {
+                        return inFactor;
+                    }
                 }
+
+
                 if (expr != null) {
                     return ExpressionToFactor(expr);
                 } else {
