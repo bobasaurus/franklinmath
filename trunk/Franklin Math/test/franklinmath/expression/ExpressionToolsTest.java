@@ -26,6 +26,7 @@ public class ExpressionToolsTest {
     protected MathContext context;
     protected FMNumber threshold;
     protected Random random;
+    protected ExpressionToolset expressionToolset;
 
     public ExpressionToolsTest() {
     }
@@ -49,9 +50,11 @@ public class ExpressionToolsTest {
     @Before
     public void setUp() throws ExecutionException {
         executor = new TreeExecutor();
-        context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
         threshold = new FMNumber("10E-15");
         random = new Random();
+        //note: this does not load any functions or variables
+        expressionToolset = new ExpressionToolset();
+        context = expressionToolset.GetMathContext();
     }
 
     @After
@@ -119,7 +122,7 @@ public class ExpressionToolsTest {
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
             FMNumber num2 = (new FMNumber(random.nextInt())).Abs(context);
-            strInput = String.format("%d + %d", num1.intValue(), num2.intValue());
+            strInput = String.format("%d + %d", num1.longValue(), num2.longValue());
             resultExpr = ProcessString(strInput);
             assertEquals(num1.Add(num2, context), resultExpr.GetSingleNumber());
         }
@@ -138,7 +141,7 @@ public class ExpressionToolsTest {
                 if (j != 0) {
                     builder.append("+");
                 }
-                builder.append(num.intValue());
+                builder.append(num.longValue());
             }
             resultExpr = ProcessString(builder.toString());
             assertEquals(result, resultExpr.GetSingleNumber());
@@ -218,7 +221,7 @@ public class ExpressionToolsTest {
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
             FMNumber num2 = (new FMNumber(random.nextInt())).Abs(context);
-            strInput = String.format("%d - %d", num1.intValue(), num2.intValue());
+            strInput = String.format("%d - %d", num1.longValue(), num2.longValue());
             resultExpr = ProcessString(strInput);
             assertEquals(num1.Subtract(num2, context), resultExpr.GetSingleNumber());
         }
@@ -236,7 +239,7 @@ public class ExpressionToolsTest {
                     result = result.Subtract(num, context);
                     builder.append("-");
                 }
-                builder.append(num.intValue());
+                builder.append(num.longValue());
             }
             resultExpr = ProcessString(builder.toString());
             assertEquals(result, resultExpr.GetSingleNumber());
@@ -289,8 +292,8 @@ public class ExpressionToolsTest {
         for (int i = 0; i < 1000; i++) {
             FMNumber num1 = new FMNumber(random.nextInt());
             FMNumber num2 = new FMNumber(random.nextInt()).Abs(context).Add(FMNumber.ONE, context);
-            String mulStr = String.format("%d * %d", num1.intValue(), num2.intValue());
-            String divStr = String.format("%d / %d", num1.intValue(), num2.intValue());
+            String mulStr = String.format("%d * %d", num1.longValue(), num2.longValue());
+            String divStr = String.format("%d / %d", num1.longValue(), num2.longValue());
 
             resultExpr = ProcessString(mulStr);
             assertEquals(resultExpr.GetSingleNumber(), num1.Multiply(num2, context));
@@ -558,25 +561,25 @@ public class ExpressionToolsTest {
         Term term = new Term();
         term = term.AppendPower(new Power(new Factor(12)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(2)), PowerOperator.MULTIPLY);
-        Term resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        Term resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertEquals(new FMNumber(24), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(-52)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(46)), PowerOperator.MULTIPLY);
-        resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertEquals(new FMNumber(-2392), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(0)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(7)), PowerOperator.MULTIPLY);
-        resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertEquals(new FMNumber(0), resultTerm.GetSingleFactor().GetNumber());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor(1)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor(42)), PowerOperator.MULTIPLY);
-        resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertEquals(new FMNumber(42), resultTerm.GetSingleFactor().GetNumber());
 
         int count = 1000;
@@ -587,7 +590,7 @@ public class ExpressionToolsTest {
             PowerOperator operator = (random.nextBoolean()) ? PowerOperator.MULTIPLY : PowerOperator.DIVIDE;
             term = term.AppendPower(new Power(new Factor(int1)), PowerOperator.NONE);
             term = term.AppendPower(new Power(new Factor(int2)), operator);
-            resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, null, 0);
+            resultTerm = expressionToolset.FlattenTerm(term, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
                 assertEquals((new FMNumber(int1)).Divide(new FMNumber(int2), context), resultTerm.GetSingleFactor().GetNumber());
             } else {
@@ -600,7 +603,7 @@ public class ExpressionToolsTest {
             operator = (random.nextBoolean()) ? PowerOperator.MULTIPLY : PowerOperator.DIVIDE;
             term = term.AppendPower(new Power(new Factor(double1)), PowerOperator.NONE);
             term = term.AppendPower(new Power(new Factor(double2)), operator);
-            resultTerm = ExpressionTools.FlattenTerm(term, context, null, null, null, null, 0);
+            resultTerm = expressionToolset.FlattenTerm(term, 0);
             if (operator.compareTo(PowerOperator.DIVIDE) == 0) {
                 FMNumber expected = (new FMNumber(double1)).Divide(new FMNumber(double2), context);
                 assertTrue(resultTerm.GetSingleFactor().GetNumber().Subtract(expected, context).Abs(context).compareTo(threshold) < 0);
@@ -616,14 +619,14 @@ public class ExpressionToolsTest {
         Term term = new Term();
         term = term.AppendPower(new Power(new Factor("a", true)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor("a", true)), PowerOperator.MULTIPLY);
-        Term resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        Term resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertEquals("a^2", resultTerm.toString().trim());
 
         term = new Term();
         term = term.AppendPower(new Power(new Factor("a", true)), PowerOperator.NONE);
         term = term.AppendPower(new Power(new Factor("b", true)), PowerOperator.MULTIPLY);
         term = term.AppendPower(new Power(new Factor("a", true)), PowerOperator.MULTIPLY);
-        resultTerm = ExpressionTools.FlattenTerm(term, null, null, null, null, null, 0);
+        resultTerm = expressionToolset.FlattenTerm(term, 0);
         assertTrue("a^2*b".equals(resultTerm.toString().trim()) || "b*a^2".equals(resultTerm.toString().trim()));
     }
 
@@ -632,37 +635,37 @@ public class ExpressionToolsTest {
         Power power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(2)));
         power = power.AppendFactor(new Factor(new FMNumber(8)));
-        Power resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        Power resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(256));
 
         power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(16)));
         power = power.AppendFactor(new Factor(new FMNumber(0.5)));
-        resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(4));
 
         power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(-1)));
         power = power.AppendFactor(new Factor(new FMNumber(2)));
-        resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(-12)));
         power = power.AppendFactor(new Factor(new FMNumber(-1)));
-        resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1.0 / -12));
 
         power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(0)));
         power = power.AppendFactor(new Factor(new FMNumber(0)));
-        resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         power = new Power();
         power = power.AppendFactor(new Factor(new FMNumber(12)));
         power = power.AppendFactor(new Factor(new FMNumber(0)));
-        resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+        resultPower = expressionToolset.FlattenPower(power, 0);
         assertEquals(resultPower.GetSingleFactor().GetNumber(), new FMNumber(1));
 
         int count = 1000;
@@ -673,7 +676,7 @@ public class ExpressionToolsTest {
             power = new Power();
             power = power.AppendFactor(new Factor(new FMNumber(num1)));
             power = power.AppendFactor(new Factor(new FMNumber(num2)));
-            resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+            resultPower = expressionToolset.FlattenPower(power, 0);
             double expectedResult = StrictMath.pow((double) num1, (double) num2);
 
             assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
@@ -684,7 +687,7 @@ public class ExpressionToolsTest {
             power = new Power();
             power = power.AppendFactor(new Factor(new FMNumber(num3)));
             power = power.AppendFactor(new Factor(new FMNumber(num4)));
-            resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+            resultPower = expressionToolset.FlattenPower(power, 0);
             expectedResult = StrictMath.pow((double) num3, (double) num4);
 
             assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
@@ -695,7 +698,7 @@ public class ExpressionToolsTest {
             power = new Power();
             power = power.AppendFactor(new Factor(new FMNumber(num5)));
             power = power.AppendFactor(new Factor(new FMNumber(num6)));
-            resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+            resultPower = expressionToolset.FlattenPower(power, 0);
             expectedResult = StrictMath.pow((double) num5, (double) num6);
 
             assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);
@@ -706,7 +709,7 @@ public class ExpressionToolsTest {
             power = new Power();
             power = power.AppendFactor(new Factor(new FMNumber(num7)));
             power = power.AppendFactor(new Factor(new FMNumber(num8)));
-            resultPower = ExpressionTools.FlattenPower(power, null, null, null, null, null, 0);
+            resultPower = expressionToolset.FlattenPower(power, 0);
             expectedResult = StrictMath.pow((double) num7, (double) num8);
 
             assertTrue(resultPower.GetSingleFactor().GetNumber().Subtract(new FMNumber(expectedResult), context).Abs(context).compareTo(threshold) < 0);

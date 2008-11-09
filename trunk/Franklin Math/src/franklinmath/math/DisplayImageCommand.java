@@ -14,7 +14,7 @@ import franklinmath.expression.*;
 public class DisplayImageCommand extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 1);
         try {
             SingleExpression single = GetSingleArgument(args);

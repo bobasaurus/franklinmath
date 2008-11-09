@@ -54,7 +54,7 @@ public class UserFunction extends Command {
     }
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         if (args.size() != symbolArgs.size()) {
             throw new CommandException("User Function argument count mismatch");
         }

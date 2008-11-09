@@ -24,6 +24,7 @@ public class TreeExecutor {
     protected FunctionTable userFunctionTable = new FunctionTable();
     protected Vector<FMResult> results = new Vector<FMResult>();
     protected MathContext context;
+    protected ExpressionToolset expressionToolset;
 
     public TreeExecutor() throws ExecutionException {
         //use reflection to build the function list
@@ -93,6 +94,10 @@ public class TreeExecutor {
         context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
 
         results.clear();
+        
+        //create the toolset that flattens expressions
+        expressionToolset = new ExpressionToolset(context, lookupTable, userFunctionTable, functionTable, results);
+        
         try {
             CheckValidTree(node, "Program");
             int numChildren = node.jjtGetNumChildren();
@@ -134,7 +139,7 @@ public class TreeExecutor {
 
         //if the statement is just an expression, finish up here
         if (numChildren == 1) {
-            lhsExpr = ExpressionTools.Flatten(lhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
+            lhsExpr = expressionToolset.Flatten(lhsExpr);
             if (lhsExpr.NumTerms() > 0) {
                 results.add(new FMResult(lhsExpr));
             }
@@ -164,7 +169,7 @@ public class TreeExecutor {
                     throw new ExecutionException("The symbol \"" + symbol + "\" is reserved");
                 }
                 Expression rhsExpr = ExecuteExpr(rhsNode);
-                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
+                rhsExpr = expressionToolset.Flatten(rhsExpr);
 
                 lookupTable.Set(symbol, rhsExpr);
                 results.add(new FMResult(rhsExpr));
@@ -176,7 +181,7 @@ public class TreeExecutor {
                 Vector<Equation> params = sf.GetParamList();
 
                 Expression rhsExpr = ExecuteExpr(rhsNode);
-                rhsExpr = ExpressionTools.Flatten(rhsExpr, context, lookupTable, userFunctionTable, functionTable, results);
+                rhsExpr = expressionToolset.Flatten(rhsExpr);
 
                 userFunctionTable.Set(sf.GetName(), new UserFunction(rhsExpr, params));
                 results.add(new FMResult(rhsExpr));
