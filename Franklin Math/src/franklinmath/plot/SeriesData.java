@@ -14,10 +14,12 @@ public class SeriesData {
 
     protected Vector<Point> pointData;
     protected SeriesInfo seriesInfo;
+    protected ExpressionToolset expressionToolset;
 
-    public SeriesData(SeriesInfo info) {
+    public SeriesData(SeriesInfo info, ExpressionToolset exprToolset) {
         assert info != null;
         assert (info.GetExpression() != null);
+        expressionToolset = exprToolset;
         
         seriesInfo = info;
         pointData = new Vector<Point>();
@@ -56,7 +58,7 @@ public class SeriesData {
                     currentX = highX;
                 }
                 Expression replacedExpr = expr.Replace(seriesInfo.GetVariableName(), new Expression(new Term(new Power(new Factor(currentX))), TermOperator.NONE));
-                Expression resultExpr = ExpressionTools.Flatten(replacedExpr, null, null, null, null, null);
+                Expression resultExpr = expressionToolset.Flatten(replacedExpr);
                 FMNumber yValue = resultExpr.GetSingleNumber();
                 if (yValue == null) {
                     pointData.add(Point.BAD_POINT);

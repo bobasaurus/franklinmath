@@ -12,7 +12,7 @@ import franklinmath.expression.*;
 public class ArcTan2Command extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 2);
         try {
 
@@ -31,10 +31,10 @@ public class ArcTan2Command extends Command {
             FMNumber number1 = factor1.GetNumber();
             FMNumber number2 = factor2.GetNumber();
             if (single1.IsSingleNegative()) {
-                number1 = number1.Negate(ExpressionTools.GetMathContext());
+                number1 = number1.Negate(expressionToolset.GetMathContext());
             }
             if (single2.IsSingleNegative()) {
-                number2 = number2.Negate(ExpressionTools.GetMathContext());
+                number2 = number2.Negate(expressionToolset.GetMathContext());
             }
 
             double result = StrictMath.atan2(number1.doubleValue(), number2.doubleValue());

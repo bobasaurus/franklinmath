@@ -13,7 +13,7 @@ public abstract class Command {
     protected String name = "";
     protected boolean isMathFunction = false;
 
-    public abstract FMResult Execute(Vector<Equation> args) throws CommandException;
+    public abstract FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException;
 
     //Typically used only during initialization.  
     public void SetName(String functionName) {

@@ -9,17 +9,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import franklinmath.util.*;
+
 /**
  * JUnit tests for the Factor class.  
  * @author Allen Jordan
  */
 public class FactorTest {
+    
+    protected ExpressionToolset expressionToolset;
 
     public FactorTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        if (!FMProperties.IsLoaded()) {
+            FMProperties.LoadProperties();
+        }
     }
 
     @AfterClass
@@ -28,6 +35,8 @@ public class FactorTest {
 
     @Before
     public void setUp() {
+        //note: this does not load any functions or variables
+        expressionToolset = new ExpressionToolset();
     }
 
     @After
@@ -104,7 +113,7 @@ public class FactorTest {
             assertEquals(factor1, factor2);
 
             //nested expression test
-            Expression expr = ExpressionTools.RandomExpression();
+            Expression expr = expressionToolset.RandomExpression();
             factor1 = new Factor(expr);
             factor2 = new Factor(expr);
             assertEquals(factor1, factor2);
@@ -113,7 +122,7 @@ public class FactorTest {
             Vector<Expression> exprList = new Vector<Expression>();
             int listSize = random.nextInt(10) + 1;
             for (int j = 0; j < listSize; j++) {
-                exprList.add(ExpressionTools.RandomExpression());
+                exprList.add(expressionToolset.RandomExpression());
             }
             factor1 = new Factor(exprList);
             factor2 = new Factor(exprList);

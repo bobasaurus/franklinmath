@@ -14,7 +14,7 @@ import franklinmath.plot.*;
 public class PlotCommand extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         try {
             int numArgs = args.size();
             if ((numArgs < 2) || (numArgs > 9)) {
@@ -61,7 +61,7 @@ public class PlotCommand extends Command {
             
             //build the series data
             SeriesInfo info = new SeriesInfo(functionExpr, variableName, lowXNum.RealValue().doubleValue(), highXNum.RealValue().doubleValue());
-            SeriesData data = new SeriesData(info);
+            SeriesData data = new SeriesData(info, expressionToolset);
             Plot plot = new Plot(data);
 
             return new FMResult(plot);

@@ -11,7 +11,7 @@ import java.util.Vector;
 public class PiCommand extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 0);
         try {
             return new FMResult(new Factor(new FMNumber(StrictMath.PI)));

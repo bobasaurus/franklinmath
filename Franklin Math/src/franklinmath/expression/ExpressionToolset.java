@@ -10,23 +10,42 @@ import franklinmath.util.*;
  * This class provides a set of tools to help with expressions and equations.  
  * @author Allen Jordan
  */
-public class ExpressionTools {
+public class ExpressionToolset {
 
     //limit the problem recursion depth
-    protected static int depthLimit = 256;
+    protected int depthLimit = 256;
     //limit the problem looping breadth
-    protected static int breadthLimit = 32768;
-    //public final static MathContext defaultContext = MathContext.DECIMAL128;
+    protected int breadthLimit = 32768;
+    protected MathContext context;
+    protected LookupTable lookupTable;
+    protected FunctionTable userFunctionTable, systemFunctionTable;
+    protected Vector<FMResult> resultList;
+    
+    public ExpressionToolset() {
+        context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
+        lookupTable = null;
+        userFunctionTable = null;
+        systemFunctionTable = null;
+        resultList = null;
+    }
+    
+    public ExpressionToolset(MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable systemFunctionTable, Vector<FMResult> resultList) {
+        this.context = context;
+        this.lookupTable = lookupTable;
+        this.userFunctionTable = userFunctionTable;
+        this.systemFunctionTable = systemFunctionTable;
+        this.resultList = resultList;
+    }
 
-    public static MathContext GetMathContext() {
-        return new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode());
+    public MathContext GetMathContext() {
+        return context;
     }
 
     /**
      * Generate a random expression (possibly for use with fuzzing)
      * @return Return the resulting random expression
      */
-    public static Expression RandomExpression() throws ExpressionException {
+    public Expression RandomExpression() throws ExpressionException {
         Random rand = new Random();
         Expression result = new Expression();
         int numTerms = rand.nextInt(5) + 1;
@@ -115,8 +134,8 @@ public class ExpressionTools {
      * @throws franklinmath.expression.ExpressionException
      * @throws franklinmath.executor.ExecutionException
      */
-    public static Equation Flatten(Equation mainEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList) throws ExpressionException, ExecutionException {
-        return FlattenEquation(mainEqu, context, lookupTable, userFunctionTable, functionTable, resultList, 0);
+    public Equation Flatten(Equation mainEqu) throws ExpressionException, ExecutionException {
+        return FlattenEquation(mainEqu, 0);
     }
 
     /**
@@ -130,24 +149,21 @@ public class ExpressionTools {
      * @throws franklinmath.expression.ExpressionException
      * @throws franklinmath.executor.ExecutionException
      */
-    public static Expression Flatten(Expression mainExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList) throws ExpressionException, ExecutionException {
-        return FlattenExpression(mainExpr, context, lookupTable, userFunctionTable, functionTable, resultList, 0);
+    public Expression Flatten(Expression mainExpr) throws ExpressionException, ExecutionException {
+        return FlattenExpression(mainExpr, 0);
     }
 
-    protected static Equation FlattenEquation(Equation inEqu, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
+    protected Equation FlattenEquation(Equation inEqu, int depth) throws ExpressionException, ExecutionException {
         assert inEqu != null;
         depth++;
         if (depth > depthLimit) {
             throw new ExpressionException("Recursion depth limit reached");
         }
-        if (context == null) {
-            context = MathContext.DECIMAL128;
-        }
 
         if (inEqu.IsExpression()) {
             Expression lhs = inEqu.GetLHS();
             assert lhs != null;
-            Expression exprFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            Expression exprFlat = FlattenExpression(lhs, depth);
             return new Equation(exprFlat, null);
         } else {
             Expression lhs = inEqu.GetLHS();
@@ -155,14 +171,14 @@ public class ExpressionTools {
             assert lhs != null;
             assert rhs != null;
 
-            Expression lhsFlat = FlattenExpression(lhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
-            Expression rhsFlat = FlattenExpression(rhs, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            Expression lhsFlat = FlattenExpression(lhs, depth);
+            Expression rhsFlat = FlattenExpression(rhs, depth);
 
             return new Equation(lhsFlat, rhsFlat);
         }
     }
 
-    protected static Expression FlattenExpression(Expression inExpr, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
+    protected Expression FlattenExpression(Expression inExpr, int depth) throws ExpressionException, ExecutionException {
         assert inExpr != null;
         depth++;
         if (depth > depthLimit) {
@@ -180,7 +196,7 @@ public class ExpressionTools {
         while (termIterator.hasNext()) {
             //retrieve and flatten the next term
             Term term = termIterator.next();
-            term = FlattenTerm(term, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            term = FlattenTerm(term, depth);
             termIterator.set(term);
             termIterator.previous();
             termIterator.next();
@@ -319,7 +335,7 @@ public class ExpressionTools {
                     newTerm = newTerm.AppendPower(term.GetPower(i), term.GetOperator(i));
                 }
 
-                newTerm = FlattenTerm(newTerm, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+                newTerm = FlattenTerm(newTerm, depth);
                 resultExpr = resultExpr.AppendTerm(newTerm, op);
             }
         }
@@ -331,14 +347,11 @@ public class ExpressionTools {
         return resultExpr;
     }
 
-    protected static Term FlattenTerm(Term inTerm, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
+    protected Term FlattenTerm(Term inTerm, int depth) throws ExpressionException, ExecutionException {
         assert inTerm != null;
         depth++;
         if (depth > depthLimit) {
             throw new ExpressionException("Recursion depth limit reached");
-        }
-        if (context == null) {
-            context = MathContext.DECIMAL128;
         }
         assert inTerm.NumPowers() > 0;
 
@@ -349,7 +362,7 @@ public class ExpressionTools {
         ListIterator powerOpIterator = operatorListCopy.listIterator();
         while (powerIterator.hasNext()) {
             //retrieve and flatten the next power
-            Power power = FlattenPower((Power) powerIterator.next(), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            Power power = FlattenPower((Power) powerIterator.next(), depth);
             powerIterator.set(power);
             powerIterator.previous();
             powerIterator.next();
@@ -491,7 +504,7 @@ public class ExpressionTools {
                             power = power.AppendFactor(new Factor(powerCount));
                         }
                         //first check for any cancellation, then append the power to the divide list
-                        Power newDividePower = CheckCancel(multiplyList, power, context);
+                        Power newDividePower = CheckCancel(multiplyList, power);
                         if (newDividePower != null) {
                             divideList.add(newDividePower);
                         }
@@ -501,7 +514,7 @@ public class ExpressionTools {
                         power = power.AppendFactor(new Factor(powerCount));
                     }
                     //first check for any cancellation, then append the power to the divide list
-                    Power newDividePower = CheckCancel(multiplyList, power, context);
+                    Power newDividePower = CheckCancel(multiplyList, power);
                     if (newDividePower != null) {
                         divideList.add(newDividePower);
                     }
@@ -511,7 +524,7 @@ public class ExpressionTools {
                     power = power.AppendFactor(new Factor(powerCount));
                 }
                 //first check for any cancellation, then append the power to the divide list
-                Power newDividePower = CheckCancel(multiplyList, power, context);
+                Power newDividePower = CheckCancel(multiplyList, power);
                 if (newDividePower != null) {
                     divideList.add(newDividePower);
                 }
@@ -536,34 +549,31 @@ public class ExpressionTools {
         //insert the multiplied powers
         for (int i = 0; i < numMultiplies; i++) {
             Power power = multiplyList.get(i);
-            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            power = FlattenPower(power, depth);
             resultTerm = resultTerm.AppendPower(power, PowerOperator.MULTIPLY);
         }
         //insert the divided powers
         for (int i = 0; i < numDivides; i++) {
             Power power = divideList.get(i);
-            power = FlattenPower(power, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            power = FlattenPower(power, depth);
             resultTerm = resultTerm.AppendPower(power, PowerOperator.DIVIDE);
         }
 
         return resultTerm;
     }
 
-    protected static Power FlattenPower(Power inPower, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
+    protected Power FlattenPower(Power inPower, int depth) throws ExpressionException, ExecutionException {
         assert inPower != null;
         depth++;
         if (depth > depthLimit) {
             throw new ExpressionException("Recursion depth limit reached");
-        }
-        if (context == null) {
-            context = MathContext.DECIMAL128;
         }
 
         assert inPower.NumFactors() > 0;
         Vector<Factor> factorListCopy = inPower.GetFactors();
         ListIterator powerIterator = factorListCopy.listIterator(inPower.NumFactors());
         Factor previousFactor = (Factor) powerIterator.previous();
-        previousFactor = FlattenFactor(previousFactor, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+        previousFactor = FlattenFactor(previousFactor, depth);
         if (previousFactor == null) {
             powerIterator.remove();
             return inPower;
@@ -572,7 +582,7 @@ public class ExpressionTools {
 
         while (powerIterator.hasPrevious()) {
             Factor factor = (Factor) powerIterator.previous();
-            factor = FlattenFactor(factor, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            factor = FlattenFactor(factor, depth);
             if (factor == null) {
                 powerIterator.remove();
                 return inPower;
@@ -606,7 +616,7 @@ public class ExpressionTools {
         return new Power(factorListCopy);
     }
 
-    protected static Factor FlattenFactor(Factor inFactor, MathContext context, LookupTable lookupTable, FunctionTable userFunctionTable, FunctionTable functionTable, Vector<FMResult> resultList, int depth) throws ExpressionException, ExecutionException {
+    protected Factor FlattenFactor(Factor inFactor, int depth) throws ExpressionException, ExecutionException {
         assert inFactor != null;
         depth++;
         if (depth > depthLimit) {
@@ -621,8 +631,8 @@ public class ExpressionTools {
                 String symbol = inFactor.GetSymbol();
                 if (lookupTable.Exists(symbol)) {
                     Expression expr = lookupTable.Get(symbol);
-                    expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
-                    return ExpressionToFactor(expr, context);
+                    expr = FlattenExpression(expr, depth);
+                    return ExpressionToFactor(expr);
                 }
             }
         }//end symbol processing
@@ -632,7 +642,7 @@ public class ExpressionTools {
             Vector<Equation> sfArgs = sf.GetParamList();
             //flatten each function argument
             for (int i = 0; i < sfArgs.size(); i++) {
-                Equation equFlat = FlattenEquation(sfArgs.get(i), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+                Equation equFlat = FlattenEquation(sfArgs.get(i), depth);
                 sfArgs.set(i, equFlat);
             }
             sf = new SymbolicFunction(sfName, sfArgs, sf.IsMathFunction());
@@ -640,10 +650,10 @@ public class ExpressionTools {
             try {
                 Expression expr = null;
                 //call the function
-                if (functionTable != null) {
-                    if (functionTable.Exists(sf.GetName())) {
-                        Command functionCommand = functionTable.Get(sfName);
-                        FMResult result = functionCommand.Execute(sfArgs);
+                if (systemFunctionTable != null) {
+                    if (systemFunctionTable.Exists(sf.GetName())) {
+                        Command functionCommand = systemFunctionTable.Get(sfName);
+                        FMResult result = functionCommand.Execute(sfArgs, this);
                         if (result.IsExpression()) {
                             expr = result.GetExpression();
                         } else if (result.IsEquation()) {
@@ -671,16 +681,16 @@ public class ExpressionTools {
                 }
                 if (userFunctionTable != null) {
                     if (userFunctionTable.Exists(sf.GetName())) {
-                        FMResult result = userFunctionTable.Get(sfName).Execute(sfArgs);
+                        FMResult result = userFunctionTable.Get(sfName).Execute(sfArgs, this);
                         if (!result.IsExpression()) {
                             throw new ExecutionException("Invalid user function result for " + sf.GetName());
                         }
                         expr = result.GetExpression();
-                        expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+                        expr = FlattenExpression(expr, depth);
                     }
                 }
                 if (expr != null) {
-                    return ExpressionToFactor(expr, context);
+                    return ExpressionToFactor(expr);
                 } else {
                     inFactor = new Factor();
                 }
@@ -691,14 +701,14 @@ public class ExpressionTools {
         }//end symbolic function processing
         else if (inFactor.IsNestedExpr()) {
             Expression expr = inFactor.GetNestedExpr();
-            expr = FlattenExpression(expr, context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+            expr = FlattenExpression(expr, depth);
 
-            return ExpressionToFactor(expr, context);
+            return ExpressionToFactor(expr);
         }//end nested expression processing
         else if (inFactor.IsExprList()) {
             Vector<Expression> exprList = inFactor.GetExprList();
             for (int i = 0; i < exprList.size(); i++) {
-                Expression exprFlat = FlattenExpression(exprList.get(i), context, lookupTable, userFunctionTable, functionTable, resultList, depth);
+                Expression exprFlat = FlattenExpression(exprList.get(i), depth);
                 exprList.set(i, exprFlat);
             }
             return new Factor(exprList);
@@ -712,7 +722,7 @@ public class ExpressionTools {
      * @param expr  The expression (hopefully pre-flattened) needing to be converted into a factor.  
      * @return      The resulting factor created from the given expression.  
      */
-    protected static Factor ExpressionToFactor(Expression expr, MathContext context) throws ExpressionException {
+    protected Factor ExpressionToFactor(Expression expr) throws ExpressionException {
         assert expr != null;
 
         SingleExpression single = expr.GetSingle();
@@ -739,7 +749,7 @@ public class ExpressionTools {
      * @param divValue      The dividing value in the denominator.  
      * @return              Null if total cancellation removed the power, otherwise returns the proper divide power to use.  
      */
-    protected static Power CheckCancel(Vector<Power> mulList, Power divValue, MathContext context) throws ExpressionException {
+    protected Power CheckCancel(Vector<Power> mulList, Power divValue) throws ExpressionException {
         boolean done = false;
         ListIterator<Power> mulIterator = mulList.listIterator();
         while (mulIterator.hasNext() && (!done)) {

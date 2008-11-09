@@ -15,9 +15,9 @@ import franklinmath.expression.*;
 public class RandomExpressionCommand extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         try {
-            Expression randomExpr = ExpressionTools.RandomExpression();
+            Expression randomExpr = expressionToolset.RandomExpression();
             return new FMResult(randomExpr);
         } catch (ExpressionException ex) {
             throw new CommandException(ex.toString());

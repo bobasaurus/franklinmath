@@ -12,7 +12,7 @@ import franklinmath.expression.*;
 public class ArcCosCommand extends Command {
 
     @Override
-    public FMResult Execute(Vector<Equation> args) throws CommandException {
+    public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 1);
         try {
             SingleExpression single = GetSingleArgument(args);
@@ -20,7 +20,7 @@ public class ArcCosCommand extends Command {
             Factor factor = single.SingleValue();
             FMNumber number = factor.GetNumber();
             if (single.IsSingleNegative()) {
-                number = number.Negate(ExpressionTools.GetMathContext());
+                number = number.Negate(expressionToolset.GetMathContext());
             }
 
             double result = StrictMath.acos(number.doubleValue());
