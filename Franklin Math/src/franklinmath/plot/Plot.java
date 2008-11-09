@@ -28,7 +28,7 @@ public class Plot extends JPanel {
         AddSeries(series);
     }
 
-    private void InitializeCoordinateData() {
+    protected void InitializeCoordinateData() {
         windowWidth = this.getWidth();
         windowHeight = this.getHeight();
         plotWidth = windowWidth - 2 * borderSize;
@@ -50,12 +50,6 @@ public class Plot extends JPanel {
             SeriesData seriesData = seriesCollection.get(i);
             SeriesInfo seriesInfo = seriesData.GetSeriesInfo();
 
-            //set the graphic options
-            int thickness = seriesInfo.GetThickness();
-            BasicStroke stroke = new BasicStroke(thickness);
-            g2d.setStroke(stroke);
-            g2d.setColor(seriesInfo.GetColor());
-
             Vector<franklinmath.util.Point> pointData = seriesData.GetData();
             //determine sizing information
             franklinmath.util.Range xRange = seriesInfo.GetXRange();
@@ -63,8 +57,14 @@ public class Plot extends JPanel {
             double aspectX = ((double) plotWidth) / (xRange.GetWidth());
             double aspectY = ((double) plotHeight) / (yRange.GetWidth());
 
+            franklinmath.util.Point origin = DataToPlotTransform(new franklinmath.util.Point(0, 0), aspectX, aspectY, xRange, yRange);
+            DrawAxis(g2d, origin, xRange, yRange);
 
-            //DrawAxis(g2d, borderSize, windowWidth, windowHeight, seriesInfo.GetLowX(), seriesInfo.GetHighX(), seriesData.GetLowY(), seriesData.GetHighY());
+            //set the graphic options
+            int thickness = seriesInfo.GetThickness();
+            BasicStroke stroke = new BasicStroke(thickness);
+            g2d.setStroke(stroke);
+            g2d.setColor(seriesInfo.GetColor());
 
             //antialias the line
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -114,27 +114,36 @@ public class Plot extends JPanel {
         }
     }
 
-    private void DrawAxis(Graphics2D g2d, int borderSize, int windowWidth, int windowHeight, double lowX, double highX, double lowY, double highY) {
-        int startWidth = borderSize;
-        int endWidth = windowWidth - borderSize;
-        int startHeight = borderSize;
-        int endHeight = windowHeight - borderSize;
+    protected void DrawAxis(Graphics2D g2d, franklinmath.util.Point origin, franklinmath.util.Range xRange, franklinmath.util.Range yRange) {
+        g2d.setColor(Color.black);
+        if (origin.x < plotStartX) {
+            origin.x = plotStartX;
+        } else if (origin.x > plotEndX) {
+            origin.x = plotEndX;
+        }
 
-        Color backupColor = g2d.getColor();
-        Stroke strokeBackup = g2d.getStroke();
-        g2d.setColor(Color.BLACK);
-        g2d.setStroke(new BasicStroke(1));
-
-        //draw straight axis lines
-        g2d.drawLine(startWidth, startHeight, startWidth, endHeight);
-        g2d.drawLine(startWidth, endHeight, endWidth, endHeight);
-
-
-        g2d.setColor(backupColor);
-        g2d.setStroke(strokeBackup);
+        if (origin.y < plotStartY) {
+            origin.y = plotStartY;
+        } else if (origin.y > plotEndY) {
+            origin.y = plotEndY;
+        }
+        
+        g2d.drawLine(plotStartX, (int)origin.y, plotEndX, (int)origin.y);
+        g2d.drawLine((int)origin.x, plotStartY, (int)origin.x, plotEndY);
+        
+        
     }
 
-    private franklinmath.util.Point DataToPlotTransform(franklinmath.util.Point dataPoint, double aspectX, double aspectY, franklinmath.util.Range xRange, franklinmath.util.Range yRange) {
+    /**
+     * Transform a data coordinate to fit within the plot window.  
+     * @param dataPoint     The data point to transform
+     * @param aspectX       The horizontal aspect ratio for the transformation
+     * @param aspectY       The vertical aspect ratio for the transformation
+     * @param xRange        The independent variable's range
+     * @param yRange        The dependent variable's range
+     * @return
+     */
+    protected franklinmath.util.Point DataToPlotTransform(franklinmath.util.Point dataPoint, double aspectX, double aspectY, franklinmath.util.Range xRange, franklinmath.util.Range yRange) {
         double normalizedDataX = dataPoint.x - xRange.low;
         double normalizedDataY = dataPoint.y - yRange.low;
         double plotX = normalizedDataX * aspectX + borderSize;
