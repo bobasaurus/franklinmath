@@ -20,7 +20,7 @@ import java.util.Random;
  * JUnit tests for the ExpressionTools class.  
  * @author Allen Jordan
  */
-public class ExpressionToolsTest {
+public class ExpressionToolsetTest {
 
     protected TreeExecutor executor;
     protected MathContext context;
@@ -28,7 +28,12 @@ public class ExpressionToolsTest {
     protected Random random;
     protected ExpressionToolset expressionToolset;
 
-    public ExpressionToolsTest() {
+    public ExpressionToolsetTest() {
+        threshold = new FMNumber(10E-15d);
+        
+        //note: this does not load any functions or variables
+        expressionToolset = new ExpressionToolset();
+        context = expressionToolset.GetMathContext();
     }
 
     @BeforeClass
@@ -50,11 +55,7 @@ public class ExpressionToolsTest {
     @Before
     public void setUp() throws ExecutionException {
         executor = new TreeExecutor();
-        threshold = new FMNumber("10E-15");
         random = new Random();
-        //note: this does not load any functions or variables
-        expressionToolset = new ExpressionToolset();
-        context = expressionToolset.GetMathContext();
     }
 
     @After
