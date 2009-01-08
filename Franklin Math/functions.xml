@@ -194,4 +194,17 @@
 	</example>
 </function>
 
+<function>
+	<name>Sqrt</name>
+	<category>Elementary Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The square root function.  
+	</description>
+	<example>
+		<input>Sqrt[16]</input>
+		<result>4</result>
+	</example>
+</function>
+
 </functionlist>
