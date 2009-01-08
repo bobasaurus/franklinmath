@@ -104,19 +104,6 @@
 </function>
 
 <function>
-	<name>Pi</name>
-	<category>Trigonometry</category>
-	<is_math_function>true</is_math_function>
-	<description>
-		The Pi trigonometric constant.  
-	</description>
-	<example>
-		<input>Pi[]</input>
-		<result>3.14159</result>
-	</example>
-</function>
-
-<function>
 	<name>RandomExpression</name>
 	<category>Trigonometry</category>
 	<is_math_function>false</is_math_function>
@@ -152,6 +139,58 @@
 	<example>
 		<input>Plot[x^2, {x, -10, 10}]</input>
 		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>Pi</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Pi trigonometric constant.  
+	</description>
+	<example>
+		<input>Pi[]</input>
+		<result>3.14159</result>
+	</example>
+</function>
+
+<function>
+	<name>E</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The exponential constant.  
+	</description>
+	<example>
+		<input>E[]</input>
+		<result>2.71828</result>
+	</example>
+</function>
+
+<function>
+	<name>GoldenRatio</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The golden ratio.  
+	</description>
+	<example>
+		<input>GoldenRatio[]</input>
+		<result>1.61803</result>
+	</example>
+</function>
+
+<function>
+	<name>FibonacciNumbers</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		The sequence of fibonacci numbers, calculated up to the specified length.  
+	</description>
+	<example>
+		<input>FibonacciNumbers[10]</input>
+		<result>{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}</result>
 	</example>
 </function>
 
