@@ -49,6 +49,7 @@ public class FMProperties {
         SetPrecision(34);
         SetRoundingMode(java.math.RoundingMode.HALF_EVEN);
         SetDisplayPrecision(15);
+        SetNumPlotPoints(50);
     }
 
     public static synchronized void SetPrecision(int value) {
