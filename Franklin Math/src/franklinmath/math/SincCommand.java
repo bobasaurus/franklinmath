@@ -32,24 +32,14 @@ public class SincCommand extends Command {
             Expression expr = new Expression(term, TermOperator.NONE);
             
             return new FMResult(expressionToolset.Flatten(expr));
-        } catch (ExpressionException ex) {
+        } catch (Exception ex) {
             try {
-                SingleExpression single = GetSingleArgument(args);
-                SymbolicFunction sinFunc = new SymbolicFunction("Sin", args, true);
-                Term term = new Term(new Power(new Factor(sinFunc)));
-                term = term.AppendPower(new Power(single.SingleValue()), PowerOperator.DIVIDE);
+                Equation arg0 = args.get(0);
+                if (!arg0.IsExpression()) throw new CommandException(ex.toString(), GetName());
                 
-                return new FMResult(new Expression(term, TermOperator.NONE));
-            } catch (Exception ex2) {
-                throw new CommandException(ex2.toString(), GetName());
-            }
-        }
-        catch (ExecutionException ex) {
-            try {
-                SingleExpression single = GetSingleArgument(args);
                 SymbolicFunction sinFunc = new SymbolicFunction("Sin", args, true);
                 Term term = new Term(new Power(new Factor(sinFunc)));
-                term = term.AppendPower(new Power(single.SingleValue()), PowerOperator.DIVIDE);
+                term = term.AppendPower(new Power(new Factor(arg0.GetLHS())), PowerOperator.DIVIDE);
                 
                 return new FMResult(new Expression(term, TermOperator.NONE));
             } catch (Exception ex2) {
