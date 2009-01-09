@@ -58,6 +58,14 @@ public class FMProperties {
     public static synchronized int GetPrecision() {
         return GetInt("number.precision");
     }
+    
+    public static synchronized void SetNumPlotPoints(long value) {
+        SetLong("plot.numPoints", value);
+    }
+    
+    public static synchronized long GetNumPlotPoints() {
+        return GetLong("plot.numPoints");
+    }
 
     public static synchronized void SetRoundingModeIndex(int mode) {
         SetInt("number.rounding", mode);
@@ -161,6 +169,14 @@ public class FMProperties {
 
     protected static int GetInt(String name) throws NumberFormatException {
         return Integer.parseInt(properties.getProperty(name));
+    }
+    
+    protected static void SetLong(String name, long value) {
+        properties.setProperty(name, String.valueOf(value));
+    }
+
+    protected static long GetLong(String name) throws NumberFormatException {
+        return Long.parseLong(properties.getProperty(name));
     }
 
     protected static void SetDouble(String name, double value) {

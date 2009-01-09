@@ -24,7 +24,7 @@ public class SeriesData {
         seriesInfo = info;
         pointData = new Vector<Point>();
 
-        long numPoints = 40;
+        long numPoints = FMProperties.GetNumPlotPoints();
         GenerateData(numPoints);
     }
 
