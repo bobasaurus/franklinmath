@@ -26,6 +26,19 @@
 </function>
 
 <function>
+	<name>Sinc</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Sinc (sine cardinal) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Sinc[2]</input>
+		<result>0.45464</result>
+	</example>
+</function>
+
+<function>
 	<name>Cos</name>
 	<category>Trigonometry</category>
 	<is_math_function>true</is_math_function>
@@ -195,6 +208,19 @@
 </function>
 
 <function>
+	<name>Random</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Generate a random positive number less than 1.  
+	</description>
+	<example>
+		<input>Random[]</input>
+		<result>0.45603</result>
+	</example>
+</function>
+
+<function>
 	<name>Sqrt</name>
 	<category>Elementary Functions</category>
 	<is_math_function>true</is_math_function>
@@ -206,5 +232,7 @@
 		<result>4</result>
 	</example>
 </function>
+
+
 
 </functionlist>
