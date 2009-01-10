@@ -234,5 +234,17 @@
 </function>
 
 
+<function>
+	<name>Log</name>
+	<category>Elementary Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The logarithm of a number.  The first argument is the base, the second is the input value.  
+	</description>
+	<example>
+		<input>Log[10, 2]</input>
+		<result></result>
+	</example>
+</function>
 
 </functionlist>
