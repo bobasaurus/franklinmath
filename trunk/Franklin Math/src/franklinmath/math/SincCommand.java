@@ -15,12 +15,7 @@ public class SincCommand extends Command {
     public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 1);
         try {
-            SingleExpression single = GetSingleArgument(args);
-            Factor factor = single.SingleValue();
-            FMNumber number = factor.GetNumber();
-            if (single.IsSingleNegative()) {
-                number = number.Negate(expressionToolset.GetMathContext());
-            }
+            FMNumber number = GetNumberArgument(args, 0);
 
             if (number.compareTo(FMNumber.ONE) == 0) {
                 return new FMResult(new Factor(FMNumber.ONE));

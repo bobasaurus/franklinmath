@@ -58,4 +58,20 @@ public abstract class Command {
 
         return single;
     }
+
+    protected FMNumber GetNumberArgument(Vector<Equation> args, int index) throws CommandException {
+        if (args.size() <= index) {
+            throw new CommandException("Too few arguments", GetName());
+        }
+        Equation argument = args.get(index);
+        if (!argument.IsExpression()) {
+            throw new CommandException("Equation invalid as argument", GetName());
+        }
+        try {
+            FMNumber result = argument.GetLHS().GetSingleNumber();
+            return result;
+        } catch (ExpressionException ex) {
+            throw new CommandException(ex.getMessage(), GetName());
+        }
+    }
 }
