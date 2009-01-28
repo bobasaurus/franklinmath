@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!--<!DOCTYPE function [
-	<!ELEMENT function (name, category*, is_math_function?, description?, example*)>
-	<!ELEMENT name				(#PCDATA)>
-	<!ELEMENT category			(#PCDATA)>
-	<!ELEMENT is_math_function	(#PCDATA)>
-	<!ELEMENT description		(#PCDATA)>
-	<!ELEMENT example (input, result)>
-		<!ELEMENT input			(#PCDATA)>
-		<!ELEMENT result		(#PCDATA)>
-]>-->
 
 <functionlist>
 
@@ -243,7 +233,59 @@
 	</description>
 	<example>
 		<input>Log[10, 2]</input>
-		<result></result>
+		<result>0.30103</result>
+	</example>
+</function>
+
+<function>
+	<name>Mod</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Take the modulo of the two input parameters, giving the remainder from divding the first by the second.  
+	</description>
+	<example>
+		<input>Mod[20, 4]</input>
+		<result>0</result>
+	</example>
+</function>
+
+<function>
+	<name>DegreesToRadians</name>
+	<category>Conversions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Convert the input degree value to radians.  
+	</description>
+	<example>
+		<input>DegreesToRadians[180]</input>
+		<result>3.14159</result>
+	</example>
+</function>
+
+<function>
+	<name>RadiansToDegrees</name>
+	<category>Conversions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Convert the input radians value to degrees.  
+	</description>
+	<example>
+		<input>RadiansToDegrees[Pi[]]</input>
+		<result>180</result>
+	</example>
+</function>
+
+<function>
+	<name>Abs</name>
+	<category>Numerical Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		Take the absolute value of the input number.  
+	</description>
+	<example>
+		<input>Abs[-3]</input>
+		<result>3</result>
 	</example>
 </function>
 

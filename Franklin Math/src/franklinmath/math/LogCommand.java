@@ -15,14 +15,10 @@ public class LogCommand extends Command {
     public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 2);
         try {
-            Equation argEqu1 = args.get(0);
-            Equation argEqu2 = args.get(1);
-            if ((!argEqu1.IsExpression()) || (!argEqu2.IsExpression())) throw new ExecutionException("Invalid argument: equation parameters not allowed");
-            FMNumber arg1 = argEqu1.GetLHS().GetSingleNumber();
-            FMNumber arg2 = argEqu2.GetLHS().GetSingleNumber();
+            FMNumber base = GetNumberArgument(args, 0);
+            FMNumber number = GetNumberArgument(args, 1);
             
-            double result = StrictMath.log(arg2.doubleValue())/StrictMath.log(arg1.doubleValue());
-            
+            double result = StrictMath.log(number.doubleValue())/StrictMath.log(base.doubleValue());
             return new FMResult(new Factor(new FMNumber(result)));
         } catch (Exception ex) {
             try {

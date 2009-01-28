@@ -15,29 +15,15 @@ public class SinCommand extends Command {
     public FMResult Execute(Vector<Equation> args, ExpressionToolset expressionToolset) throws CommandException {
         CheckArgsLength(args, 1);
         try {
-            SingleExpression single = GetSingleArgument(args);
-
-            Factor factor = single.SingleValue();
-            FMNumber number = factor.GetNumber();
-            if (single.IsSingleNegative()) {
-                number = number.Negate(expressionToolset.GetMathContext());
-            }
+            FMNumber number = GetNumberArgument(args, 0);
 
             double result = StrictMath.sin(number.doubleValue());
             return new FMResult(new Factor(new FMNumber(result)));
-        } catch (ExpressionException ex) {
-            try {
-                SymbolicFunction newSF = new SymbolicFunction(GetName(), args, isMathFunction);
-                Factor newFactor = new Factor(newSF);
-                return new FMResult(newFactor);
-            } catch (ExpressionException ex2) {
-                throw new CommandException(ex2.toString(), GetName());
-            }
-        } catch (CommandException ex) {
+        } catch (Exception ex) {
             try {
                 return new FMResult(new Factor(new SymbolicFunction(GetName(), args, isMathFunction)));
             } catch (ExpressionException ex2) {
-                throw ex;
+                throw new CommandException(ex.toString(), GetName());
             }
         }
     }
