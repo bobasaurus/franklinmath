@@ -5,7 +5,7 @@ import javax.swing.text.*;
 import java.awt.*;
 
 /**
- * A handy extension of JTextPane that highlights Franklin Math syntax
+ * A handy extension of JTextPane that adds functionality
  * @author Allen Jordan
  */
 public class FancyTextPane extends JTextPane {
