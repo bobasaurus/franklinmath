@@ -28,12 +28,31 @@ public class FancyTextPane extends JTextPane {
         }
     }
 
+    public void Prepend(String value) {
+        try {
+            AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
+            document.insertString(0, value, attribSet);
+        } catch (BadLocationException ex) {
+        }
+    }
+    
     public void Append(Image image) {
         try {
             StyledDocument doc = (StyledDocument) this.getDocument();
             Style style = doc.addStyle("ImageStyle", null);
             StyleConstants.setIcon(style, new ImageIcon(image));
             doc.insertString(doc.getLength(), " ", style);
+        } catch (BadLocationException ex) {
+        }
+    }
+    
+    public void Prepend(Image image, boolean addNewline) {
+        try {
+            StyledDocument doc = (StyledDocument) this.getDocument();
+            Style style = doc.addStyle("ImageStyle", null);
+            StyleConstants.setIcon(style, new ImageIcon(image));
+            doc.insertString(0, " ", style);
+            if (addNewline) doc.insertString(1, "\n", style);
         } catch (BadLocationException ex) {
         }
     }

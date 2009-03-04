@@ -145,10 +145,20 @@ public class MainWindowBasic extends JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading in user properties/settings: " + ex.toString());
         }
+        
+        FunctionInformation functionInformation = null;
+        //try to load in in the system function information
+        try {
+            functionInformation = new FunctionInformation("functions.xml");
+        }
+        catch (java.io.IOException ex) {
+            JOptionPane.showMessageDialog(this, "Critical Error loading in system functions: " + ex.toString());
+            System.exit(0);
+        }
 
         try {
             //create the tree executor, loading in the list of built-in functions
-            executor = new TreeExecutor();
+            executor = new TreeExecutor(functionInformation);
         } catch (Exception ex) {
             outputPane.Append(ex.toString());
         }

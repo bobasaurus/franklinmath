@@ -3,15 +3,11 @@ package franklinmath.executor;
 import java.util.*;
 import java.math.*;
 import java.lang.reflect.*;
-import java.io.*;
+//import java.io.*;
 
 import franklinmath.parser.*;
 import franklinmath.expression.*;
 import franklinmath.util.*;
-
-import javax.xml.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
 
 /**
  * This class executes a parsed syntax tree.  
@@ -26,52 +22,24 @@ public class TreeExecutor {
     protected MathContext context;
     protected ExpressionToolset expressionToolset;
 
-    public TreeExecutor() throws ExecutionException {
-        //use reflection to build the function list
+    public TreeExecutor(FunctionInformation functionInformation) throws ExecutionException {
         try {
-            //Read in the XML function list.  The java DOM API is fairly complex and difficult.  Might eventually switch back to the JDOM library.  
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new File("functions.xml"));
-            Element root = document.getDocumentElement();
-            NodeList functionNodeList = root.getElementsByTagName("function");
-            for (int i = 0; i < functionNodeList.getLength(); i++) {
-                org.w3c.dom.Node node = functionNodeList.item(i);
-                if (node.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
-                    throw new ExecutionException("XML function list parsing error; invalid node type");
-                }
-                if (!node.getNodeName().equals("function")) {
-                    throw new ExecutionException("XML function list parsing error; invalid element name");
-                }
-
-                String functionName = "";
-                boolean isMathFunction = false;
-
-                NodeList functionDataList = node.getChildNodes();
-                for (int j = 0; j < functionDataList.getLength(); j++) {
-                    org.w3c.dom.Node dataNode = functionDataList.item(j);
-                    String nodeName = dataNode.getNodeName();
-
-                    if (nodeName.equals("name")) {
-                        functionName = dataNode.getTextContent();
-                    } else if (nodeName.equals("is_math_function")) {
-                        isMathFunction = (dataNode.getTextContent().equals("true")) ? true : false;
-                    }
-                }
-
-                String classname = "franklinmath.math." + functionName + "Command";
+            Vector<FunctionInformation.FunctionInfo> functionInfoList = functionInformation.GetFunctionList();
+            for (int i = 0; i < functionInfoList.size(); i++) {
+                FunctionInformation.FunctionInfo info = functionInfoList.get(i);
+                String classname = "franklinmath.math." + info.name + "Command";
                 Class function = Class.forName(classname);
                 Constructor functionConstructor = function.getConstructor();
 
                 Command functionCommand = (Command) functionConstructor.newInstance();
-                functionCommand.SetName(functionName);
-                functionCommand.SetIsMathFunction(isMathFunction);
+                functionCommand.SetName(info.name);
+                functionCommand.SetIsMathFunction(info.isMathFunction);
 
                 //add the command into the function table
-                functionTable.Set(functionName, functionCommand);
+                functionTable.Set(info.name, functionCommand);
             }
         } catch (Exception ex) {
-            throw new ExecutionException("Error when loading function table: " + ex.toString());
+            throw new ExecutionException(ex.toString());
         }
     }
 
@@ -94,10 +62,10 @@ public class TreeExecutor {
         context = new MathContext(FMProperties.GetPrecision(), FMProperties.GetRoundingMode());
 
         results.clear();
-        
+
         //create the toolset that flattens expressions
         expressionToolset = new ExpressionToolset(context, lookupTable, userFunctionTable, functionTable, results);
-        
+
         try {
             CheckValidTree(node, "Program");
             int numChildren = node.jjtGetNumChildren();

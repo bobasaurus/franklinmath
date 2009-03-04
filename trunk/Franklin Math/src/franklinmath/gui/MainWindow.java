@@ -3,6 +3,7 @@ package franklinmath.gui;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.tree.*;
+import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.Image;
 import java.util.*;
@@ -24,9 +25,14 @@ public class MainWindow extends javax.swing.JFrame {
     protected FancyTextPane outputTextPane;
     protected DefaultMutableTreeNode rootFunctionNode;
     //Franklin Math's command execution class
-    private TreeExecutor executor;
+    protected TreeExecutor executor;
     //atomic boolean to help ensure proper concurrency
-    private java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
+    protected java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
+    protected FunctionInformation functionInformation;
+    //table containing function information for documentation lookup
+    protected Hashtable<String, FunctionInformation.FunctionInfo> functionInfoTable;
+    protected String HTMLBegin = "<html><body>";
+    protected String HTMLEnd = "</body></html>";
 
     /** Creates new form MainWindow */
     public MainWindow() {
@@ -45,9 +51,6 @@ public class MainWindow extends javax.swing.JFrame {
         rootFunctionNode = new DefaultMutableTreeNode("Available Functions");
         DefaultTreeModel treeModel = new DefaultTreeModel(rootFunctionNode);
         functionTree.setModel(treeModel);
-        rootFunctionNode.add(new DefaultMutableTreeNode("Numeric Functions"));
-        TreePath pathToRoot = new TreePath(rootFunctionNode.getPath());
-        functionTree.expandPath(pathToRoot);
 
         //make sure the cursor starts in the input text box
         inputTextArea.requestFocus();
@@ -75,17 +78,88 @@ public class MainWindow extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error loading in user properties/settings: " + ex.toString());
         }
 
+        //try to load in in the system function information
         try {
-            //create the tree executor, loading in the list of built-in functions
-            executor = new TreeExecutor();
-        } catch (Exception ex) {
-            outputTextPane.Append(ex.toString());
+            functionInformation = new FunctionInformation("functions.xml");
+        } catch (java.io.IOException ex) {
+            JOptionPane.showMessageDialog(this, "Critical Error loading in system functions: " + ex.toString());
+            System.exit(0);
         }
 
+        //display function information in the GUI tree
+        Vector<FunctionInformation.FunctionInfo> functionInfoList = functionInformation.GetFunctionList();
+        Vector<String> functionCategoryList = functionInformation.GetCategoryList();
+        //store the category nodes in a hash table indexec by category name for easy function insertion later
+        Hashtable<String, DefaultMutableTreeNode> categoryTable = new Hashtable<String, DefaultMutableTreeNode>();
+        //store the function information in a table indexed by function name for easy access later
+        functionInfoTable = new Hashtable<String, FunctionInformation.FunctionInfo>();
+        for (int categoryIndex = 0; categoryIndex < functionCategoryList.size(); categoryIndex++) {
+            String category = functionCategoryList.get(categoryIndex);
+            DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(category);
+            categoryTable.put(category, categoryNode);
+            rootFunctionNode.add(categoryNode);
+        }
+        //insert the function names into their proper categories in the GUI tree
+        for (int functionIndex = 0; functionIndex < functionInfoList.size(); functionIndex++) {
+            FunctionInformation.FunctionInfo info = functionInfoList.get(functionIndex);
+            functionInfoTable.put(info.name, info);
+            DefaultMutableTreeNode functionNode = new DefaultMutableTreeNode(info.name);
+            categoryTable.get(info.category).add(functionNode);
+        }
+
+        //allow only one selection at a time on the function tree
+        functionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        //setup the tree selection listener
+        functionTree.addTreeSelectionListener(
+                new TreeSelectionListener() {
+
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) functionTree.getLastSelectedPathComponent();
+                        if (node == null) {
+                            return;
+                        }
+                        String nodeName = ((String) node.getUserObject());
+                        FunctionSelected(nodeName);
+                    }
+                });
+
+        //make sure the function table is set in html mode
+        functionDocumentationPane.setContentType("text/html");
+
+        //expand the root tree node
+        TreePath pathToRoot = new TreePath(rootFunctionNode.getPath());
+        functionTree.expandPath(pathToRoot);
+
+        try {
+            //create the tree executor
+            executor = new TreeExecutor(functionInformation);
+        } catch (Exception ex) {
+            outputTextPane.Append(ex.toString() + "\n");
+        }
+    }
+
+    //called to display documentation when a function is selected in the GUI tree
+    protected void FunctionSelected(String name) {
+        if (functionInfoTable.containsKey(name)) {
+            FunctionInformation.FunctionInfo info = functionInfoTable.get(name);
+            String docHTML = HTMLBegin + "<center><b>" + info.name + "</b></center><br>" + info.description + "<br><b>Example:</b><br>" + info.exampleInput + "<br>" + info.exampleResult + HTMLEnd;
+            functionDocumentationPane.setText(docHTML);
+            functionDocumentationScrollPane.getViewport().setViewPosition(new java.awt.Point(0, 0));
+            //have the documentation window scroll to the top
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    functionDocumentationPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
+                }
+            });
+        //functionDocumentationScrollPane.getVerticalScrollBar().getModel().setValue(0);
+        }
     }
 
     /**
-     * Start evaluating the current set of math commands in the input box
+     * Start evaluating the current set of math commands in the input box.  
      */
     public void Evaluate() {
         //see if we need to clear away the initial instruction text
@@ -104,12 +178,14 @@ public class MainWindow extends javax.swing.JFrame {
             outputTextPane.Append("No math commands have been entered.  \n");
             return;
         }
+
+        //start the worker thread running to execute the math commands
         javax.swing.SwingWorker worker = new EvaluationWorker(text);
         worker.execute();
     }
 
     /**
-     * Represents a worker thread that will parse and evaluate the given input code.  
+     * Represents a worker thread that will parse and evaluate the given input commands.  
      */
     private class EvaluationWorker extends javax.swing.SwingWorker<Vector<FMResult>, Void> {
 
@@ -152,27 +228,26 @@ public class MainWindow extends javax.swing.JFrame {
                     FMResult result = resultList.get(i);
                     if (result.IsExpression()) {
                         String exprString = result.GetExpression().toString();
-                        outputTextPane.Append(exprString);
+                        outputTextPane.Prepend(exprString + "\n");
 //                        hotEqn.setEquation(exprString);
                     //DisplayExpression(result.GetExpression());
                     } else if (result.IsEquation()) {
                         String equString = result.GetEquation().toString();
-                        outputTextPane.Append(equString);
+                        outputTextPane.Prepend(equString + "\n");
 
                     } else if (result.IsString()) {
-                        outputTextPane.Append("\"" + result.GetString() + "\"");
+                        outputTextPane.Prepend("\"" + result.GetString() + "\"\n");
                     } else if (result.IsImage()) {
                         Image img = result.GetImage();
-                        outputTextPane.Append(img);
+                        outputTextPane.Prepend(img, true);
                     } else if (result.IsPanel()) {
                         /*JPanel resultPanel = result.GetPanel();
                         resultPanel.setPreferredSize(new Dimension(300, 200));
                         outputTextPanel.add(resultPanel);
                         PackWindow();*/
                     } else {
-                        outputTextPane.Append("Could not display result");
+                        outputTextPane.Prepend("Could not display result\n");
                     }
-                    outputTextPane.Append("\n");
 
                 }
             } catch (Exception ex) {
@@ -196,6 +271,8 @@ public class MainWindow extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         functionTree = new javax.swing.JTree();
+        functionDocumentationScrollPane = new javax.swing.JScrollPane();
+        functionDocumentationPane = new javax.swing.JTextPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         inputTextArea = new javax.swing.JTextArea();
@@ -218,20 +295,27 @@ public class MainWindow extends javax.swing.JFrame {
 
         jScrollPane2.setViewportView(functionTree);
 
+        functionDocumentationPane.setEditable(false);
+        functionDocumentationScrollPane.setViewportView(functionDocumentationPane);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(functionDocumentationScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(functionDocumentationScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -251,8 +335,8 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(outputScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
+                    .addComponent(outputScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -261,7 +345,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(outputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addComponent(outputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -319,11 +403,11 @@ public class MainWindow extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
         );
 
         pack();
@@ -371,6 +455,8 @@ private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JMenuItem evaluateMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JTextPane functionDocumentationPane;
+    private javax.swing.JScrollPane functionDocumentationScrollPane;
     private javax.swing.JTree functionTree;
     private javax.swing.JTextArea inputTextArea;
     private javax.swing.JMenuBar jMenuBar1;
