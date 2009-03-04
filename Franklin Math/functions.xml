@@ -37,7 +37,7 @@
 	</description>
 	<example>
 		<input>Cos[2]</input>
-		<result></result>
+		<result>-0.41615</result>
 	</example>
 </function>
 
@@ -50,7 +50,7 @@
 	</description>
 	<example>
 		<input>Tan[2]</input>
-		<result></result>
+		<result>-2.18504</result>
 	</example>
 </function>
 
@@ -62,8 +62,8 @@
 		The ArcSine (inverse Sine) trigonometric function.  Assumes that the input is in radians.  
 	</description>
 	<example>
-		<input>ArcSin[2]</input>
-		<result></result>
+		<input>ArcSin[0.5]</input>
+		<result>0.52360</result>
 	</example>
 </function>
 
@@ -75,8 +75,8 @@
 		The ArcCosine (inverse Cosine) trigonometric function.  Assumes that the input is in radians.  
 	</description>
 	<example>
-		<input>ArcCos[2]</input>
-		<result></result>
+		<input>ArcCos[0.5]</input>
+		<result>1.04720</result>
 	</example>
 </function>
 
@@ -88,8 +88,8 @@
 		The ArcTangent (inverse Tangent) trigonometric function.  Assumes that the input is in radians.  
 	</description>
 	<example>
-		<input>ArcTan[2]</input>
-		<result></result>
+		<input>ArcTan[0.5]</input>
+		<result>0.46365</result>
 	</example>
 </function>
 
@@ -102,13 +102,13 @@
 	</description>
 	<example>
 		<input>ArcTan2[2, 2]</input>
-		<result></result>
+		<result>0.78540</result>
 	</example>
 </function>
 
 <function>
 	<name>RandomExpression</name>
-	<category>Trigonometry</category>
+	<category>Other</category>
 	<is_math_function>false</is_math_function>
 	<description>
 		Calculates a random expression.  
