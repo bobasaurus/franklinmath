@@ -4,8 +4,10 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.tree.*;
 import javax.swing.event.*;
+import javax.swing.undo.*;
 import java.awt.event.*;
 import java.awt.Image;
+import java.awt.image.*;
 import java.util.*;
 
 import franklinmath.parser.*;
@@ -33,6 +35,8 @@ public class MainWindow extends javax.swing.JFrame {
     protected Hashtable<String, FunctionInformation.FunctionInfo> functionInfoTable;
     protected String HTMLBegin = "<html><body>";
     protected String HTMLEnd = "</body></html>";
+    //object that keeps track of input box undo-ing
+    protected UndoManager undoManager;
 
     /** Creates new form MainWindow */
     public MainWindow() {
@@ -55,18 +59,9 @@ public class MainWindow extends javax.swing.JFrame {
         //make sure the cursor starts in the input text box
         inputTextArea.requestFocus();
 
-        //setup the listener for the shift+enter press on the input text box
-        inputTextArea.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.isShiftDown()) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                        Evaluate();
-                    }
-                }
-            }
-        });
+        //setup the ability to undo edits to the input box
+        undoManager = new UndoManager();
+        inputTextArea.getDocument().addUndoableEditListener(undoManager);
 
         //center this frame on the screen
         this.setLocationRelativeTo(null);
@@ -127,6 +122,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         //make sure the function table is set in html mode
         functionDocumentationPane.setContentType("text/html");
+        functionDocumentationPane.setText(HTMLBegin + "Select available functions in the tree to view documentation.  " + HTMLEnd);
 
         //expand the root tree node
         TreePath pathToRoot = new TreePath(rootFunctionNode.getPath());
@@ -150,6 +146,7 @@ public class MainWindow extends javax.swing.JFrame {
             //have the documentation window scroll to the top
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     functionDocumentationPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
                 }
@@ -169,13 +166,13 @@ public class MainWindow extends javax.swing.JFrame {
         }
 
         if (threadRunning.get()) {
-            outputTextPane.Append("Evaluation thread is already running.  Try again later.  \n");
+            outputTextPane.Prepend("Evaluation thread is already running.  Try again later.  \n\n");
             return;
         }
 
         String text = inputTextArea.getText();
         if (text.length() < 1) {
-            outputTextPane.Append("No math commands have been entered.  \n");
+            outputTextPane.Prepend("No math commands have been entered.  \n\n");
             return;
         }
 
@@ -224,35 +221,68 @@ public class MainWindow extends javax.swing.JFrame {
 
             try {
                 Vector<FMResult> resultList = get();
+                if (resultList.size() > 0) {
+                    //maintain a visual separation between separate execution results
+                    outputTextPane.Prepend("\n");
+                }
+
+                //keep track of string insertion location
+                int insertLocation = 0;
+
                 for (int i = 0; i < resultList.size(); i++) {
                     FMResult result = resultList.get(i);
                     if (result.IsExpression()) {
-                        String exprString = result.GetExpression().toString();
-                        outputTextPane.Prepend(exprString + "\n");
-//                        hotEqn.setEquation(exprString);
-                    //DisplayExpression(result.GetExpression());
+                        String exprString = result.GetExpression().toString() + "\n";
+                        outputTextPane.InsertAt(exprString, insertLocation);
+                        insertLocation += exprString.length();
                     } else if (result.IsEquation()) {
-                        String equString = result.GetEquation().toString();
-                        outputTextPane.Prepend(equString + "\n");
-
+                        String equString = result.GetEquation().toString() + "\n";
+                        outputTextPane.InsertAt(equString, insertLocation);
+                        insertLocation += equString.length();
                     } else if (result.IsString()) {
-                        outputTextPane.Prepend("\"" + result.GetString() + "\"\n");
+                        String str = "\"" + result.GetString() + "\"\n";
+                        outputTextPane.InsertAt(str, insertLocation);
+                        insertLocation += str.length();
                     } else if (result.IsImage()) {
                         Image img = result.GetImage();
-                        outputTextPane.Prepend(img, true);
+                        outputTextPane.InsertAt(img, insertLocation, true);
+                        insertLocation += 2;
                     } else if (result.IsPanel()) {
-                        /*JPanel resultPanel = result.GetPanel();
-                        resultPanel.setPreferredSize(new Dimension(300, 200));
-                        outputTextPanel.add(resultPanel);
-                        PackWindow();*/
+                        JPanel resultPanel = result.GetPanel();
+                        resultPanel.setPreferredSize(new java.awt.Dimension(300, 200));
+                        
+                        //todo: don't just fix the width/height
+                        ((Plot)resultPanel).SetPlotDimensions(300, 200);
+                        BufferedImage image = new BufferedImage(300, 200, BufferedImage.TYPE_INT_RGB);
+                        java.awt.Graphics g = image.createGraphics();//.drawString("blah", 0, 0)
+                        g.setColor(java.awt.Color.WHITE);
+                        g.fillRect(0, 0, 300, 200);
+                        resultPanel.paint(g);
+                        
+                        //resultPanel.paint(image.createGraphics());
+                        
+                        
+                        outputTextPane.InsertAt((new ImageIcon(image)).getImage(), insertLocation, true);
+                        insertLocation += 2;
+                        
                     } else {
-                        outputTextPane.Prepend("Could not display result\n");
+                        String errorString = "Could not display result\n";
+                        outputTextPane.InsertAt(errorString, insertLocation);
+                        insertLocation += errorString.length();
                     }
-
                 }
+
+                //scroll to the top of the output text area
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        outputTextPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
+                    }
+                });
+
             } catch (Exception ex) {
-                outputTextPane.Append(
-                        "Error: " + ex.toString() + "\n");
+                outputTextPane.Prepend("Error: " + ex.toString() + "\n");
             }
             threadRunning.set(false);
         }
@@ -280,9 +310,13 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         exitMenuItem = new javax.swing.JMenuItem();
+        editMenu = new javax.swing.JMenu();
+        undoMenuItem = new javax.swing.JMenuItem();
+        redoMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
         evaluateMenuItem = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
+        clearOutputMenuItem = new javax.swing.JMenuItem();
         aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -291,7 +325,7 @@ public class MainWindow extends javax.swing.JFrame {
         jSplitPane1.setBackground(new java.awt.Color(255, 255, 255));
         jSplitPane1.setDividerLocation(180);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(240, 250, 250));
 
         jScrollPane2.setViewportView(functionTree);
 
@@ -315,7 +349,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(functionDocumentationScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+                .addComponent(functionDocumentationScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -345,7 +379,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(outputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                .addComponent(outputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -365,9 +399,35 @@ public class MainWindow extends javax.swing.JFrame {
 
         jMenuBar1.add(fileMenu);
 
+        editMenu.setMnemonic('e');
+        editMenu.setText("Edit");
+
+        undoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        undoMenuItem.setMnemonic('u');
+        undoMenuItem.setText("Undo");
+        undoMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                undoMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(undoMenuItem);
+
+        redoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
+        redoMenuItem.setMnemonic('r');
+        redoMenuItem.setText("Redo");
+        redoMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                redoMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(redoMenuItem);
+
+        jMenuBar1.add(editMenu);
+
         optionsMenu.setMnemonic('o');
         optionsMenu.setText("Options");
 
+        evaluateMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.SHIFT_MASK));
         evaluateMenuItem.setMnemonic('e');
         evaluateMenuItem.setText("Evaluate");
         evaluateMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -385,6 +445,15 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         optionsMenu.add(settingsMenuItem);
+
+        clearOutputMenuItem.setMnemonic('c');
+        clearOutputMenuItem.setText("Clear Output");
+        clearOutputMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearOutputMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(clearOutputMenuItem);
 
         aboutMenuItem.setMnemonic('a');
         aboutMenuItem.setText("About");
@@ -407,7 +476,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
         );
 
         pack();
@@ -431,6 +500,24 @@ private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     System.exit(0);
 }//GEN-LAST:event_exitMenuItemActionPerformed
 
+private void undoMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoMenuItemActionPerformed
+    try {
+        undoManager.undo();
+    } catch (CannotUndoException ex) {
+    }
+}//GEN-LAST:event_undoMenuItemActionPerformed
+
+private void redoMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redoMenuItemActionPerformed
+    try {
+        undoManager.redo();
+    } catch (CannotRedoException ex) {
+    }
+}//GEN-LAST:event_redoMenuItemActionPerformed
+
+private void clearOutputMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearOutputMenuItemActionPerformed
+    outputTextPane.setText("");
+}//GEN-LAST:event_clearOutputMenuItemActionPerformed
+
     /**
      * The static code entry point, which invokes this MainWindow class to run the GUI
      * @param args the command line arguments
@@ -452,6 +539,8 @@ private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem clearOutputMenuItem;
+    private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem evaluateMenuItem;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
@@ -467,6 +556,8 @@ private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JScrollPane outputScrollPane;
+    private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
+    private javax.swing.JMenuItem undoMenuItem;
     // End of variables declaration//GEN-END:variables
 }

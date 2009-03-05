@@ -8,6 +8,8 @@ import java.awt.*;
  * A class for plotting series data.  
  * @author Allen Jordan
  */
+
+//todo: make this an image instead of a panel
 public class Plot extends JPanel {
 
     protected Vector<SeriesData> seriesCollection;
@@ -17,6 +19,8 @@ public class Plot extends JPanel {
     public Plot() {
         seriesCollection = new Vector<SeriesData>();
         borderSize = 10;
+        windowWidth = 0;
+        windowHeight = 0;
         InitializeCoordinateData();
         this.repaint();
     }
@@ -24,19 +28,26 @@ public class Plot extends JPanel {
     public Plot(SeriesData series) {
         seriesCollection = new Vector<SeriesData>();
         borderSize = 10;
+        windowWidth = 0;
+        windowHeight = 0;
         InitializeCoordinateData();
         AddSeries(series);
     }
 
     protected void InitializeCoordinateData() {
-        windowWidth = this.getWidth();
-        windowHeight = this.getHeight();
+        if (windowWidth == 0) windowWidth = this.getWidth();
+        if (windowHeight == 0) windowHeight = this.getHeight();
         plotWidth = windowWidth - 2 * borderSize;
         plotHeight = windowHeight - 2 * borderSize;
         plotStartX = borderSize;
         plotStartY = borderSize;
         plotEndX = windowWidth - borderSize;
         plotEndY = windowHeight - borderSize;
+    }
+    
+    public void SetPlotDimensions(int width, int height) {
+        windowWidth = width;
+        windowHeight = height;
     }
 
     @Override
