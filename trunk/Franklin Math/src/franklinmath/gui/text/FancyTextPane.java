@@ -36,6 +36,14 @@ public class FancyTextPane extends JTextPane {
         }
     }
     
+    public void InsertAt(String value, int location) {
+        try {
+            AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
+            document.insertString(location, value, attribSet);
+        } catch (BadLocationException ex) {
+        }
+    }
+    
     public void Append(Image image) {
         try {
             StyledDocument doc = (StyledDocument) this.getDocument();
@@ -53,6 +61,17 @@ public class FancyTextPane extends JTextPane {
             StyleConstants.setIcon(style, new ImageIcon(image));
             doc.insertString(0, " ", style);
             if (addNewline) doc.insertString(1, "\n", style);
+        } catch (BadLocationException ex) {
+        }
+    }
+    
+    public void InsertAt(Image image, int location, boolean addNewline) {
+        try {
+            StyledDocument doc = (StyledDocument) this.getDocument();
+            Style style = doc.addStyle("ImageStyle", null);
+            StyleConstants.setIcon(style, new ImageIcon(image));
+            doc.insertString(location, " ", style);
+            if (addNewline) doc.insertString(location+1, "\n", style);
         } catch (BadLocationException ex) {
         }
     }
