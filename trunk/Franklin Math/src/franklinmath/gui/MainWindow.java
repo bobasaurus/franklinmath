@@ -54,6 +54,7 @@ public class MainWindow extends javax.swing.JFrame {
         outputTextPane = new FancyTextPane(new DefaultStyledDocument());
         outputTextPane.setEditable(false);
         outputScrollPane.getViewport().setView(outputTextPane);
+        outputTextPane.setBackground(java.awt.Color.WHITE);
         outputTextPane.Append("Press Shift+Enter to execute math commands entered above, or use the Options->Evaluate menu option.  ");
 
         //setup the function tree
