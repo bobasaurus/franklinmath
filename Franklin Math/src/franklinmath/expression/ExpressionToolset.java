@@ -673,23 +673,17 @@ public class ExpressionToolset {
                             if (resultList != null) {
                                 resultList.add(result);
                             }
-                        } else if (result.IsPanel()) {
-                            if (resultList != null) {
-                                resultList.add(result);
-                            }
                         } else {
                             throw new ExecutionException("Unrecognized function result type");
                         }
-                    }
-                    else if (userFunctionTable.Exists(functionName)) {
+                    } else if (userFunctionTable.Exists(functionName)) {
                         FMResult result = userFunctionTable.Get(sfName).Execute(sfArgs, this);
                         if (!result.IsExpression()) {
                             throw new ExecutionException("Invalid user function result for " + sf.GetName());
                         }
                         expr = result.GetExpression();
                         expr = FlattenExpression(expr, depth);
-                    }
-                    else {
+                    } else {
                         return inFactor;
                     }
                 }
