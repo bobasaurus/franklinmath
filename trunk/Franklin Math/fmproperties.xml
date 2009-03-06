@@ -3,7 +3,9 @@
 <properties>
 <comment>Options/Properties for Franklin Math</comment>
 <entry key="number.precision">34</entry>
-<entry key="display.decimal.precision">5</entry>
+<entry key="display.decimal.precision">15</entry>
 <entry key="plot.numPoints">70</entry>
+<entry key="plot.height">400</entry>
+<entry key="plot.width">500</entry>
 <entry key="number.rounding">4</entry>
 </properties>

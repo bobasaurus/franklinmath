@@ -49,7 +49,9 @@ public class FMProperties {
         SetPrecision(34);
         SetRoundingMode(java.math.RoundingMode.HALF_EVEN);
         SetDisplayPrecision(15);
-        SetNumPlotPoints(50);
+        SetNumPlotPoints(70);
+        SetPlotWidth(400);
+        SetPlotHeight(300);
     }
 
     public static synchronized void SetPrecision(int value) {
@@ -67,7 +69,25 @@ public class FMProperties {
     public static synchronized long GetNumPlotPoints() {
         return GetLong("plot.numPoints");
     }
-
+    
+    public static synchronized void SetPlotWidth(int width) {
+        if (width < 100) width = 100;
+        SetInt("plot.width", width);
+    }
+    
+    public static synchronized int GetPlotWidth() {
+        return GetInt("plot.width");
+    }
+    
+    public static synchronized void SetPlotHeight(int height) {
+        if (height < 100) height = 100;
+        SetInt("plot.height", height);
+    }
+    
+    public static synchronized int GetPlotHeight() {
+        return GetInt("plot.height");
+    }
+    
     public static synchronized void SetRoundingModeIndex(int mode) {
         SetInt("number.rounding", mode);
     }

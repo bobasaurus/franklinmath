@@ -25,7 +25,9 @@ public class SettingsDialog extends javax.swing.JDialog {
             roundingModeComboBox.setSelectedIndex(FMProperties.GetRoundingModeIndex());
             displayPrecisionTextField.setText("" + FMProperties.GetDisplayPrecision());
             numPlotPointsTextField.setText("" + FMProperties.GetNumPlotPoints());
-
+            plotWidthTextField.setText("" + FMProperties.GetPlotWidth());
+            plotHeightTextField.setText("" + FMProperties.GetPlotHeight());
+            
             this.setLocationRelativeTo(parent);
         } else {
             JOptionPane.showMessageDialog(this, "Error: properties file did not load correctly", "Error", JOptionPane.ERROR_MESSAGE);
@@ -53,6 +55,11 @@ public class SettingsDialog extends javax.swing.JDialog {
         displayPrecisionTextField = new javax.swing.JTextField();
         numPlotPointsTextField = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
+        plotWidthTextField = new javax.swing.JTextField();
+        plotHeightTextField = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
@@ -74,13 +81,20 @@ public class SettingsDialog extends javax.swing.JDialog {
 
         jLabel5.setText("Number of Plot Points:");
 
+        jLabel6.setText("Plot Size (width x height):");
+
+        jLabel7.setText("[pixels]");
+
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("x");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -93,17 +107,27 @@ public class SettingsDialog extends javax.swing.JDialog {
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addComponent(jLabel4)
                                     .addGap(18, 18, 18)))
-                            .addComponent(jLabel5))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(roundingModeComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 85, Short.MAX_VALUE)
-                            .addComponent(displayPrecisionTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
+                        .addGap(36, 36, 36)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(roundingModeComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, 119, Short.MAX_VALUE)
+                            .addComponent(displayPrecisionTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(internalPrecisionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addComponent(numPlotPointsTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))))
-                .addContainerGap(91, Short.MAX_VALUE))
+                            .addComponent(numPlotPointsTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(plotWidthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 21, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(plotHeightTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGap(5, 5, 5)
+                        .addComponent(jLabel7)))
+                .addGap(33, 33, 33))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,6 +150,13 @@ public class SettingsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(numPlotPointsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7)
+                    .addComponent(plotWidthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(plotHeightTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -153,7 +184,7 @@ public class SettingsDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(cancelButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -180,11 +211,15 @@ public class SettingsDialog extends javax.swing.JDialog {
             int roundingMode = roundingModeComboBox.getSelectedIndex();
             int displayPrecision = Integer.parseInt(displayPrecisionTextField.getText());
             long numPlotPoints = Long.parseLong(numPlotPointsTextField.getText());
+            int plotWidth = Integer.parseInt(plotWidthTextField.getText());
+            int plotHeight = Integer.parseInt(plotHeightTextField.getText());
 
             FMProperties.SetPrecision(precision);
             FMProperties.SetRoundingModeIndex(roundingMode);
             FMProperties.SetDisplayPrecision(displayPrecision);
             FMProperties.SetNumPlotPoints(numPlotPoints);
+            FMProperties.SetPlotWidth(plotWidth);
+            FMProperties.SetPlotHeight(plotHeight);
 
             FMProperties.SaveProperties();
 
@@ -227,9 +262,14 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField numPlotPointsTextField;
     private javax.swing.JButton okButton;
+    private javax.swing.JTextField plotHeightTextField;
+    private javax.swing.JTextField plotWidthTextField;
     private javax.swing.JComboBox roundingModeComboBox;
     // End of variables declaration//GEN-END:variables
 }

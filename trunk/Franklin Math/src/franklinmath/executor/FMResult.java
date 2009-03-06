@@ -14,7 +14,7 @@ public class FMResult {
     protected Equation equation;
     protected Image image;
     protected String string;
-    protected JPanel panel;
+    //protected JPanel panel;
     
     public FMResult() {
     }
@@ -39,10 +39,10 @@ public class FMResult {
         type = FMResultType.STRING;
         string = str;
     }
-    public FMResult(JPanel panel) {
+    /*public FMResult(JPanel panel) {
         type = FMResultType.PANEL;
         this.panel = panel;
-    }
+    }*/
     
     public FMResultType GetType() {
         return type;
@@ -64,9 +64,9 @@ public class FMResult {
         return (type.compareTo(FMResultType.STRING) == 0);
     }
     
-    public boolean IsPanel() {
+    /*public boolean IsPanel() {
         return (type.compareTo(FMResultType.PANEL) == 0);
-    }
+    }*/
     
     public Expression GetExpression() throws ExecutionException {
         CheckType(FMResultType.EXPRESSION);
@@ -88,17 +88,17 @@ public class FMResult {
         return string;
     }
     
-    public JPanel GetPanel() throws ExecutionException {
+    /*public JPanel GetPanel() throws ExecutionException {
         CheckType(FMResultType.PANEL);
         return panel;
-    }
+    }*/
     
     protected void Clear() {
         expression = null;
         equation = null;
         image = null;
         string = "";
-        panel = null;
+        //panel = null;
     }
     
     public void SetExpression(Expression ex) {
@@ -125,9 +125,9 @@ public class FMResult {
         string = str;
     }
     
-    public void SetPanel(JPanel panel) {
+    /*public void SetPanel(JPanel panel) {
         this.panel = panel;
-    }
+    }*/
     
     protected void CheckType(FMResultType check) throws ExecutionException {
         if (type.compareTo(check) != 0) throw new ExecutionException("Result type incompatibility.  Given: " + check + " Needed: " + type);
