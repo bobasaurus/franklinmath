@@ -64,7 +64,7 @@ public class PlotCommand extends Command {
             SeriesData data = new SeriesData(info, expressionToolset);
             Plot plot = new Plot(data);
 
-            return new FMResult(plot);
+            return new FMResult(plot.GetPlotImage());
         } catch (ExpressionException ex) {
             throw new CommandException(ex.toString());
         }

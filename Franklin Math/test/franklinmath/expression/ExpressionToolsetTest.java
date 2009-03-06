@@ -30,7 +30,7 @@ public class ExpressionToolsetTest {
 
     public ExpressionToolsetTest() {
         threshold = new FMNumber(10E-15d);
-        
+
         //note: this does not load any functions or variables
         expressionToolset = new ExpressionToolset();
         context = expressionToolset.GetMathContext();
@@ -53,8 +53,11 @@ public class ExpressionToolsetTest {
     }
 
     @Before
-    public void setUp() throws ExecutionException {
-        executor = new TreeExecutor();
+    public void setUp() throws ExecutionException, java.io.IOException {
+        //try to load in in the system function information
+        FunctionInformation functionInformation = new FunctionInformation("functions.xml");
+
+        executor = new TreeExecutor(functionInformation);
         random = new Random();
     }
 
@@ -429,14 +432,14 @@ public class ExpressionToolsetTest {
         //do some fuzzing
         for (int i = 0; i < 500; i++) {
             int exponent = random.nextInt(10) + 1;
-            int numExtraMultiplies = random.nextInt(8)+1;
-            String execString = "var^"+exponent;
-            for (int j=0; j<numExtraMultiplies; j++) {
-                execString = execString+"*var^"+exponent;
+            int numExtraMultiplies = random.nextInt(8) + 1;
+            String execString = "var^" + exponent;
+            for (int j = 0; j < numExtraMultiplies; j++) {
+                execString = execString + "*var^" + exponent;
             }
             resultExpr = ProcessString(execString);
             expectedPower = new Power(new Factor("var", true));
-            expectedPower = expectedPower.AppendFactor(new Factor(exponent*(numExtraMultiplies+1)));
+            expectedPower = expectedPower.AppendFactor(new Factor(exponent * (numExtraMultiplies + 1)));
             assertEquals(new Expression(new Term(expectedPower), TermOperator.NONE), resultExpr);
         }
     }
@@ -858,43 +861,43 @@ public class ExpressionToolsetTest {
         expectedExpr = expectedExpr.AppendTerm(new Term(new Power(new Factor("q", true))), TermOperator.ADD);
         assertEquals(expectedExpr, resultExpr);
     }
-    
+
     @Test
     public void testSymbolicFunctionAddition() throws Exception {
         Expression resultExpr = ProcessString("blah[]");
         Expression expectedExpr = new Expression(new Term(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true)))), TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("blah[] + blah[]");
         Term expectedTerm = new Term(new Power(new Factor(2)));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true))), PowerOperator.MULTIPLY);
         expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("blah[] + blah[] + blah[]");
         expectedTerm = new Term(new Power(new Factor(3)));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true))), PowerOperator.MULTIPLY);
         expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("test[var]");
         Vector<Equation> expectedParams = new Vector<Equation>();
         expectedParams.add(new Equation(new Expression(new Term(new Power(new Factor("var", true))), TermOperator.NONE), null));
         expectedExpr = new Expression(new Term(new Power(new Factor(new SymbolicFunction("test", expectedParams, true)))), TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("test[var] + test[var]");
         expectedTerm = new Term(new Power(new Factor(2)));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new SymbolicFunction("test", expectedParams, true))), PowerOperator.MULTIPLY);
         expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("test[var] + test[var] + test[var]");
         expectedTerm = new Term(new Power(new Factor(3)));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new SymbolicFunction("test", expectedParams, true))), PowerOperator.MULTIPLY);
         expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("blah[var] + blah[] + blah[var]");
         expectedTerm = new Term(new Power(new Factor(2)));
         expectedTerm = expectedTerm.AppendPower(new Power(new Factor(new SymbolicFunction("blah", expectedParams, true))), PowerOperator.MULTIPLY);
@@ -902,18 +905,18 @@ public class ExpressionToolsetTest {
         expectedExpr = expectedExpr.AppendTerm(new Term(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true)))), TermOperator.ADD);
         assertEquals(expectedExpr, resultExpr);
     }
-    
+
     @Test
     public void testSymbolicFunctionSubtraction() throws Exception {
         Expression resultExpr = ProcessString("blah[]");
         Expression expectedExpr = new Expression(new Term(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true)))), TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("blah[] - blah[]");
         Term expectedTerm = new Term(new Power(new Factor(0)));
         expectedExpr = new Expression(expectedTerm, TermOperator.NONE);
         assertEquals(expectedExpr, resultExpr);
-        
+
         resultExpr = ProcessString("blah[] - blah[] - blah[]");
         expectedTerm = new Term(new Power(new Factor(new SymbolicFunction("blah", new Vector<Equation>(), true))));
         expectedExpr = new Expression(expectedTerm, TermOperator.SUBTRACT);

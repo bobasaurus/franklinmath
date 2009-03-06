@@ -8,6 +8,5 @@ public enum FMResultType {
     EXPRESSION,
     EQUATION,
     IMAGE,
-    STRING,
-    PANEL
+    STRING
 }

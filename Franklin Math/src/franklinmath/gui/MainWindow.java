@@ -23,18 +23,23 @@ import franklinmath.util.*;
  */
 public class MainWindow extends javax.swing.JFrame {
 
+    //flag to check if the initial help text (visible on program startup) has been cleared from the screen
     protected boolean isInitialTextCleared = false;
+    //output text pane for math command results
     protected FancyTextPane outputTextPane;
+    //root node of the GUI's "available functions" tree
     protected DefaultMutableTreeNode rootFunctionNode;
     //Franklin Math's command execution class
     protected TreeExecutor executor;
     //atomic boolean to help ensure proper concurrency
     protected java.util.concurrent.atomic.AtomicBoolean threadRunning = new java.util.concurrent.atomic.AtomicBoolean();
+    //class to store function information parsed from an xml input file
     protected FunctionInformation functionInformation;
     //table containing function information for documentation lookup
     protected Hashtable<String, FunctionInformation.FunctionInfo> functionInfoTable;
-    protected String HTMLBegin = "<html><body>";
-    protected String HTMLEnd = "</body></html>";
+    //constants for easily constructing html strings
+    protected final String HTMLBegin = "<html><body>";
+    protected final String HTMLEnd = "</body></html>";
     //object that keeps track of input box undo-ing
     protected UndoManager undoManager;
 
@@ -247,24 +252,6 @@ public class MainWindow extends javax.swing.JFrame {
                         Image img = result.GetImage();
                         outputTextPane.InsertAt(img, insertLocation, true);
                         insertLocation += 2;
-                    } else if (result.IsPanel()) {
-                        JPanel resultPanel = result.GetPanel();
-                        resultPanel.setPreferredSize(new java.awt.Dimension(300, 200));
-                        
-                        //todo: don't just fix the width/height
-                        ((Plot)resultPanel).SetPlotDimensions(300, 200);
-                        BufferedImage image = new BufferedImage(300, 200, BufferedImage.TYPE_INT_RGB);
-                        java.awt.Graphics g = image.createGraphics();//.drawString("blah", 0, 0)
-                        g.setColor(java.awt.Color.WHITE);
-                        g.fillRect(0, 0, 300, 200);
-                        resultPanel.paint(g);
-                        
-                        //resultPanel.paint(image.createGraphics());
-                        
-                        
-                        outputTextPane.InsertAt((new ImageIcon(image)).getImage(), insertLocation, true);
-                        insertLocation += 2;
-                        
                     } else {
                         String errorString = "Could not display result\n";
                         outputTextPane.InsertAt(errorString, insertLocation);
@@ -272,18 +259,19 @@ public class MainWindow extends javax.swing.JFrame {
                     }
                 }
 
-                //scroll to the top of the output text area
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        outputTextPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
-                    }
-                });
-
             } catch (Exception ex) {
                 outputTextPane.Prepend("Error: " + ex.toString() + "\n");
             }
+
+            //scroll to the top of the output text area
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    outputTextPane.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
+                }
+            });
+
             threadRunning.set(false);
         }
     }

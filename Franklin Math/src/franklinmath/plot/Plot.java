@@ -1,8 +1,10 @@
 package franklinmath.plot;
 
-import javax.swing.*;
 import java.util.*;
 import java.awt.*;
+import java.awt.image.*;
+
+import franklinmath.util.*;
 
 /**
  * A class for plotting series data.  
@@ -10,47 +12,44 @@ import java.awt.*;
  */
 
 //todo: make this an image instead of a panel
-public class Plot extends JPanel {
+public class Plot {
 
     protected Vector<SeriesData> seriesCollection;
     //graph coordinate variables
-    protected int borderSize,  windowWidth,  windowHeight,  plotWidth,  plotHeight,  plotStartX,  plotStartY,  plotEndX,  plotEndY;
-
+    protected int borderSize,  windowWidth,  windowHeight,  internalPlotWidth,  internalPlotHeight,  plotStartX,  plotStartY,  plotEndX,  plotEndY;
+    
     public Plot() {
         seriesCollection = new Vector<SeriesData>();
-        borderSize = 10;
-        windowWidth = 0;
-        windowHeight = 0;
         InitializeCoordinateData();
-        this.repaint();
     }
 
     public Plot(SeriesData series) {
         seriesCollection = new Vector<SeriesData>();
-        borderSize = 10;
-        windowWidth = 0;
-        windowHeight = 0;
         InitializeCoordinateData();
         AddSeries(series);
     }
 
     protected void InitializeCoordinateData() {
-        if (windowWidth == 0) windowWidth = this.getWidth();
-        if (windowHeight == 0) windowHeight = this.getHeight();
-        plotWidth = windowWidth - 2 * borderSize;
-        plotHeight = windowHeight - 2 * borderSize;
+        borderSize = 50;
+        windowWidth = FMProperties.GetPlotWidth();
+        windowHeight = FMProperties.GetPlotHeight();
+        internalPlotWidth = windowWidth - 2 * borderSize;
+        internalPlotHeight = windowHeight - 2 * borderSize;
         plotStartX = borderSize;
         plotStartY = borderSize;
         plotEndX = windowWidth - borderSize;
         plotEndY = windowHeight - borderSize;
     }
-    
-    public void SetPlotDimensions(int width, int height) {
-        windowWidth = width;
-        windowHeight = height;
+
+    public BufferedImage GetPlotImage() {
+        BufferedImage image = new BufferedImage(windowWidth, windowHeight, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, windowWidth, windowHeight);
+        paint(graphics);
+        return image;
     }
 
-    @Override
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
@@ -65,11 +64,11 @@ public class Plot extends JPanel {
             //determine sizing information
             franklinmath.util.Range xRange = seriesInfo.GetXRange();
             franklinmath.util.Range yRange = seriesInfo.GetYRange();
-            double aspectX = ((double) plotWidth) / (xRange.GetWidth());
-            double aspectY = ((double) plotHeight) / (yRange.GetWidth());
+            double aspectX = ((double) internalPlotWidth) / (xRange.GetWidth());
+            double aspectY = ((double) internalPlotHeight) / (yRange.GetWidth());
 
             franklinmath.util.Point origin = DataToPlotTransform(new franklinmath.util.Point(0, 0), aspectX, aspectY, xRange, yRange);
-            DrawAxis(g2d, origin, xRange, yRange);
+            DrawAxis(g2d, origin, xRange, yRange, aspectX, aspectY);
 
             //set the graphic options
             int thickness = seriesInfo.GetThickness();
@@ -125,7 +124,8 @@ public class Plot extends JPanel {
         }
     }
 
-    protected void DrawAxis(Graphics2D g2d, franklinmath.util.Point origin, franklinmath.util.Range xRange, franklinmath.util.Range yRange) {
+    //Draw the horizontal axis and vertical axis
+    protected void DrawAxis(Graphics2D g2d, franklinmath.util.Point origin, franklinmath.util.Range xRange, franklinmath.util.Range yRange, double aspectX, double aspectY) {
         g2d.setColor(Color.black);
         if (origin.x < plotStartX) {
             origin.x = plotStartX;
@@ -138,11 +138,115 @@ public class Plot extends JPanel {
         } else if (origin.y > plotEndY) {
             origin.y = plotEndY;
         }
+
+        g2d.drawLine(plotStartX, (int) origin.y, plotEndX, (int) origin.y);
+        g2d.drawLine((int) origin.x, plotStartY, (int) origin.x, plotEndY);
+
+        double tickSpacingX = GetTickSpacing(xRange.GetWidth());
+        double tickSpacingY = GetTickSpacing(yRange.GetWidth());
+
+        //calculate a clean starting value for the X ticks
+        double tickStartX = xRange.low;
+        if (tickSpacingX > 1) {
+            tickSpacingX = (int) tickSpacingX;
+            tickStartX = Math.ceil(tickStartX);
+            double tickFraction = tickStartX / tickSpacingX;
+            while (tickFraction != ((int) tickFraction)) {
+                tickStartX++;
+                if (tickStartX > xRange.high) {
+                    return;
+                }
+                tickFraction = tickStartX / tickSpacingX;
+            }
+        }
+
+        //calculate a clean starting value for the Y ticks
+        double tickStartY = yRange.low;
+        if (tickSpacingY > 1) {
+            tickSpacingY = (int) tickSpacingY;
+            tickStartY = Math.ceil(tickStartY);
+            double tickFraction = tickStartY / tickSpacingY;
+            while (tickFraction != ((int) tickFraction)) {
+                tickStartY++;
+                if (tickStartY > yRange.high) {
+                    return;
+                }
+                tickFraction = tickStartY / tickSpacingY;
+            }
+        }
         
-        g2d.drawLine(plotStartX, (int)origin.y, plotEndX, (int)origin.y);
-        g2d.drawLine((int)origin.x, plotStartY, (int)origin.x, plotEndY);
-        
-        
+        assert tickSpacingX > 0;
+        assert tickSpacingY > 0;
+        int tickHalfLength = windowWidth/100;
+        Font font = new Font(g2d.getFont().getFontName(), Font.PLAIN, 10);
+        g2d.setFont(font);
+        if (tickHalfLength <= 0) tickHalfLength = 1;
+        //draw the X ticks and labels
+        for (double tickValue = tickStartX; tickValue <= xRange.high; tickValue += tickSpacingX) {
+            double plotTickValueX = DataToPlotTransform(new franklinmath.util.Point(tickValue, 0), aspectX, aspectY, xRange, yRange).x;
+            g2d.setColor(Color.BLACK);
+            g2d.drawLine((int)plotTickValueX, (int)origin.y-tickHalfLength, (int)plotTickValueX, (int)origin.y+tickHalfLength);
+            
+            g2d.setColor(Color.GRAY);
+            
+            String labelString;
+            if (tickSpacingX >= .01) labelString = String.format("%.2f", tickValue);
+            else labelString = String.format("%.2E", tickValue);
+            g2d.drawString(labelString, (int)(plotTickValueX - labelString.length()/2*5), (int)origin.y + tickHalfLength + 10);
+        }
+        //draw the Y ticks and labels
+        for (double tickValue = tickStartY; tickValue <= yRange.high; tickValue += tickSpacingY) {
+            double plotTickValueY = DataToPlotTransform(new franklinmath.util.Point(0, tickValue), aspectY, aspectY, xRange, yRange).y;
+            g2d.drawLine((int)origin.x-tickHalfLength, (int)plotTickValueY, (int)origin.x+tickHalfLength, (int)plotTickValueY);
+            
+            g2d.setColor(Color.GRAY);
+            
+            String labelString;
+            if (tickSpacingY >= .01) labelString = String.format("%.2f", tickValue);
+            else labelString = String.format("%.2E", tickValue);
+            g2d.drawString(labelString, (int)origin.x - labelString.length()*5 - tickHalfLength-2, (int)plotTickValueY+5);
+        }
+
+        return;
+    }
+
+    protected double GetTickSpacing(double rangeWidth) {
+        double tickSpacing = rangeWidth / 6;
+        if (rangeWidth >= 500000) {
+            tickSpacing = 100000;
+        } else if (rangeWidth >= 300000) {
+            tickSpacing = 50000;
+        } else if (rangeWidth >= 100000) {
+            tickSpacing = 20000;
+        } else if (rangeWidth >= 50000) {
+            tickSpacing = 10000;
+        } else if (rangeWidth >= 30000) {
+            tickSpacing = 5000;
+        } else if (rangeWidth >= 10000) {
+            tickSpacing = 2000;
+        } else if (rangeWidth >= 5000) {
+            tickSpacing = 1000;
+        } else if (rangeWidth >= 3000) {
+            tickSpacing = 500;
+        } else if (rangeWidth >= 1000) {
+            tickSpacing = 200;
+        } else if (rangeWidth >= 500) {
+            tickSpacing = 100;
+        } else if (rangeWidth >= 300) {
+            tickSpacing = 50;
+        } else if (rangeWidth >= 100) {
+            tickSpacing = 20;
+        } else if (rangeWidth >= 50) {
+            tickSpacing = 10;
+        } else if (rangeWidth >= 30) {
+            tickSpacing = 5;
+        } else if (rangeWidth >= 10) {
+            tickSpacing = 2;
+        } else if (rangeWidth >= 5) {
+            tickSpacing = 1;
+        }
+
+        return tickSpacing;
     }
 
     /**
@@ -158,10 +262,11 @@ public class Plot extends JPanel {
         double normalizedDataX = dataPoint.x - xRange.low;
         double normalizedDataY = dataPoint.y - yRange.low;
         double plotX = normalizedDataX * aspectX + borderSize;
-        double plotY = plotHeight - normalizedDataY * aspectY + borderSize;
+        double plotY = internalPlotHeight - normalizedDataY * aspectY + borderSize;
         return new franklinmath.util.Point(plotX, plotY);
     }
-
+    
+    
     /**
      * Add a data series to this plot.  
      * @param series    The data series to add.  
@@ -169,8 +274,6 @@ public class Plot extends JPanel {
      */
     public int AddSeries(SeriesData series) {
         seriesCollection.add(series);
-        this.repaint();
         return seriesCollection.size() - 1;
-
     }
 }

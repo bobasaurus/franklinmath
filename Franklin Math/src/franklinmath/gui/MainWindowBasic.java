@@ -257,12 +257,12 @@ public class MainWindowBasic extends JFrame {
                     } else if (result.IsImage()) {
                         Image img = result.GetImage();
                         outputPane.Append(img);
-                    } else if (result.IsPanel()) {
+                    } /*else if (result.IsPanel()) {
                         JPanel resultPanel = result.GetPanel();
                         resultPanel.setPreferredSize(new Dimension(300, 200));
                         outputPanel.add(resultPanel);
                         PackWindow();
-                    } else {
+                    } */else {
                         outputPane.Append("Could not display result");
                     }
                     outputPane.Append("\n");
