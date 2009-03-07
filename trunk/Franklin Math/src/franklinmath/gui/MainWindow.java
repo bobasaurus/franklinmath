@@ -17,6 +17,10 @@ import franklinmath.plot.*;
 import franklinmath.gui.text.*;
 import franklinmath.util.*;
 
+import java.awt.print.*;
+import javax.print.*;
+import javax.print.attribute.*;
+
 /**
  * Main GUI window class for Franklin Math
  * @author  Allen Jordan
@@ -46,6 +50,8 @@ public class MainWindow extends javax.swing.JFrame {
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
+        
+        this.setIconImage((new ImageIcon("icon.png")).getImage());
 
         //mark that the command execution thread is not currently running
         threadRunning.set(false);
@@ -298,10 +304,16 @@ public class MainWindow extends javax.swing.JFrame {
         outputScrollPane = new javax.swing.JScrollPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        printMenuItem = new javax.swing.JMenuItem();
         exitMenuItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
         undoMenuItem = new javax.swing.JMenuItem();
         redoMenuItem = new javax.swing.JMenuItem();
+        examplesMenu = new javax.swing.JMenu();
+        basicMathExampleMenuItem = new javax.swing.JMenuItem();
+        customVariablesExampleMenuItem = new javax.swing.JMenuItem();
+        customFunctionsExampleMenuItem = new javax.swing.JMenuItem();
+        functionPlottingExampleMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
         evaluateMenuItem = new javax.swing.JMenuItem();
         settingsMenuItem = new javax.swing.JMenuItem();
@@ -377,6 +389,16 @@ public class MainWindow extends javax.swing.JFrame {
         fileMenu.setMnemonic('f');
         fileMenu.setText("File");
 
+        printMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        printMenuItem.setMnemonic('p');
+        printMenuItem.setText("Print");
+        printMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                printMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(printMenuItem);
+
         exitMenuItem.setMnemonic('e');
         exitMenuItem.setText("Exit");
         exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -413,6 +435,47 @@ public class MainWindow extends javax.swing.JFrame {
 
         jMenuBar1.add(editMenu);
 
+        examplesMenu.setMnemonic('e');
+        examplesMenu.setText("Examples");
+
+        basicMathExampleMenuItem.setMnemonic('b');
+        basicMathExampleMenuItem.setText("Basic Math");
+        basicMathExampleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                basicMathExampleMenuItemActionPerformed(evt);
+            }
+        });
+        examplesMenu.add(basicMathExampleMenuItem);
+
+        customVariablesExampleMenuItem.setMnemonic('v');
+        customVariablesExampleMenuItem.setText("Custom Variables");
+        customVariablesExampleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                customVariablesExampleMenuItemActionPerformed(evt);
+            }
+        });
+        examplesMenu.add(customVariablesExampleMenuItem);
+
+        customFunctionsExampleMenuItem.setMnemonic('f');
+        customFunctionsExampleMenuItem.setText("Custom Functions");
+        customFunctionsExampleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                customFunctionsExampleMenuItemActionPerformed(evt);
+            }
+        });
+        examplesMenu.add(customFunctionsExampleMenuItem);
+
+        functionPlottingExampleMenuItem.setMnemonic('p');
+        functionPlottingExampleMenuItem.setText("Function Plotting");
+        functionPlottingExampleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                functionPlottingExampleMenuItemActionPerformed(evt);
+            }
+        });
+        examplesMenu.add(functionPlottingExampleMenuItem);
+
+        jMenuBar1.add(examplesMenu);
+
         optionsMenu.setMnemonic('o');
         optionsMenu.setText("Options");
 
@@ -435,6 +498,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
         optionsMenu.add(settingsMenuItem);
 
+        clearOutputMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         clearOutputMenuItem.setMnemonic('c');
         clearOutputMenuItem.setText("Clear Output");
         clearOutputMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -507,6 +571,35 @@ private void clearOutputMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     outputTextPane.setText("");
 }//GEN-LAST:event_clearOutputMenuItemActionPerformed
 
+private void basicMathExampleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_basicMathExampleMenuItemActionPerformed
+    //example math commands for basic numeric and symbolic arithmetic
+    inputTextArea.setText("\"Numeric Arithmetic:\"\n7+6\n2.7-1.1+2*3^2\n\"Symbolic Arithmetic:\"\nvar1+var1+var2^3/var2");
+}//GEN-LAST:event_basicMathExampleMenuItemActionPerformed
+
+private void customVariablesExampleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customVariablesExampleMenuItemActionPerformed
+    //example math commands for custom variables
+    inputTextArea.setText("\"Custom User-Defined Variables:\"\nvar1 = 12+a\nvar1-a");
+}//GEN-LAST:event_customVariablesExampleMenuItemActionPerformed
+
+private void customFunctionsExampleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customFunctionsExampleMenuItemActionPerformed
+    //example math commands for custom functions
+    inputTextArea.setText("\"Custom User-Defined Functions:\"\nfunction[x] = 3x^2 + 2x + 1\nfunction2[x, y] = x+y\nfunction[2]\nfunction2[3, 4]");
+}//GEN-LAST:event_customFunctionsExampleMenuItemActionPerformed
+
+private void functionPlottingExampleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_functionPlottingExampleMenuItemActionPerformed
+    //example math commands for function plotting
+    inputTextArea.setText("\"Function Plotting:\"\nPlot[Sin[x], {x, -2Pi[], 2Pi[]}]\nPlot[2x^3+1, {x, -10, 10}]");
+}//GEN-LAST:event_functionPlottingExampleMenuItemActionPerformed
+
+private void printMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printMenuItemActionPerformed
+    try {
+        //open a dialog that can print the contents of the output pane
+        outputTextPane.print();
+    } catch (PrinterException ex) {
+        JOptionPane.showMessageDialog(this, ex.toString(), "Printing Error", JOptionPane.ERROR_MESSAGE);
+    }
+}//GEN-LAST:event_printMenuItemActionPerformed
+
     /**
      * The static code entry point, which invokes this MainWindow class to run the GUI
      * @param args the command line arguments
@@ -528,13 +621,18 @@ private void clearOutputMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem basicMathExampleMenuItem;
     private javax.swing.JMenuItem clearOutputMenuItem;
+    private javax.swing.JMenuItem customFunctionsExampleMenuItem;
+    private javax.swing.JMenuItem customVariablesExampleMenuItem;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem evaluateMenuItem;
+    private javax.swing.JMenu examplesMenu;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JTextPane functionDocumentationPane;
     private javax.swing.JScrollPane functionDocumentationScrollPane;
+    private javax.swing.JMenuItem functionPlottingExampleMenuItem;
     private javax.swing.JTree functionTree;
     private javax.swing.JTextArea inputTextArea;
     private javax.swing.JMenuBar jMenuBar1;
@@ -545,6 +643,7 @@ private void clearOutputMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JScrollPane outputScrollPane;
+    private javax.swing.JMenuItem printMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenuItem settingsMenuItem;
     private javax.swing.JMenuItem undoMenuItem;
