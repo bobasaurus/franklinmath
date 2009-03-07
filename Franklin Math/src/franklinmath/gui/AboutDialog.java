@@ -1,25 +1,52 @@
 /*
- * AboutDialog.java
- *
- * Created on February 19, 2008, 1:26 PM
- */
+Copyright 2009 Allen Franklin Jordan (allen.jordan@gmail.com).
+
+This file is part of Franklin Math.
+
+Franklin Math is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Franklin Math is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package franklinmath.gui;
 
 import javax.swing.*;
 import java.awt.*;
 import java.net.*;
 
+import franklinmath.util.*;
+
 /**
  * The about dialog for this program.  
  * @author  Allen Jordan
  */
 public class AboutDialog extends javax.swing.JDialog {
-
+    
     /** Creates new form AboutDialog */
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(parent);
+        
+        versionLabel.setText(String.format("Version %.2f", FMProperties.GetProgramVersion()));
+
+        //scroll to the top of the detailed information
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                detailedInformationTextArea.scrollRectToVisible(new java.awt.Rectangle(0, 0, 1, 1));
+            }
+        });
     }
 
     /** This method is called from within the constructor to
@@ -32,9 +59,10 @@ public class AboutDialog extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        detailedInformationTextArea = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        versionLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About Franklin Math");
@@ -43,16 +71,16 @@ public class AboutDialog extends javax.swing.JDialog {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setRows(5);
-        jTextArea1.setText("Franklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  \n\nTechnologies Used:\nJava 6, and JavaCC with JJTree");
-        jTextArea1.setWrapStyleWord(true);
-        jTextArea1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), javax.swing.BorderFactory.createEmptyBorder(4, 4, 4, 4)));
-        jScrollPane1.setViewportView(jTextArea1);
+        detailedInformationTextArea.setColumns(20);
+        detailedInformationTextArea.setEditable(false);
+        detailedInformationTextArea.setLineWrap(true);
+        detailedInformationTextArea.setRows(5);
+        detailedInformationTextArea.setText("Franklin Math Copyright (C) 2009 Allen Franklin Jordan\n\nFranklin Math is an open source symbolic CAS (computer algebra system), able to run on multiple operating systems.  \n\nTechnologies Used:\nJava 6, and JavaCC with JJTree\n\nThis program comes with ABSOLUTELY NO WARRANTY; for details examine the license.txt file.  \n\nThis is free software, and you are welcome to redistribute it under certain conditions detailed in the license.txt file.  ");
+        detailedInformationTextArea.setWrapStyleWord(true);
+        detailedInformationTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), javax.swing.BorderFactory.createEmptyBorder(4, 4, 4, 4)));
+        jScrollPane1.setViewportView(detailedInformationTextArea);
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 18));
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         jLabel1.setText("Franklin Math");
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -66,7 +94,7 @@ public class AboutDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 12));
+        jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
         jLabel2.setText("Allen Franklin Jordan");
         jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -80,6 +108,10 @@ public class AboutDialog extends javax.swing.JDialog {
             }
         });
 
+        versionLabel.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        versionLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        versionLabel.setText("Version ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -87,20 +119,26 @@ public class AboutDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel2)
                     .addComponent(jLabel1)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(versionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(4, 4, 4)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(versionLabel)))
                 .addContainerGap())
         );
 
@@ -184,10 +222,11 @@ public class AboutDialog extends javax.swing.JDialog {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea detailedInformationTextArea;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel versionLabel;
     // End of variables declaration//GEN-END:variables
 }
