@@ -1,1 +1,1 @@
-"C:\Program Files\IzPack\bin\compile" install.xml -b . -o "Franklin Math Installer.jar" -k standard
+"C:\Program Files\IzPack\bin\compile" install.xml -b . -o "Franklin Math Installer (Any Platform).jar" -k standard
