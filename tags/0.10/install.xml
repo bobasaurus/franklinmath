@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!-- 
+Installation file for Franklin Math using IzPack.  
+-->
+
+<installation version="1.0">
+
+    <info>
+        <appname>Franklin Math</appname>
+        <appversion>0.10</appversion>
+        <authors>
+            <author name="Allen Franklin Jordan" email="allen.jordan@gmail.com"/>
+        </authors>
+        <url>http://www.franklinmath.com</url>
+		<javaversion>1.6</javaversion>
+    </info>
+
+    <guiprefs width="640" height="480" resizable="no"/>
+
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <resources>
+        <res id="LicencePanel.licence" src="license.txt"/>
+		<res src="default_shortcut_spec.xml" id="shortcutSpec.xml"/>
+		<res src="unix_shortcut_spec.xml" id="Unix_shortcutSpec.xml"/>
+    </resources>
+
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+		<panel classname="ShortcutPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="FinishPanel"/>
+    </panels>
+
+    <packs>
+        <pack name="Base" required="yes">
+            <description>The base files</description>
+            <file src="readme.txt" targetdir="$INSTALL_PATH"/>
+            <file src="license.txt" targetdir="$INSTALL_PATH"/>
+            <file src="dist/Franklin_Math.jar" targetdir="$INSTALL_PATH"/>
+            <file src="dist/functions.xml" targetdir="$INSTALL_PATH"/>
+            <file src="dist/fmproperties.xml" targetdir="$INSTALL_PATH"/>
+			<file src="icon.png" targetdir="$INSTALL_PATH"/>
+			<file src="icon.ico" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+	
+	<!-- The native libraries to add. This is required for creating shortcuts on Windows -->
+	<native type="izpack" name="ShellLink.dll"/>
+	
+</installation>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Options/Properties for Franklin Math</comment>
+<entry key="number.precision">34</entry>
+<entry key="program.version">0.1</entry>
+<entry key="display.decimal.precision">15</entry>
+<entry key="plot.numPoints">70</entry>
+<entry key="plot.height">300</entry>
+<entry key="plot.width">400</entry>
+<entry key="number.rounding">4</entry>
+</properties>

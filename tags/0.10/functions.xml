@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<functionlist>
+
+<function>
+	<name>Sin</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Sine trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Sin[2]</input>
+		<result>0.90930</result>
+	</example>
+</function>
+
+<function>
+	<name>Sinc</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Sinc (sine cardinal) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Sinc[2]</input>
+		<result>0.45464</result>
+	</example>
+</function>
+
+<function>
+	<name>Cos</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Cosine trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Cos[2]</input>
+		<result>-0.41615</result>
+	</example>
+</function>
+
+<function>
+	<name>Tan</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Tangent trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>Tan[2]</input>
+		<result>-2.18504</result>
+	</example>
+</function>
+
+<function>
+	<name>ArcSin</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcSine (inverse Sine) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcSin[0.5]</input>
+		<result>0.52360</result>
+	</example>
+</function>
+
+<function>
+	<name>ArcCos</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcCosine (inverse Cosine) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcCos[0.5]</input>
+		<result>1.04720</result>
+	</example>
+</function>
+
+<function>
+	<name>ArcTan</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcTangent (inverse Tangent) trigonometric function.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcTan[0.5]</input>
+		<result>0.46365</result>
+	</example>
+</function>
+
+<function>
+	<name>ArcTan2</name>
+	<category>Trigonometry</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The ArcTangent (inverse Tangent) trigonometric function, quadrant corrected.  Assumes that the input is in radians.  
+	</description>
+	<example>
+		<input>ArcTan2[2, 2]</input>
+		<result>0.78540</result>
+	</example>
+</function>
+
+<function>
+	<name>RandomExpression</name>
+	<category>Other</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Calculates a random expression.  
+	</description>
+	<example>
+		<input>RandomExpression[]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>DisplayImage</name>
+	<category>Display</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Display the image at the given URL.  
+	</description>
+	<example>
+		<input>DisplayImage["image.jpg"]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>Plot</name>
+	<category>Plotting</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Make a plot of a function.  The first parameter is an expression with one symbollic independent variable.  The second parameter is a list in the format {var, min, max}, with var being the variable from the expression ranging over min to max values.  
+	</description>
+	<example>
+		<input>Plot[x^2, {x, -10, 10}]</input>
+		<result></result>
+	</example>
+</function>
+
+<function>
+	<name>Pi</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The Pi trigonometric constant.  
+	</description>
+	<example>
+		<input>Pi[]</input>
+		<result>3.14159</result>
+	</example>
+</function>
+
+<function>
+	<name>E</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The exponential constant.  
+	</description>
+	<example>
+		<input>E[]</input>
+		<result>2.71828</result>
+	</example>
+</function>
+
+<function>
+	<name>GoldenRatio</name>
+	<category>Math Constants</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The golden ratio.  
+	</description>
+	<example>
+		<input>GoldenRatio[]</input>
+		<result>1.61803</result>
+	</example>
+</function>
+
+<function>
+	<name>FibonacciNumbers</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		The sequence of fibonacci numbers, calculated up to the specified length.  
+	</description>
+	<example>
+		<input>FibonacciNumbers[10]</input>
+		<result>{0, 1, 1, 2, 3, 5, 8, 13, 21, 34}</result>
+	</example>
+</function>
+
+<function>
+	<name>Random</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Generate a random positive number less than 1.  
+	</description>
+	<example>
+		<input>Random[]</input>
+		<result>0.45603</result>
+	</example>
+</function>
+
+<function>
+	<name>Sqrt</name>
+	<category>Elementary Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The square root function.  
+	</description>
+	<example>
+		<input>Sqrt[16]</input>
+		<result>4</result>
+	</example>
+</function>
+
+
+<function>
+	<name>Log</name>
+	<category>Elementary Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		The logarithm of a number.  The first argument is the base, the second is the input value.  
+	</description>
+	<example>
+		<input>Log[10, 2]</input>
+		<result>0.30103</result>
+	</example>
+</function>
+
+<function>
+	<name>Mod</name>
+	<category>Numerical Functions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Take the modulo of the two input parameters, giving the remainder from divding the first by the second.  
+	</description>
+	<example>
+		<input>Mod[20, 4]</input>
+		<result>0</result>
+	</example>
+</function>
+
+<function>
+	<name>DegreesToRadians</name>
+	<category>Conversions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Convert the input degree value to radians.  
+	</description>
+	<example>
+		<input>DegreesToRadians[180]</input>
+		<result>3.14159</result>
+	</example>
+</function>
+
+<function>
+	<name>RadiansToDegrees</name>
+	<category>Conversions</category>
+	<is_math_function>false</is_math_function>
+	<description>
+		Convert the input radians value to degrees.  
+	</description>
+	<example>
+		<input>RadiansToDegrees[Pi[]]</input>
+		<result>180</result>
+	</example>
+</function>
+
+<function>
+	<name>Abs</name>
+	<category>Numerical Functions</category>
+	<is_math_function>true</is_math_function>
+	<description>
+		Take the absolute value of the input number.  
+	</description>
+	<example>
+		<input>Abs[-3]</input>
+		<result>3</result>
+	</example>
+</function>
+
+</functionlist>
