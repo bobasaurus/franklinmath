@@ -43,8 +43,8 @@ Installation file for Franklin Math using IzPack.
             <file src="readme.txt" targetdir="$INSTALL_PATH"/>
             <file src="license.txt" targetdir="$INSTALL_PATH"/>
             <file src="dist/Franklin_Math.jar" targetdir="$INSTALL_PATH"/>
-            <file src="dist/functions.xml" targetdir="$INSTALL_PATH"/>
-            <file src="dist/fmproperties.xml" targetdir="$INSTALL_PATH"/>
+            <file src="functions.xml" targetdir="$INSTALL_PATH"/>
+            <file src="fmproperties.xml" targetdir="$INSTALL_PATH"/>
 			<file src="icon.png" targetdir="$INSTALL_PATH"/>
 			<file src="icon.ico" targetdir="$INSTALL_PATH"/>
         </pack>
