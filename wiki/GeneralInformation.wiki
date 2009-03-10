@@ -1,7 +1,6 @@
 #labels Featured
 = Franklin Math Information =
-
-I decided to create Franklin Math in November, 2007 while taking a class in Numerical Analysis.  As a graduate with a B.S. in Computer Science and Applied Mathematics, I have always loved using computers to advance the field of mathematics.  Influenced by the amazing capabilities of commercial CAS programs, I decided to make a math language of my own.  And thus, Franklin Math was born.  
+I began creating Franklin Math as a hobby project in November, 2007 while taking a class in Numerical Analysis.  As a graduate with a B.S. in Computer Science and Applied Mathematics, I have always loved using computers to advance the field of mathematics.  Influenced by the amazing capabilities of commercial CAS programs, I decided to make a math language of my own.  And thus, Franklin Math was born.  
 
 = Author Information =
 
