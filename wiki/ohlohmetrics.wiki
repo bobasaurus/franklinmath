@@ -1,0 +1,6 @@
+#summary This page contains metrics for this project from Ohloh.net
+#labels ohloh,metrics,value
+
+= Ohloh Metrics =
+
+<wiki:gadget url="http://www.ohloh.net/p/56171/widgets/project_basic_stats.xml" height="220"  border="1" />
