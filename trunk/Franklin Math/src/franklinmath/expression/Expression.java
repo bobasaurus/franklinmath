@@ -314,7 +314,6 @@ public final class Expression implements LatexOutput {
      * @param expr      The expression to replace each matching symbol.
      * @throws franklinmath.expression.ExpressionException
      */
-    //todo: make this immutable
     public Expression Replace(String symbol, Expression expr) throws ExpressionException {
 
         Vector<Term> termListCopy = GetTerms();
