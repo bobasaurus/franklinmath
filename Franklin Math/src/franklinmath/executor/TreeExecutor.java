@@ -22,11 +22,11 @@ package franklinmath.executor;
 import java.util.*;
 import java.math.*;
 import java.lang.reflect.*;
-//import java.io.*;
 
 import franklinmath.parser.*;
 import franklinmath.expression.*;
 import franklinmath.util.*;
+import franklinmath.math.*;
 
 /**
  * This class executes a parsed syntax tree.  
@@ -57,6 +57,11 @@ public class TreeExecutor {
                 //add the command into the function table
                 functionTable.Set(info.name, functionCommand);
             }
+            
+            //add variables for math constants
+            lookupTable.Set("Pi", new Expression(new Term(new Power(new Factor(PiCommand.PI))), TermOperator.NONE));
+            lookupTable.Set("E", new Expression(new Term(new Power(new Factor(ECommand.E))), TermOperator.NONE));
+            
         } catch (Exception ex) {
             throw new ExecutionException(ex.toString());
         }
@@ -334,9 +339,9 @@ public class TreeExecutor {
 
             //symbol
             if (numChildren == 1) {
-                if (IsReserved(id)) {
+                /*if (IsReserved(id)) {
                     throw new ExecutionException("The symbol \"" + id + "\" is reserved");
-                }
+                }*/
                 return new Factor(id, true);
             } //function call
             else {

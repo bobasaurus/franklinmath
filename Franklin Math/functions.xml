@@ -150,7 +150,7 @@
 	<category>Math Constants</category>
 	<is_math_function>true</is_math_function>
 	<description>
-		The Pi trigonometric constant.  
+		The Pi trigonometric constant.  This can be used as a function or variable.  
 	</description>
 	<example>
 		<input>Pi[]</input>
@@ -163,7 +163,7 @@
 	<category>Math Constants</category>
 	<is_math_function>true</is_math_function>
 	<description>
-		The exponential constant.  
+		The exponential constant.  This can be used as a function or variable.  
 	</description>
 	<example>
 		<input>E[]</input>
