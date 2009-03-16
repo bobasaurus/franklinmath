@@ -1,7 +1,7 @@
 img {border-style: none}
 #centered {text-align: center}
 #logo {font-size: 9pt; font-family: georgia; line-height: 1%}
-#codelink {font-family: serif; line-height: 75%}
+.codelink {font-family: serif; line-height: 75%}
 .exampleheader {font-size: 14pt}
 .examplecode {font-size: 11pt}
 .linkheader {font-size: 14pt}
