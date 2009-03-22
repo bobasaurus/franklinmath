@@ -8,7 +8,7 @@ Installation file for Franklin Math using IzPack.
 
     <info>
         <appname>Franklin Math</appname>
-        <appversion>0.10</appversion>
+        <appversion>0.11</appversion>
         <authors>
             <author name="Allen Franklin Jordan" email="allen.jordan@gmail.com"/>
         </authors>
@@ -42,6 +42,7 @@ Installation file for Franklin Math using IzPack.
             <description>The base files</description>
             <file src="readme.txt" targetdir="$INSTALL_PATH"/>
             <file src="license.txt" targetdir="$INSTALL_PATH"/>
+			<file src="changelog.txt" targetdir="$INSTALL_PATH"/>
             <file src="dist/Franklin_Math.jar" targetdir="$INSTALL_PATH"/>
             <file src="functions.xml" targetdir="$INSTALL_PATH"/>
             <file src="fmproperties.xml" targetdir="$INSTALL_PATH"/>

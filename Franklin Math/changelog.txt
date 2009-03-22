@@ -1,0 +1,6 @@
+Changes for Version 0.11:
+
+increased accuracy of Pi and E, and made them available as system variables (instead of just functions)
+fixed a bug in generating plot tick spacing
+improved the .ico version of the franklin math icon thanks to a plugin for Paint.NET
+added an easter egg :)
