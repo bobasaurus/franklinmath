@@ -124,7 +124,7 @@
 	<category>Display</category>
 	<is_math_function>false</is_math_function>
 	<description>
-		Display the image at the given URL.  
+		Display an image at the given path.  
 	</description>
 	<example>
 		<input>DisplayImage["image.jpg"]</input>

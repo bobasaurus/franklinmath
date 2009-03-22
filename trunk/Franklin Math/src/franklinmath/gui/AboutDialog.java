@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.gui;
 
 import javax.swing.*;
@@ -30,13 +29,15 @@ import franklinmath.util.*;
  * @author  Allen Jordan
  */
 public class AboutDialog extends javax.swing.JDialog {
-    
+
+    protected int pressCount = 0;
+
     /** Creates new form AboutDialog */
     public AboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(parent);
-        
+
         versionLabel.setText(String.format("Version %.2f", FMProperties.GetProgramVersion()));
 
         //scroll to the top of the detailed information
@@ -70,6 +71,11 @@ public class AboutDialog extends javax.swing.JDialog {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel1MousePressed(evt);
+            }
+        });
 
         detailedInformationTextArea.setColumns(20);
         detailedInformationTextArea.setEditable(false);
@@ -80,7 +86,7 @@ public class AboutDialog extends javax.swing.JDialog {
         detailedInformationTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), javax.swing.BorderFactory.createEmptyBorder(4, 4, 4, 4)));
         jScrollPane1.setViewportView(detailedInformationTextArea);
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 18));
         jLabel1.setText("Franklin Math");
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -94,7 +100,7 @@ public class AboutDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Times New Roman", 0, 12));
         jLabel2.setText("Allen Franklin Jordan");
         jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -108,7 +114,7 @@ public class AboutDialog extends javax.swing.JDialog {
             }
         });
 
-        versionLabel.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        versionLabel.setFont(new java.awt.Font("Times New Roman", 0, 12));
         versionLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         versionLabel.setText("Version ");
 
@@ -155,8 +161,8 @@ public class AboutDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -202,6 +208,13 @@ public class AboutDialog extends javax.swing.JDialog {
         jLabel2.setForeground(Color.BLACK);
         this.setCursor(Cursor.getDefaultCursor());
     }//GEN-LAST:event_jLabel2MouseExited
+
+    private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
+        if ((evt.getX() >= (jPanel1.getWidth() - 5)) && (evt.getY() <= 5)) {
+            GameDialog game = new GameDialog((java.awt.Frame)this.getParent(), true);
+            game.setVisible(true);
+        }
+    }//GEN-LAST:event_jPanel1MousePressed
 
     /**
      * @param args the command line arguments

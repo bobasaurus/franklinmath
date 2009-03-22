@@ -231,38 +231,54 @@ public class Plot {
 
     protected double GetTickSpacing(double rangeWidth) {
         double tickSpacing = rangeWidth / 6;
-        if (rangeWidth >= 500000) {
-            tickSpacing = 100000;
-        } else if (rangeWidth >= 300000) {
-            tickSpacing = 50000;
-        } else if (rangeWidth >= 100000) {
-            tickSpacing = 20000;
-        } else if (rangeWidth >= 50000) {
-            tickSpacing = 10000;
-        } else if (rangeWidth >= 30000) {
-            tickSpacing = 5000;
-        } else if (rangeWidth >= 10000) {
-            tickSpacing = 2000;
-        } else if (rangeWidth >= 5000) {
-            tickSpacing = 1000;
-        } else if (rangeWidth >= 3000) {
-            tickSpacing = 500;
-        } else if (rangeWidth >= 1000) {
-            tickSpacing = 200;
-        } else if (rangeWidth >= 500) {
-            tickSpacing = 100;
-        } else if (rangeWidth >= 300) {
-            tickSpacing = 50;
-        } else if (rangeWidth >= 100) {
-            tickSpacing = 20;
-        } else if (rangeWidth >= 50) {
-            tickSpacing = 10;
-        } else if (rangeWidth >= 30) {
-            tickSpacing = 5;
-        } else if (rangeWidth >= 10) {
-            tickSpacing = 2;
-        } else if (rangeWidth >= 5) {
+        
+        if (rangeWidth <= 5) {
             tickSpacing = 1;
+        }
+        else if (rangeWidth <= 10) {
+            tickSpacing = 2;
+        }
+        else if (rangeWidth <= 30) {
+            tickSpacing = 5;
+        }
+        else if (rangeWidth <= 50) {
+            tickSpacing = 10;
+        }
+        else if (rangeWidth <= 100) {
+            tickSpacing = 20;
+        }
+        else if (rangeWidth <= 300) {
+            tickSpacing = 50;
+        }
+        else if (rangeWidth <= 500) {
+            tickSpacing = 100;
+        }
+        else if (rangeWidth <= 1000) {
+            tickSpacing = 200;
+        }
+        else if (rangeWidth <= 3000) {
+            tickSpacing = 500;
+        }
+        else if (rangeWidth <= 5000) {
+            tickSpacing = 1000;
+        }
+        else if (rangeWidth <= 10000) {
+            tickSpacing = 2000;
+        }
+        else if (rangeWidth <= 30000) {
+            tickSpacing = 5000;
+        }
+        else if (rangeWidth <= 50000) {
+            tickSpacing = 10000;
+        }
+        else if (rangeWidth <= 100000) {
+            tickSpacing = 20000;
+        }
+        else if (rangeWidth <= 300000) {
+            tickSpacing = 50000;
+        }
+        else if (rangeWidth <= 500000) {
+            tickSpacing = 100000;
         }
 
         return tickSpacing;
