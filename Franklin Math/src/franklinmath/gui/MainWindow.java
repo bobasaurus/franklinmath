@@ -153,7 +153,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         //make sure the function table is set in html mode
         functionDocumentationPane.setContentType("text/html");
-        functionDocumentationPane.setText(HTMLBegin + "Select available functions in the tree to view documentation.  " + HTMLEnd);
+        functionDocumentationPane.setText(HTMLBegin + "Select available functions in the categories above to view documentation.  " + HTMLEnd);
 
         //expand the root tree node
         TreePath pathToRoot = new TreePath(rootFunctionNode.getPath());
@@ -165,6 +165,7 @@ public class MainWindow extends javax.swing.JFrame {
         } catch (Exception ex) {
             outputTextPane.Append(ex.toString() + "\n");
         }
+        
     }
 
     //called to display documentation when a function is selected in the GUI tree
@@ -566,6 +567,7 @@ private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
 private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
     AboutDialog about = new AboutDialog(this, true);
     about.setVisible(true);
+    about.requestFocusInWindow();
 }//GEN-LAST:event_aboutMenuItemActionPerformed
 
 private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
