@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.gui.text;
 
 import javax.swing.*;
@@ -44,6 +43,7 @@ public class FancyTextPane extends JTextPane {
             AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
             document.insertString(document.getLength(), value, attribSet);
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane Append String Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -52,17 +52,19 @@ public class FancyTextPane extends JTextPane {
             AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
             document.insertString(0, value, attribSet);
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane Prepend String Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void InsertAt(String value, int location) {
         try {
             AttributeSet attribSet = document.getDefaultRootElement().getAttributes().copyAttributes();
             document.insertString(location, value, attribSet);
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane InsertAt String Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void Append(Image image) {
         try {
             StyledDocument doc = (StyledDocument) this.getDocument();
@@ -70,28 +72,35 @@ public class FancyTextPane extends JTextPane {
             StyleConstants.setIcon(style, new ImageIcon(image));
             doc.insertString(doc.getLength(), " ", style);
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane Append Image Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void Prepend(Image image, boolean addNewline) {
         try {
             StyledDocument doc = (StyledDocument) this.getDocument();
             Style style = doc.addStyle("ImageStyle", null);
             StyleConstants.setIcon(style, new ImageIcon(image));
             doc.insertString(0, " ", style);
-            if (addNewline) doc.insertString(1, "\n", style);
+            if (addNewline) {
+                doc.insertString(1, "\n", style);
+            }
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane Prepend Image Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void InsertAt(Image image, int location, boolean addNewline) {
         try {
             StyledDocument doc = (StyledDocument) this.getDocument();
             Style style = doc.addStyle("ImageStyle", null);
             StyleConstants.setIcon(style, new ImageIcon(image));
             doc.insertString(location, " ", style);
-            if (addNewline) doc.insertString(location+1, "\n", style);
+            if (addNewline) {
+                doc.insertString(location + 1, "\n", style);
+            }
         } catch (BadLocationException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "FancyTextPane InsertAt Image Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

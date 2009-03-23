@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.gui;
 
 import javax.swing.*;
@@ -69,7 +68,7 @@ public class MainWindow extends javax.swing.JFrame {
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-        
+
         this.setIconImage((new ImageIcon("icon.png")).getImage());
 
         //mark that the command execution thread is not currently running
@@ -165,7 +164,7 @@ public class MainWindow extends javax.swing.JFrame {
         } catch (Exception ex) {
             outputTextPane.Append(ex.toString() + "\n");
         }
-        
+
     }
 
     //called to display documentation when a function is selected in the GUI tree
@@ -190,7 +189,7 @@ public class MainWindow extends javax.swing.JFrame {
     /**
      * Start evaluating the current set of math commands in the input box.  
      */
-    public void Evaluate() {
+    public void Evaluate() throws ExecutionException {
         //see if we need to clear away the initial instruction text
         if (!isInitialTextCleared) {
             isInitialTextCleared = true;
@@ -198,8 +197,7 @@ public class MainWindow extends javax.swing.JFrame {
         }
 
         if (threadRunning.get()) {
-            outputTextPane.Prepend("Evaluation thread is already running.  Try again later.  \n\n");
-            return;
+            throw new ExecutionException("Evaluation thread is already running.  Try again later.  ");
         }
 
         String text = inputTextArea.getText();
@@ -556,7 +554,11 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 private void evaluateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_evaluateMenuItemActionPerformed
-    Evaluate();
+    try {
+        Evaluate();
+    } catch (ExecutionException ex) {
+        outputTextPane.Prepend(ex.toString());
+    }
 }//GEN-LAST:event_evaluateMenuItemActionPerformed
 
 private void settingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsMenuItemActionPerformed
@@ -578,6 +580,7 @@ private void undoMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     try {
         undoManager.undo();
     } catch (CannotUndoException ex) {
+        outputTextPane.Prepend(ex.toString());
     }
 }//GEN-LAST:event_undoMenuItemActionPerformed
 
@@ -585,6 +588,7 @@ private void redoMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     try {
         undoManager.redo();
     } catch (CannotRedoException ex) {
+        outputTextPane.Prepend(ex.toString());
     }
 }//GEN-LAST:event_redoMenuItemActionPerformed
 
@@ -630,6 +634,7 @@ private void printMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN
             //set a look and feel to match the current system
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "Look and Feel Error", JOptionPane.ERROR_MESSAGE);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
 

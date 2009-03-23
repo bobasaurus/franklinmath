@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.math;
 
 import java.util.Vector;
@@ -66,7 +65,9 @@ public class PlotCommand extends Command {
                 throw new CommandException("Invalid second parameter (3 element list needed)", name);
             }
             SingleExpression variableNameSingleExpr = varAndRangeList.get(0).GetSingle();
-            if (variableNameSingleExpr == null) throw new CommandException("Invalid second parameter (first list element: string needed)", name);
+            if (variableNameSingleExpr == null) {
+                throw new CommandException("Invalid second parameter (first list element: string needed)", name);
+            }
             String variableName = variableNameSingleExpr.SingleValue().GetSymbol();
             FMNumber lowXNum = varAndRangeList.get(1).GetSingleNumber();
             FMNumber highXNum = varAndRangeList.get(2).GetSingleNumber();
@@ -76,8 +77,10 @@ public class PlotCommand extends Command {
             if ((lowXNum.IsImaginary()) || (highXNum.IsImaginary())) {
                 throw new CommandException("Invalid second parameter (real numbers needed)", name);
             }
-            if (lowXNum.compareTo(highXNum) > 0) throw new CommandException("Invalid second parameter (range inverted)", name);
-            
+            if (lowXNum.compareTo(highXNum) > 0) {
+                throw new CommandException("Invalid second parameter (range inverted)", name);
+            }
+
             //build the series data
             SeriesInfo info = new SeriesInfo(functionExpr, variableName, lowXNum.RealValue().doubleValue(), highXNum.RealValue().doubleValue());
             SeriesData data = new SeriesData(info, expressionToolset);

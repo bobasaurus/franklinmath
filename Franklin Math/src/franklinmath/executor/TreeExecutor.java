@@ -40,6 +40,8 @@ public class TreeExecutor {
     protected Vector<FMResult> results = new Vector<FMResult>();
     protected MathContext context;
     protected ExpressionToolset expressionToolset;
+    //this is a constant to reduce memory from repeated string literals (and to keep PMD from complaining)
+    protected final String literalStringExpr = "Expr";
 
     public TreeExecutor(FunctionInformation functionInformation) throws ExecutionException {
         try {
@@ -125,7 +127,7 @@ public class TreeExecutor {
         }
 
         SimpleNode lhsNode = (SimpleNode) node.jjtGetChild(0);
-        CheckValidTree(lhsNode, "Expr");
+        CheckValidTree(lhsNode, literalStringExpr);
         Expression lhsExpr = ExecuteExpr(lhsNode);
 
 
@@ -139,7 +141,7 @@ public class TreeExecutor {
         else {
             //get the RHS node
             SimpleNode rhsNode = (SimpleNode) node.jjtGetChild(1);
-            CheckValidTree(rhsNode, "Expr");
+            CheckValidTree(rhsNode, literalStringExpr);
 
             //get a single factor representing the LHS to be assigned
             Factor lhsFactor = null;
@@ -326,7 +328,7 @@ public class TreeExecutor {
         String factorChildType = factorChildNode.toString();
 
         //nested expression
-        if (factorChildType.equals("Expr")) {
+        if (factorChildType.equals(literalStringExpr)) {
             Expression expr = ExecuteExpr(factorChildNode);
             return new Factor(expr);
         } //symbol or function call
@@ -424,12 +426,12 @@ public class TreeExecutor {
         Expression rhsExpr = null;
 
         SimpleNode lhsExprNode = (SimpleNode) node.jjtGetChild(0);
-        CheckValidTree(lhsExprNode, "Expr");
+        CheckValidTree(lhsExprNode, literalStringExpr);
         lhsExpr = ExecuteExpr(lhsExprNode);
 
         if (numChildren == 2) {
             SimpleNode rhsExprNode = (SimpleNode) node.jjtGetChild(1);
-            CheckValidTree(rhsExprNode, "Expr");
+            CheckValidTree(rhsExprNode, literalStringExpr);
             rhsExpr = ExecuteExpr(rhsExprNode);
         }
 
@@ -443,7 +445,7 @@ public class TreeExecutor {
 
         for (int i = 0; i < numChildren; i++) {
             SimpleNode exprNode = (SimpleNode) node.jjtGetChild(i);
-            CheckValidTree(exprNode, "Expr");
+            CheckValidTree(exprNode, literalStringExpr);
             Expression expr = ExecuteExpr(exprNode);
             result.add(expr);
         }

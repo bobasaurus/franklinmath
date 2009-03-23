@@ -58,7 +58,7 @@ public class GamePanel extends javax.swing.JPanel implements ActionListener {
     //the graphics object for the double buffer image
     protected Graphics2D doubleBufferGraphics;
     //width and height of the double buffer image
-    protected int doubleBufferWidth, doubleBufferHeight;
+    protected int doubleBufferWidth,  doubleBufferHeight;
     //a timer to manage repainting updates
     protected javax.swing.Timer timer;
 
@@ -258,7 +258,7 @@ public class GamePanel extends javax.swing.JPanel implements ActionListener {
                 if (Math.random() < enemySpawnRate * 5) {
                     newEnemy.power += Math.random() * 20 + 5;
                 }
-                newEnemy.sightDistance = 50+newEnemy.power;
+                newEnemy.sightDistance = 50 + newEnemy.power;
 
                 //make sure the enemy spawns far enough away from the main character
                 do {
@@ -355,9 +355,15 @@ public class GamePanel extends javax.swing.JPanel implements ActionListener {
                 maxEnemies += 5;
                 attackSize += 5;
 
-                if (enemySpawnRate > 0.4) enemySpawnRate = 0.4;
-                if (maxEnemies > 150) maxEnemies = 150;
-                if (attackSize > windowWidth/2) attackSize = windowWidth/2;
+                if (enemySpawnRate > 0.4) {
+                    enemySpawnRate = 0.4;
+                }
+                if (maxEnemies > 150) {
+                    maxEnemies = 150;
+                }
+                if (attackSize > windowWidth / 2) {
+                    attackSize = windowWidth / 2;
+                }
             }
         }
 

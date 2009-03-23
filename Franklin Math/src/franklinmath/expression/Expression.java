@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.expression;
 
 import java.util.*;
@@ -195,11 +194,15 @@ public final class Expression implements LatexOutput {
 
     public FMNumber GetSingleNumber() throws ExpressionException {
         SingleExpression single = GetSingle();
-        if (single == null) return null;
-        
+        if (single == null) {
+            return null;
+        }
+
         Factor singleValue = single.SingleValue();
-        if (!singleValue.IsNumber()) return null;
-        
+        if (!singleValue.IsNumber()) {
+            return null;
+        }
+
         FMNumber number = singleValue.GetNumber();
         if (single.IsSingleNegative()) {
             number = number.Negate(new MathContext(FMProperties.GetDisplayPrecision(), FMProperties.GetRoundingMode()));
@@ -209,11 +212,15 @@ public final class Expression implements LatexOutput {
 
     public String GetSingleString() throws ExpressionException {
         SingleExpression single = GetSingle();
-        if (single == null) return null;
-        
+        if (single == null) {
+            return null;
+        }
+
         Factor singleValue = single.SingleValue();
-        if (!singleValue.IsString()) return null;
-        
+        if (!singleValue.IsString()) {
+            return null;
+        }
+
         String result = singleValue.GetString();
         if (single.IsSingleNegative()) {
             throw new ExpressionException("Negative character string");

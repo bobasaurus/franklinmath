@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.plot;
 
 import java.util.*;
@@ -36,7 +35,7 @@ public class Plot {
     protected Vector<SeriesData> seriesCollection;
     //graph coordinate variables
     protected int borderSize,  windowWidth,  windowHeight,  internalPlotWidth,  internalPlotHeight,  plotStartX,  plotStartY,  plotEndX,  plotEndY;
-    
+
     public Plot() {
         seriesCollection = new Vector<SeriesData>();
         InitializeCoordinateData();
@@ -193,37 +192,45 @@ public class Plot {
                 tickFraction = tickStartY / tickSpacingY;
             }
         }
-        
+
         assert tickSpacingX > 0;
         assert tickSpacingY > 0;
-        int tickHalfLength = windowWidth/100;
+        int tickHalfLength = windowWidth / 100;
         Font font = new Font(g2d.getFont().getFontName(), Font.PLAIN, 10);
         g2d.setFont(font);
-        if (tickHalfLength <= 0) tickHalfLength = 1;
+        if (tickHalfLength <= 0) {
+            tickHalfLength = 1;
+        }
         //draw the X ticks and labels
         for (double tickValue = tickStartX; tickValue <= xRange.high; tickValue += tickSpacingX) {
             double plotTickValueX = DataToPlotTransform(new franklinmath.util.Point(tickValue, 0), aspectX, aspectY, xRange, yRange).x;
             g2d.setColor(Color.BLACK);
-            g2d.drawLine((int)plotTickValueX, (int)origin.y-tickHalfLength, (int)plotTickValueX, (int)origin.y+tickHalfLength);
-            
+            g2d.drawLine((int) plotTickValueX, (int) origin.y - tickHalfLength, (int) plotTickValueX, (int) origin.y + tickHalfLength);
+
             g2d.setColor(Color.GRAY);
-            
+
             String labelString;
-            if (tickSpacingX >= .01) labelString = String.format("%.2f", tickValue);
-            else labelString = String.format("%.2E", tickValue);
-            g2d.drawString(labelString, (int)(plotTickValueX - labelString.length()/2*5), (int)origin.y + tickHalfLength + 10);
+            if (tickSpacingX >= .01) {
+                labelString = String.format("%.2f", tickValue);
+            } else {
+                labelString = String.format("%.2E", tickValue);
+            }
+            g2d.drawString(labelString, (int) (plotTickValueX - labelString.length() / 2 * 5), (int) origin.y + tickHalfLength + 10);
         }
         //draw the Y ticks and labels
         for (double tickValue = tickStartY; tickValue <= yRange.high; tickValue += tickSpacingY) {
             double plotTickValueY = DataToPlotTransform(new franklinmath.util.Point(0, tickValue), aspectY, aspectY, xRange, yRange).y;
-            g2d.drawLine((int)origin.x-tickHalfLength, (int)plotTickValueY, (int)origin.x+tickHalfLength, (int)plotTickValueY);
-            
+            g2d.drawLine((int) origin.x - tickHalfLength, (int) plotTickValueY, (int) origin.x + tickHalfLength, (int) plotTickValueY);
+
             g2d.setColor(Color.GRAY);
-            
+
             String labelString;
-            if (tickSpacingY >= .01) labelString = String.format("%.2f", tickValue);
-            else labelString = String.format("%.2E", tickValue);
-            g2d.drawString(labelString, (int)origin.x - labelString.length()*5 - tickHalfLength-2, (int)plotTickValueY+5);
+            if (tickSpacingY >= .01) {
+                labelString = String.format("%.2f", tickValue);
+            } else {
+                labelString = String.format("%.2E", tickValue);
+            }
+            g2d.drawString(labelString, (int) origin.x - labelString.length() * 5 - tickHalfLength - 2, (int) plotTickValueY + 5);
         }
 
         return;
@@ -231,53 +238,38 @@ public class Plot {
 
     protected double GetTickSpacing(double rangeWidth) {
         double tickSpacing = rangeWidth / 6;
-        
+
         if (rangeWidth <= 5) {
             tickSpacing = 1;
-        }
-        else if (rangeWidth <= 10) {
+        } else if (rangeWidth <= 10) {
             tickSpacing = 2;
-        }
-        else if (rangeWidth <= 30) {
+        } else if (rangeWidth <= 30) {
             tickSpacing = 5;
-        }
-        else if (rangeWidth <= 50) {
+        } else if (rangeWidth <= 50) {
             tickSpacing = 10;
-        }
-        else if (rangeWidth <= 100) {
+        } else if (rangeWidth <= 100) {
             tickSpacing = 20;
-        }
-        else if (rangeWidth <= 300) {
+        } else if (rangeWidth <= 300) {
             tickSpacing = 50;
-        }
-        else if (rangeWidth <= 500) {
+        } else if (rangeWidth <= 500) {
             tickSpacing = 100;
-        }
-        else if (rangeWidth <= 1000) {
+        } else if (rangeWidth <= 1000) {
             tickSpacing = 200;
-        }
-        else if (rangeWidth <= 3000) {
+        } else if (rangeWidth <= 3000) {
             tickSpacing = 500;
-        }
-        else if (rangeWidth <= 5000) {
+        } else if (rangeWidth <= 5000) {
             tickSpacing = 1000;
-        }
-        else if (rangeWidth <= 10000) {
+        } else if (rangeWidth <= 10000) {
             tickSpacing = 2000;
-        }
-        else if (rangeWidth <= 30000) {
+        } else if (rangeWidth <= 30000) {
             tickSpacing = 5000;
-        }
-        else if (rangeWidth <= 50000) {
+        } else if (rangeWidth <= 50000) {
             tickSpacing = 10000;
-        }
-        else if (rangeWidth <= 100000) {
+        } else if (rangeWidth <= 100000) {
             tickSpacing = 20000;
-        }
-        else if (rangeWidth <= 300000) {
+        } else if (rangeWidth <= 300000) {
             tickSpacing = 50000;
-        }
-        else if (rangeWidth <= 500000) {
+        } else if (rangeWidth <= 500000) {
             tickSpacing = 100000;
         }
 
@@ -300,8 +292,7 @@ public class Plot {
         double plotY = internalPlotHeight - normalizedDataY * aspectY + borderSize;
         return new franklinmath.util.Point(plotX, plotY);
     }
-    
-    
+
     /**
      * Add a data series to this plot.  
      * @param series    The data series to add.  

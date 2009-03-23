@@ -81,13 +81,15 @@ public class GameDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowClosing
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
+
             public void run() {
                 GameDialog dialog = new GameDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -100,5 +102,4 @@ public class GameDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private franklinmath.gui.GamePanel gamePanel1;
     // End of variables declaration//GEN-END:variables
-
 }
