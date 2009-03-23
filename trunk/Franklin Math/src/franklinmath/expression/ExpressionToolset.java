@@ -176,7 +176,7 @@ public class ExpressionToolset {
         assert inEqu != null;
         depth++;
         if (depth > depthLimit) {
-            throw new ExpressionException("Recursion depth limit reached");
+            throw new ExpressionException("Recursion depth limit reached in FlattenEquation");
         }
 
         if (inEqu.IsExpression()) {
@@ -201,7 +201,7 @@ public class ExpressionToolset {
         assert inExpr != null;
         depth++;
         if (depth > depthLimit) {
-            throw new ExpressionException("Recursion depth limit reached");
+            throw new ExpressionException("Recursion depth limit reached in FlattenExpression");
         }
         if (context == null) {
             context = MathContext.DECIMAL128;
@@ -370,7 +370,7 @@ public class ExpressionToolset {
         assert inTerm != null;
         depth++;
         if (depth > depthLimit) {
-            throw new ExpressionException("Recursion depth limit reached");
+            throw new ExpressionException("Recursion depth limit reached in FlattenTerm");
         }
         assert inTerm.NumPowers() > 0;
 
@@ -585,7 +585,7 @@ public class ExpressionToolset {
         assert inPower != null;
         depth++;
         if (depth > depthLimit) {
-            throw new ExpressionException("Recursion depth limit reached");
+            throw new ExpressionException("Recursion depth limit reached in FlattenPower");
         }
 
         assert inPower.NumFactors() > 0;
@@ -639,7 +639,7 @@ public class ExpressionToolset {
         assert inFactor != null;
         depth++;
         if (depth > depthLimit) {
-            throw new ExpressionException("Recursion depth limit reached");
+            throw new ExpressionException("Recursion depth limit reached in FlattenFactor");
         }
         if (context == null) {
             context = MathContext.DECIMAL128;

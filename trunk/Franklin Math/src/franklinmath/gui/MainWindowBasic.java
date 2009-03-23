@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.gui;
 
 import javax.swing.*;
@@ -55,6 +54,7 @@ public class MainWindowBasic extends JFrame {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(), "Look and Feel Error", JOptionPane.ERROR_MESSAGE);
         }
 
         //make sure the program closes when the window is exited
@@ -164,13 +164,12 @@ public class MainWindowBasic extends JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading in user properties/settings: " + ex.toString());
         }
-        
+
         FunctionInformation functionInformation = null;
         //try to load in in the system function information
         try {
             functionInformation = new FunctionInformation("functions.xml");
-        }
-        catch (java.io.IOException ex) {
+        } catch (java.io.IOException ex) {
             JOptionPane.showMessageDialog(this, "Critical Error loading in system functions: " + ex.toString());
             System.exit(0);
         }
@@ -204,20 +203,19 @@ public class MainWindowBasic extends JFrame {
 
         if (threadRunning.get()) {
             outputPane.Append("Evaluation thread is already running.  Try again later.  \n");
-            return;
+        } else {
+
+            String text = inputPane.getText();
+            if (text.length() < 1) {
+                outputPane.Append("No input provided.  \n");
+                return;
+            }
+            javax.swing.SwingWorker worker =
+                    new EvaluationWorker(text);
+            worker.execute();
+
+            threadRunning.set(true);
         }
-
-        String text = inputPane.getText();
-        if (text.length() < 1) {
-            outputPane.Append("No input provided.  \n");
-            return;
-        }
-        javax.swing.SwingWorker worker =
-                new EvaluationWorker(text);
-        worker.execute();
-
-        threadRunning.set(true);
-
     }
 
     /**
@@ -277,11 +275,11 @@ public class MainWindowBasic extends JFrame {
                         Image img = result.GetImage();
                         outputPane.Append(img);
                     } /*else if (result.IsPanel()) {
-                        JPanel resultPanel = result.GetPanel();
-                        resultPanel.setPreferredSize(new Dimension(300, 200));
-                        outputPanel.add(resultPanel);
-                        PackWindow();
-                    } */else {
+                    JPanel resultPanel = result.GetPanel();
+                    resultPanel.setPreferredSize(new Dimension(300, 200));
+                    outputPanel.add(resultPanel);
+                    PackWindow();
+                    } */ else {
                         outputPane.Append("Could not display result");
                     }
                     outputPane.Append("\n");
@@ -293,10 +291,6 @@ public class MainWindowBasic extends JFrame {
             }
             threadRunning.set(false);
         }
-    }
-
-    private void PackWindow() {
-        this.pack();
     }
 
     public static void main(String args[]) {

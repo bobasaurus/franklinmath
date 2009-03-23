@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.math;
 
 import java.util.Vector;
@@ -36,11 +35,13 @@ public class ModCommand extends Command {
         try {
             Equation arg0 = args.get(0);
             Equation arg1 = args.get(1);
-            if ((!arg0.IsExpression()) || (!arg1.IsExpression())) throw new Exception("Equation arguments invalid for this function");
-            
+            if ((!arg0.IsExpression()) || (!arg1.IsExpression())) {
+                throw new Exception("Equation arguments invalid for this function");
+            }
+
             FMNumber firstNumber = arg0.GetLHS().GetSingleNumber();
             FMNumber secondNumber = arg1.GetLHS().GetSingleNumber();
-            
+
             return new FMResult(new Factor(new FMNumber(firstNumber.doubleValue() % secondNumber.doubleValue())));
         } catch (Exception ex) {
             try {

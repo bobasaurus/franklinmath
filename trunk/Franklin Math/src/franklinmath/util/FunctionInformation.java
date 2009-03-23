@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.util;
 
 import java.util.*;
@@ -33,7 +32,7 @@ public class FunctionInformation {
 
     protected Vector<FunctionInfo> functionList;
     protected Vector<String> categoryList;
-    
+
     public static class FunctionInfo {
 
         public String name,  category,  description,  exampleInput,  exampleResult;
@@ -45,14 +44,14 @@ public class FunctionInformation {
         functionList = new Vector<FunctionInfo>();
         //initialize an empty list of function categories
         categoryList = new Vector<String>();
-        
+
         try {
             //Read in the XML function list.  The java DOM API is fairly complex and difficult.  Might eventually switch back to the JDOM library.  
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             //load the function xml file
-            Document document = builder.parse(new File("functions.xml"));
-            
+            Document document = builder.parse(new File(filename));
+
             //starting from the root element of the document, parse out all functions
             Element root = document.getDocumentElement();
             NodeList functionNodeList = root.getElementsByTagName("function");
@@ -80,7 +79,9 @@ public class FunctionInformation {
                     } else if (nodeName.equals("category")) {
                         info.category = dataNode.getTextContent();
                         //update the unique category list
-                        if (!categoryList.contains(info.category)) categoryList.add(info.category);
+                        if (!categoryList.contains(info.category)) {
+                            categoryList.add(info.category);
+                        }
                     } else if (nodeName.equals("is_math_function")) {
                         info.isMathFunction = (dataNode.getTextContent().equals("true")) ? true : false;
                     } else if (nodeName.equals("description")) {
@@ -106,11 +107,10 @@ public class FunctionInformation {
 
         } catch (ParserConfigurationException ex) {
             throw new IOException(ex.toString());
-        }
-        catch (org.xml.sax.SAXException ex) {
+        } catch (org.xml.sax.SAXException ex) {
             throw new IOException(ex.toString());
         }
-        
+
         //sort the list of unique categories
         Collections.sort(categoryList);
 
@@ -126,7 +126,7 @@ public class FunctionInformation {
     public Vector<FunctionInfo> GetFunctionList() {
         return functionList;
     }
-    
+
     /**
      * Get the list of unique function categories.  
      * @return  A vector containing the unique function category names.  

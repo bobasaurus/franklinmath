@@ -15,8 +15,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Franklin Math.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+ */
 package franklinmath.util;
 
 import java.util.Properties;
@@ -73,7 +72,7 @@ public class FMProperties {
         SetPlotWidth(400);
         SetPlotHeight(300);
     }
-    
+
     public static synchronized double GetProgramVersion() {
         return GetDouble("program.version");
     }
@@ -85,33 +84,37 @@ public class FMProperties {
     public static synchronized int GetPrecision() {
         return GetInt("number.precision");
     }
-    
+
     public static synchronized void SetNumPlotPoints(long value) {
         SetLong("plot.numPoints", value);
     }
-    
+
     public static synchronized long GetNumPlotPoints() {
         return GetLong("plot.numPoints");
     }
-    
+
     public static synchronized void SetPlotWidth(int width) {
-        if (width < 100) width = 100;
+        if (width < 100) {
+            width = 100;
+        }
         SetInt("plot.width", width);
     }
-    
+
     public static synchronized int GetPlotWidth() {
         return GetInt("plot.width");
     }
-    
+
     public static synchronized void SetPlotHeight(int height) {
-        if (height < 100) height = 100;
+        if (height < 100) {
+            height = 100;
+        }
         SetInt("plot.height", height);
     }
-    
+
     public static synchronized int GetPlotHeight() {
         return GetInt("plot.height");
     }
-    
+
     public static synchronized void SetRoundingModeIndex(int mode) {
         SetInt("number.rounding", mode);
     }
@@ -147,6 +150,9 @@ public class FMProperties {
             case UNNECESSARY:
                 index = 7;
                 break;
+            default:
+                index = 4;
+                break;
         }
         SetRoundingModeIndex(index);
     }
@@ -178,6 +184,9 @@ public class FMProperties {
                 break;
             case 7:
                 mode = RoundingMode.UNNECESSARY;
+                break;
+            default:
+                mode = RoundingMode.HALF_EVEN;
                 break;
         }
 
@@ -215,7 +224,7 @@ public class FMProperties {
     protected static int GetInt(String name) throws NumberFormatException {
         return Integer.parseInt(properties.getProperty(name));
     }
-    
+
     protected static void SetLong(String name, long value) {
         properties.setProperty(name, String.valueOf(value));
     }
