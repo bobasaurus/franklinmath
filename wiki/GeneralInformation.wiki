@@ -8,8 +8,9 @@ I began creating Franklin Math as a hobby project in November, 2007 while taking
   * allen.jordan@gmail.com
   * Graduated from Metropolitan State College of Denver with a dual major in Computer Science and Applied Mathematics.  
   * 4.0 GPA, President's Honor Roll, Who's Who Among Students
-  * Currently employed as a senior computer specialist at the National Oceanic and Atmospheric Administration (about 6 years total experience).  
-  * Programming skills:  Java, C++, C (AVR embedded), IDL, Ruby on Rails, Perl, and more.  
-  * Electronic skills:  circuit board design in Altium DXP, lots of soldering iron experience, SMT soldering.  
+  * Currently employed as an Associate Scientist at the National Oceanic and Atmospheric Administration (about 8 years total experience).  
+  * Programming skills:  C#, Java, C++, C (AVR embedded), IDL, Ruby on Rails, Perl, and more.  
+  * Electronic skills:  microcontroller development, circuit board design in Altium Designer, lots of soldering iron experience, SMT soldering.  
 
-I'm currently looking for a full time job to take up when my contract with NOAA expires.  If you're looking to hire a programmer, please see my personal website at http://www.allenjordan.info for my resume and details of my experience.  
+Personal Website:
+http://www.allenjordan.info
